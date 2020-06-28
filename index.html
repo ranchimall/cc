@@ -11310,10 +11310,11 @@
                 const headings = Object.values(cloudArticleApp.export_file_object).sort((a, b) => a.rank < b.rank);
 
                 let t = ``;
+                let count = 0;
 
                 for (textContent of headings) {
                     t += `<div class="collumns">
-                            <div class="collumn">`;
+                            <div class="collumn" id='section${++count}'>`;
                     let snippets = Object.values(textContent.contents).sort((c, d) => c.rank < d.rank);
                     t += `<div class="head"><span class="headline hl3">${textContent.title}</span></div>`;
                     for (snips of snippets) {
@@ -11322,6 +11323,7 @@
                     }
                     t += `</div></div>`;
                 }
+                count = 0;
 
                 let template = cloudArticleApp.html_template(t);
 
@@ -11697,11 +11699,11 @@
                             <div class="head">
                                 <div class="headerobjectswrapper">
 
-                                    <header>${Object.keys(floGlobals.appObjects[cloudArticleApp.SUBJECT])[0]}</header>
+                                    <header id='title'>${Object.keys(floGlobals.appObjects[cloudArticleApp.SUBJECT])[0]}</header>
                                 </div>
-                                <div class="subhead">Exported by RanchiMall Content Collaboration on FLO Blockchain</div>
+                                <div class="subhead" id='subtitle'>Exported by RanchiMall Content Collaboration on FLO Blockchain</div>
                             </div>
-                            <div class="content">`;
+                            <div class="content" id='sectionmaster'>`;
                 t += `${mid_section}`;
                 t += `</div>
                 </body>
