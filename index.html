@@ -21148,7 +21148,9 @@
                                                 }
                                             }
 
-                                            document.getElementById('article-vote').innerText = voterCount
+                                            if (voterCount > 0) {
+                                                document.getElementById('article-vote').innerText = voterCount
+                                            }
                                         });
 
                                     }).catch(error => console.error(error))
