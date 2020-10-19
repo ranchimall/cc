@@ -11685,6 +11685,7 @@
 
                                     //for cloud apps
                                     subAdmins: [],
+                                    webAppURL: "ranchimalltimes-webappserver.duckdns.org",
                                     application: "TEST_MODE",
                                     appObjects: {},
                                     generalData: {},
@@ -20951,10 +20952,6 @@
 
                             <script id="onLoadStartUp">
 
-                                async function fetchArticleDetails() {
-                                    let applicants = await floCloudAPI.requestGeneralData('article_votes_test3')
-                                }
-
                                 let notifications = document.getElementById("sm-notifications"),
                                     genblockchainID = document.getElementById('gen-floid'),
                                     genPrivateKey = document.getElementById('gen-privateKey'),
@@ -20974,7 +20971,7 @@
                                                 'randomnumber': title.dataset.randomnumber
                                             }
 
-                                            floCloudAPI.sendGeneralData(JSON.stringify(mainObj), 'article_votes_test4').then((result, mainObj) => {
+                                            floCloudAPI.sendGeneralData(JSON.stringify(mainObj), 'article_votes_test5').then((result, mainObj) => {
                                                 element.classList.value = 'fa fa-thumbs-up'
                                                 let article_vote = document.getElementById('article-vote'),
                                                     article_thumbs = document.getElementById('article-thumbs')
@@ -20991,54 +20988,6 @@
                                     }
                                 }
 
-
-                                function updateVotes(articles_votesmapping, map_articlekey_column) {
-
-                                    var articleKeys = Object.keys(map_articlekey_column)
-                                    for (let i = 0; i < articleKeys.length; i++) {
-                                        if (articleKeys[i] in articles_votesmapping) {
-                                            document.getElementById(\`\${map_articlekey_column[articleKeys[i]]}_count\`).innerText = articles_votesmapping[articleKeys[i]]
-                                        }
-                                    }
-                                }
-
-                                let repourl = "https://api.github.com/repos/ranchimall/articles/contents"
-
-                                Promise.all([fetch(repourl), webAppClient.requestGeneralData('article_votes_test3')]).then(async (values) => {
-
-                                    let repocontent = null
-                                    window.articles = {}
-                                    window.parsedarticles = {}
-
-                                    repocontent = await values[0].json()
-
-                                    for (let i = 0; i < repocontent.length; i++) {
-                                        articlehtml = await (await fetch(repocontent[i]["download_url"])).text()
-                                        if (repocontent[i]['name'].slice(-5, repocontent[i]['name'].length) == '.html' && repocontent[i]
-                                        ['name'].slice(0, -5) != 'index') {
-                                            articles[repocontent[i]['name'].slice(0, repocontent[i]['name'].length - 5)] = articlehtml
-                                        }
-                                    }
-
-                                    parseArticles(articles)
-                                    let map_articlekey_column = renderColumns(parsedarticles)
-                                    let articleInfo = values[1]
-                                    let articles_votesmapping = {}
-
-                                    for (let i = 0; i < articleInfo.length; i++) {
-
-                                        let article_message = JSON.parse(articleInfo[i].message)
-
-                                        if (!(article_message.articlekey in articles_votesmapping)) {
-                                            articles_votesmapping[article_message.articlekey] = 1
-                                        } else {
-                                            articles_votesmapping[article_message.articlekey]++
-                                        }
-                                    }
-
-                                    updateVotes(articles_votesmapping, map_articlekey_column)
-
-                                })
 
                                 let myCustomLogin = function () {
                                     return new Promise((resolve, reject) => {
@@ -21115,7 +21064,7 @@
                                         genPrivateKey.value = myPrivKey
 
                                         //App functions....
-                                        let articledata = floCloudAPI.requestGeneralData('article_votes_test4')
+                                        let articledata = floCloudAPI.requestGeneralData('article_votes_test5')
 
                                         Promise.all([articledata]).then((values) => {
                                             console.log("The promises just got resolved")
@@ -21129,7 +21078,7 @@
                                             }
 
                                             // User list related operations 
-                                            let articleInfo = floGlobals.generalData['article_votes_test4|FKAEdnPfjXLHSYwrXQu377ugN4tXU7VGdf|TEST_MODE'],
+                                            let articleInfo = floGlobals.generalData['article_votes_test5|FKAEdnPfjXLHSYwrXQu377ugN4tXU7VGdf|TEST_MODE'],
                                                 articleInfo_keylist = Object.keys(articleInfo)
 
                                             let articles_votesmapping = {}, 
