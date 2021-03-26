@@ -16,11 +16,14 @@ smButton.innerHTML = `
     --border-radius: 0.3rem;
     --background: rgba(var(--text-color), 0.1);
 }
-:host([disable]) .button{
+:host([disabled]) .button{
     cursor: not-allowed;
     opacity: 0.6;
     background: rgba(var(--text-color), 0.3) !important;
     color: rgba(var(--foreground-color), 0.6);
+}
+:host([disabled][variant="primary"]) .button{
+    color: rgba(var(--text-color), 1);
 }
 :host([variant='primary']) .button{
     background: var(--accent-color);
@@ -63,7 +66,6 @@ smButton.innerHTML = `
     -o-transition: box-shadow 0.3s;
     transition: box-shadow 0.3s;
     transition: box-shadow 0.3s, -webkit-box-shadow 0.3s;
-    text-transform: capitalize;
     font-family: inherit;
     font-size: 0.9rem;
     font-weight: 500;
@@ -74,7 +76,7 @@ smButton.innerHTML = `
     border: none;
     color: inherit;
 }
-:host(:not([disable])) .button:focus-visible{
+:host(:not([disabled])) .button:focus-visible{
     -webkit-box-shadow: 0 0 0 0.1rem var(--accent-color);
             box-shadow: 0 0 0 0.1rem var(--accent-color);
 }
@@ -83,7 +85,7 @@ smButton.innerHTML = `
             box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0 0 0.1rem var(--accent-color);
 }
 @media (hover: hover){
-    :host(:not([disable])) .button:hover{
+    :host(:not([disabled])) .button:hover{
         -webkit-box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.12);
                 box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.12);
     }
@@ -93,7 +95,7 @@ smButton.innerHTML = `
     }
 }
 @media (hover: none){
-    :host(:not([disable])) .button:active{
+    :host(:not([disabled])) .button:active{
         -webkit-box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.2);
                 box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.2);
     }
@@ -122,17 +124,17 @@ customElements.define('sm-button',
         set disabled(value) {
             if (value && !this.isDisabled) {
                 this.isDisabled = true
-                this.setAttribute('disable', '')
+                this.setAttribute('disabled', '')
                 this.button.removeAttribute('tabindex')
             } else if (!value && this.isDisabled) {
                 this.isDisabled = false
-                this.removeAttribute('disable')
+                this.removeAttribute('disabled')
             }
         }
 
         dispatch() {
             if (this.isDisabled) {
-                this.dispatchEvent(new CustomEvent('disable', {
+                this.dispatchEvent(new CustomEvent('disabled', {
                     bubbles: true,
                     composed: true
                 }))
@@ -147,7 +149,7 @@ customElements.define('sm-button',
         connectedCallback() {
             this.isDisabled = false
             this.button = this.shadowRoot.querySelector('.button')
-            if (this.hasAttribute('disable') && !this.isDisabled)
+            if (this.hasAttribute('disabled') && !this.isDisabled)
                 this.isDisabled = true
             this.addEventListener('click', (e) => {
                 this.dispatch()
@@ -1921,8 +1923,11 @@ smPopup.innerHTML = `
     display: grid;
     z-index: 10;
     --width: 100%;
+    --height: auto;
     --min-width: auto;
+    --min-height: auto;
     --body-padding: 1.5rem;
+    --backdrop: rgba(0, 0, 0, 0.6);
     --border-radius: 0.8rem 0.8rem 0 0;
 }
 ::-webkit-scrollbar{
@@ -1945,7 +1950,7 @@ smPopup.innerHTML = `
     left: 0;
     right: 0;
     place-items: center;
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--backdrop);
     -webkit-transition: opacity 0.3s;
     -o-transition: opacity 0.3s;
     transition: opacity 0.3s;
@@ -1971,6 +1976,9 @@ smPopup.innerHTML = `
             align-items: flex-start;
     width: var(--width);
     min-width: var(--min-width);
+    height: var(--height);
+    min-height: var(--min-height);
+    max-height: 90vh;
     border-radius: var(--border-radius);
     -webkit-transform: scale(1) translateY(100%);
             transform: scale(1) translateY(100%);
@@ -1982,7 +1990,6 @@ smPopup.innerHTML = `
     background: rgba(var(--foreground-color), 1);
     -webkit-box-shadow: 0 -1rem 2rem #00000020;
             box-shadow: 0 -1rem 2rem #00000020;
-    max-height: 90vh;
     content-visibility: auto;
 }
 .container-header{
@@ -2027,7 +2034,7 @@ smPopup.innerHTML = `
             -ms-grid-row-align: center;
             align-self: center;
         border-radius: var(--border-radius);
-        height: auto;
+        height: var(--height);
         -webkit-transform: scale(1) translateY(3rem);
                 transform: scale(1) translateY(3rem);
         -webkit-box-shadow: 0 3rem 2rem -0.5rem #00000040;

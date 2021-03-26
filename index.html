@@ -9,113 +9,134 @@
     <meta name="description"
         content="This web app can be used to collaborate between various teams using blockchain technology.">
     <link rel="stylesheet" href="css/main.css">
-    <script src="components.js"></script>
 </head>
 
-<body onload="onLoadStartUp()">
-
-    <sm-notifications id="sm-notifications"></sm-notifications>
-
-    <div class="popup-container hide">
-        <div id="confirmation" class="popup">
-            <p></p>
-            <div>
-                <button class="hover" onclick="hidePopup()">Cancel</button>
-                <button class="hover">Ok</button>
-            </div>
+<body onload="onLoadStartUp()" data-theme="dark">
+    <audio id="notification_sound">
+        <source src="https://rmservices.duckdns.org/files/notification-sound.mp3" type="audio/mpeg">
+        <source src="https://rmservices.duckdns.org/files/notification-sound.ogg" type="audio/ogg">
+    </audio>
+    <sm-popup id="confirmation_popup">
+        <h4 id="confirm_title"></h4>
+        <p id="confirm_message"></p>
+        <div class="flex align-center">
+            <sm-button variant="no-outline" class="cancel-btn">Cancel</sm-button>
+            <sm-button variant="no-outline" class="submit-btn">OK</button>
         </div>
-    </div>
-    <div class="popup-container hide solid-background">
-        <div id="sign_in" class="popup">
-            <header class="container-header">
-                <button class="hide-completely back-btn" id="back_to_main_page">
-                    <svg class="icon" viewBox="0 0 64 64">
-                        <title>go back</title>
-                        <polyline points="48.01 0.35 16.35 32 48.01 63.65" />
-                    </svg>
-                    back
-                </button>
-                <h2>Sign In</h2>
-            </header>
-            <p>Welcome to Content Collaboration.<br>
-                Please enter your FLO private key to continue.
-            </p>
-            <div class="fade-in">
-                <button id="guest_btn" class="hover" title="sign in as a guest">
-                    <svg class="icon" viewBox="0 0 64 64">
-                        <title>guest</title>
-                        <path d="M44.7,19.53c0,8.58-4.36,15.95-12.7,15.9-7.48,0-11.75-5.88-12.55-13.26" />
-                        <path
-                            d="M25.9,35.87c-2.31,4.31-9.66,6.53-15.09,8.91-2.25,1-4.05,12.8-1.51,12.8a45.45,45.45,0,0,0,23.18,5.9,40,40,0,0,0,22.22-5.9c2.54,0,.74-11.81-1.51-12.8-5.46-2.38-12.81-4.6-15.09-8.91" />
-                        <path
-                            d="M44.92,18.76c-5.86,2.53-18.4,5.12-25.47,3.41-4.1-1-7.11-3.32-7.9-7.54-.73-3.87,3.82-6.53,8.23-7.15l.3,0v6.68H43.92v-6a50.44,50.44,0,0,0,9.15.39C54.53,8.36,53.43,15.08,44.92,18.76Z" />
-                        <path
-                            d="M43.92,6.34v7.78H20.08V6.34A5.84,5.84,0,0,1,25.93.5H38.07A5.84,5.84,0,0,1,43.92,6.34Z" />
-                    </svg>
-                    as guest
-                </button>
-                <button id="priv_key_btn" class="hover" title="sign in with private key">
-                    <svg class="icon" viewBox="0 0 64 64">
-                        <title>password</title>
-                        <path
-                            d="M20.29,21.49H43.71A9.31,9.31,0,0,1,53,30.8V41.93C53,53.7,43.39,63.71,31.61,63.5A21,21,0,0,1,11,42.48V30.8a9.31,9.31,0,0,1,9.32-9.31h0V12.61A12,12,0,0,1,31.21.53,11.71,11.71,0,0,1,43.71,12.2v9.29" />
-                        <circle cx="32" cy="44.93" r="5.79" />
-                        <line x1="32" y1="39.14" x2="32" y2="33.09" />
-                    </svg>
-                    private key</button>
-            </div>
-            <div id="priv_key_sign_in" class="hide-completely fade-in">
-                <label class="input">
-                    <input id="priv_key_field" placeholder="Private key" type="password">
-                </label>
-                <button id="sign_in_btn" disabled>continue</button>
-            </div>
-            <p>Don't have a private key? get it <a href="https://flo-webwallet.duckdns.org/"
-                    target="_blank">here</a><br> or you can sign as guest.</p>
+    </sm-popup>
+    <sm-popup id="prompt_popup">
+        <h4 id="prompt_title"></h4>
+        <p id="prompt_message"></p>
+        <sm-input id="prompt_input"></sm-input>
+        <div class="flex align-center">
+            <sm-button variant="no-outline" class="cancel-btn">Cancel</sm-button>
+            <sm-button variant="no-outline" class="submit-btn" type="submit">OK</button>
         </div>
-    </div>
+    </sm-popup>
+    <sm-notifications id="notification_drawer"></sm-notifications>
+    <sm-popup id="sign_in">
+        <header class="container-header">
+            <button title="Go to previus section" class="hide-completely back-btn" id="back_to_main_page">
+                <svg class="icon option__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M7.828 11H20v2H7.828l5.364 5.364-1.414 1.414L4 12l7.778-7.778 1.414 1.414z"/></svg>
+                <span class="option__label">
+                    Back
+                </span>
+            </button>
+            <h2>Sign In</h2>
+        </header>
+        <p>Welcome to Content Collaboration.<br>
+            Please enter your FLO private key to continue.
+        </p>
+        <div class="fade-in">
+            <button id="guest_btn" class="sign-in-mode__button" title="sign in as a guest">
+                <svg class="icon big-icon" viewBox="0 0 64 64">
+                    <title>guest</title>
+                    <path d="M44.7,19.53c0,8.58-4.36,15.95-12.7,15.9-7.48,0-11.75-5.88-12.55-13.26" />
+                    <path
+                        d="M25.9,35.87c-2.31,4.31-9.66,6.53-15.09,8.91-2.25,1-4.05,12.8-1.51,12.8a45.45,45.45,0,0,0,23.18,5.9,40,40,0,0,0,22.22-5.9c2.54,0,.74-11.81-1.51-12.8-5.46-2.38-12.81-4.6-15.09-8.91" />
+                    <path
+                        d="M44.92,18.76c-5.86,2.53-18.4,5.12-25.47,3.41-4.1-1-7.11-3.32-7.9-7.54-.73-3.87,3.82-6.53,8.23-7.15l.3,0v6.68H43.92v-6a50.44,50.44,0,0,0,9.15.39C54.53,8.36,53.43,15.08,44.92,18.76Z" />
+                    <path
+                        d="M43.92,6.34v7.78H20.08V6.34A5.84,5.84,0,0,1,25.93.5H38.07A5.84,5.84,0,0,1,43.92,6.34Z" />
+                </svg>
+                as guest
+            </button>
+            <button id="priv_key_btn" class="sign-in-mode__button" title="sign in with private key">
+                <svg class="icon big-icon" viewBox="0 0 64 64">
+                    <title>password</title>
+                    <path
+                        d="M20.29,21.49H43.71A9.31,9.31,0,0,1,53,30.8V41.93C53,53.7,43.39,63.71,31.61,63.5A21,21,0,0,1,11,42.48V30.8a9.31,9.31,0,0,1,9.32-9.31h0V12.61A12,12,0,0,1,31.21.53,11.71,11.71,0,0,1,43.71,12.2v9.29" />
+                    <circle cx="32" cy="44.93" r="5.79" />
+                    <line x1="32" y1="39.14" x2="32" y2="33.09" />
+                </svg>
+                private key</button>
+        </div>
+        <div id="priv_key_sign_in" class="hide-completely fade-in">
+            <sm-input id="priv_key_field" placeholder="Private key" type="password" privateKey required></sm-input>
+            <sm-button id="sign_in_button" class="margin-top-1-5" variant="primary" disabled>continue</sm-button>
+        </div>
+        <p>Don't have a private key? get it <a href="https://flo-webwallet.duckdns.org/"
+                target="_blank">here</a><br> or you can sign as guest.</p>
+    </sm-popup>
+    <sm-popup id="scoring_popup">
+        <header id="article_list__header" class="popup__header" slot="header">
+            <button id="scoring_popup__close_button" class="close-button">
+                <svg class="icon icon-only close-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></svg>
+            </button>
+            <h3>Update score</h3>
+        </header>
+        <sm-input id="update_score_field" class="outlined" placeholder="Score" type="number" step="0.1" min="0" max="100" animate required></sm-input>
+        <div id="inc_section" class="grid flow-column margin-top-1-5 margin-bottom-1-5">
+            <sm-button variant="outlined" onclick="incScore(0.1)">+ 0.1</sm-button>
+            <sm-button variant="outlined" onclick="incScore(1)">+ 1</sm-button>
+            <sm-button variant="outlined" onclick="incScore(5)">+ 5</button>
+        </div>
+        <div class="flex align-center margin-top-1-5">
+            <sm-button id="get_new_score" variant="primary" class="justify-right" disabled>Update</sm-button>
+        </div>
+    </sm-popup>
+    <sm-popup id="article_list_popup">
+        <header id="article_list__header" class="popup__header" slot="header">
+            <button class="close-button" onclick="hidePopup()">
+                <svg class="icon icon-only close-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></svg>
+            </button>
+            <h3>All Articles</h3>
+            <sm-input id="article_list__search" placeholder="Search articles" type="search">
+                <svg slot="icon" class="icon search__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M18.031 16.617l4.283 4.282-1.415 1.415-4.282-4.283A8.96 8.96 0 0 1 11 20c-4.968 0-9-4.032-9-9s4.032-9 9-9 9 4.032 9 9a8.96 8.96 0 0 1-1.969 5.617zm-2.006-.742A6.977 6.977 0 0 0 18 11c0-3.868-3.133-7-7-7-3.868 0-7 3.132-7 7 0 3.867 3.132 7 7 7a6.977 6.977 0 0 0 4.875-1.975l.15-.15z"/></svg>
+            <sm-input>
+        </header>
+        
+        <ul id="article_list" class="observe-empty-state"></ul>
+        <section id="article_list__empty-state" class="flex empty-state">
+            No articles found
+        </section>
+    </sm-popup>
     <div id="admindiv"></div>
     <div id="sectionplotdiv"></div>
     <div id="userdiv"></div>
-    <div id="context_menu" class="hide">
-        <button onclick="cloudArticleApp.reset_export_list()">
-            <svg class="icon" viewBox="0 0 64 64">>
-                <line x1="0" y1="0" x2="64" y2="64" />
-                <line x1="64" y1="0" x2="0" y2="64" />
-            </svg>
-            Clear Selection</button>
-        <button onclick="cloudArticleApp.export_as_file()">
-            <svg class="icon" viewBox="0 0 64 64">
-                <line x1="16.36" y1="17.11" x2="24.18" y2="9.3" />
-                <polyline points="32 41.22 32 1.48 47.64 17.11" />
-                <path d="M53.4,32.29V59.07a4.58,4.58,0,0,1-4.58,4.57H15.18a4.58,4.58,0,0,1-4.58-4.57V32.29" />
-            </svg>
-            Export as file</button>
-    </div>
-    <div class="floating-btn">
+<!--     <ul id="context_menu" class="hide">
+        <li>
+            <button onclick="cloudArticleApp.reset_export_list()">
+                <svg class="icon option__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></svg>
+                <span class="option__label">
+                    Clear Selection
+                </span>
+            </button>
+        </li>
+        <li>
+            <button onclick="cloudArticleApp.export_as_file()">
+                <svg class="icon option__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M10 3v2H5v14h14v-5h2v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h6zm7.707 4.707L12 13.414 10.586 12l5.707-5.707L13 3h8v8l-3.293-3.293z"/></svg>
+                <span class="option__label">
+                    Export as file
+                </span>
+            </button>
+        </li>
+    </ul> -->
+    <!-- <div class="floating-btn">
         <button id="refresh_button" onclick="cloudArticleApp.retrieveLatestContent(true)">
-            <svg class="icon" viewBox="0 0 64 64">
-                <title>refresh</title>
-                <path d="M60.94,43.13A30.87,30.87,0,1,1,59,17.93" />
-                <polyline points="63.09 0.1 59.3 18.87 40.49 15.08" />
-            </svg>
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M18.537 19.567A9.961 9.961 0 0 1 12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10c0 2.136-.67 4.116-1.81 5.74L17 12h3a8 8 0 1 0-2.46 5.772l.997 1.795z"/></svg>
         </button>
-        <button class="admin-options hide-completely" onclick="showPopup('article_creation_modal')">
-            <svg class="icon" viewBox="0 0 64 64">
-                <title>Create New Article</title>
-                <line x1="32" x2="32" y2="64" />
-                <line x1="64" y1="32" y2="32" />
-            </svg>
-        </button>
-        <button class="admin-options hide-completely" onclick="showPopup('section_plot_modal')"
-            title="Create new sections by plot diagram">
-            <svg class="icon" viewBox="0 0 64 64">
-                <polyline points="21.46 42.99 0.5 42.99 0.5 13.51 63.5 13.51 63.5 28.25" />
-                <line x1="45.12" y1="35.49" x2="45.12" y2="50.49" />
-                <line x1="52.62" y1="42.99" x2="37.62" y2="42.99" />
-            </svg>
-        </button>
-    </div>
+    </div> -->
     <nav id="navbar">
         <svg id="icon" viewBox="0 0 99.555 117.877" title="Content collaboration logo">
             <style type="text/css">
@@ -138,69 +159,59 @@
             </g>
         </svg>
         <span>
-            <h5>RanchiMall</h5>CONTENT COLLABORATION
+            <h5>RanchiMall</h5>
+            <span class="app-name">
+                Content Collaboration
+            </span>
         </span>
         <div class="spacer"></div>
-        <button id="refresh_btn" title="Refresh the content" class="hide-on-mobile"
+<!--         <button id="refresh_btn" title="Refresh the content" class="button hide-on-mobile"
             onclick="cloudArticleApp.retrieveLatestContent(true)">
-            <svg class="icon" viewBox="0 0 64 64">
-                <title>refresh</title>
-                <path d="M60.94,43.13A30.87,30.87,0,1,1,59,17.93" />
-                <polyline points="63.09 0.1 59.3 18.87 40.49 15.08" />
-            </svg>
-            Refresh</button>
-        <button id="clear_export" title="Clear article selection" class="export-options hide-completely hide-on-mobile"
-            onclick="cloudArticleApp.reset_export_list()">
-            <svg class="icon" viewBox="0 0 64 64">>
-                <line x1="0" y1="0" x2="64" y2="64" />
-                <line x1="64" y1="0" x2="0" y2="64" />
-            </svg>
-            Clear Selection</button>
-        <button class="export-options hide-completely hide-on-mobile" title="Export selected articles as html file"
-            onclick="cloudArticleApp.export_as_file()">
-            <svg class="icon" viewBox="0 0 64 64">
-                <line x1="16.36" y1="17.11" x2="24.18" y2="9.3" />
-                <polyline points="32 41.22 32 1.48 47.64 17.11" />
-                <path d="M53.4,32.29V59.07a4.58,4.58,0,0,1-4.58,4.57H15.18a4.58,4.58,0,0,1-4.58-4.57V32.29" />
-            </svg>
-            Export as file
-        </button>
-        <div class="dropdown hide-on-mobile admin-options hide-completely" title="dropdown menu option for sub-admins">
-            <button class="dropbtn">
-                <svg class="icon" viewBox="0 0 64 64">
-                    <title>options</title>
-                    <circle cx="32" cy="6" r="5.5" />
-                    <circle cx="32" cy="58" r="5.5" />
-                    <circle cx="32" cy="31.89" r="5.5" />
-                </svg>
-                Options</button>
-            <div class="dropdown-content">
-                <button onclick="showPopup('article_creation_modal')" title="Create new article">
-                    <svg class="icon" viewBox="0 0 64 64">
-                        <title>add</title>
-                        <line x1="32" x2="32" y2="64" />
-                        <line x1="64" y1="32" y2="32" />
-                    </svg>
+            <svg class="icon option__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M18.537 19.567A9.961 9.961 0 0 1 12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10c0 2.136-.67 4.116-1.81 5.74L17 12h3a8 8 0 1 0-2.46 5.772l.997 1.795z"/></svg>
+            <span class="option__label">
+                Refresh
+            </span>
+        </button> -->
+        <ul id="export_option_list" class="grid align-center hide-completely">
+            <li>
+                <button id="clear_export" title="Clear article selection" class="button"
+                    onclick="cloudArticleApp.reset_export_list()">
+                    <svg class="icon option__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></svg>
+                    <span class="option__label">
+                        Clear Selection
+                    </span>
+                </button>
+            </li>
+            <li>
+                <button class="button button--primary" title="Export selected snippets as one html file"
+                    onclick="cloudArticleApp.export_as_file()">
+                    <svg class="icon option__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M10 3v2H5v14h14v-5h2v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h6zm7.707 4.707L12 13.414 10.586 12l5.707-5.707L13 3h8v8l-3.293-3.293z"/></svg>
+                    <span class="option__label">
+                        Export as file
+                    </span>
+                </button>
+            </li>
+        </ul>
+        <sm-menu align-options="right">
+            <sm-menu-option class="admin-options hide-completely" onclick="showPopup('article_creation_popup')" title="Create new article">                
+                <svg class="icon option__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M19 22H5a3 3 0 0 1-3-3V3a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v12h4v4a3 3 0 0 1-3 3zm-1-5v2a1 1 0 0 0 2 0v-2h-2zm-2 3V4H4v15a1 1 0 0 0 1 1h11zM6 7h8v2H6V7zm0 4h8v2H6v-2zm0 4h5v2H6v-2z"/></svg>
+                <span class="option__label">
                     New Article
-                </button>
-                <button onclick="showPopup('section_plot_modal')" title="Create new sections by plot diagram">
-                    <svg class="icon" viewBox="0 0 64 64">
-                        <polyline points="21.46 42.99 0.5 42.99 0.5 13.51 63.5 13.51 63.5 28.25" />
-                        <line x1="45.12" y1="35.49" x2="45.12" y2="50.49" />
-                        <line x1="52.62" y1="42.99" x2="37.62" y2="42.99" />
-                    </svg>
+                </span>
+            </sm-menu-option>
+                <sm-menu-option class="admin-options hide-completely" onclick="showPopup('section_plot_popup')" title="Create new sections by plot diagram">
+                <svg class="icon option__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M2 18h10v2H2v-2zm0-7h20v2H2v-2zm0-7h20v2H2V4zm16 14v-3h2v3h3v2h-3v3h-2v-3h-3v-2h3z"/></svg>
+                <span class="option__label">
                     Add Sections from Plot Diagram
-                </button>
-            </div>
-        </div>
-        <button id="logout_btn" title="Logout button" onclick="cloudArticleApp.logout()">
-            <svg class="icon" viewBox="0 0 64 64">
-                <title>sign out</title>
-                <path d="M38.56.5H51.85a7.37,7.37,0,0,1,7.37,7.37V56.13a7.37,7.37,0,0,1-7.37,7.37H38.56" />
-                <polyline points="19.38 17.6 4.99 32 19.38 46.4" />
-                <line x1="5.74" y1="32" x2="41.02" y2="32" />
-            </svg>
-            Logout</button>
+                </span>
+            </sm-menu-option>
+            <sm-menu-option id="logout_btn" title="Logout from app" onclick="cloudArticleApp.logout()">
+                <svg class="icon option__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M4 18h2v2h12V4H6v2H4V3a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3zm2-7h7v2H6v3l-5-4 5-4v3z"/></svg>
+                <span class="option__label">
+                    Logout
+                </span>
+            </sm-menu-option>
+        </sm-menu>
     </nav>
 
     <div id="loader_container" class="hide">
@@ -212,13 +223,13 @@
             </g>
         </svg>
         <h4 id="show_log_events"></h4>
-        <button onclick="cloudArticleApp.logout()">Clear All Data</button>
+        <sm-button class="margin-top-1-5" onclick="cloudArticleApp.logout()">Clear all data</sm-button>
     </div>
 
     <section id="article_container">
         <div id="current_data"></div>
     </section>
-
+    <script src="components.js"></script>
     <script id="floGlobals">
         /* Constants for FLO blockchain operations !!Make sure to add this at begining!! */
         const floGlobals = {
@@ -248,89 +259,80 @@
             generalVC: {}
         }
     </script>
+    <script id="standard_UI_functions">
 
-    <script>
-        document.getElementById('priv_key_field').addEventListener('input', function (e) {
-            if (this.value.trim() !== '')
-                enableBtn('sign_in_btn')
-            else
-                disableBtn('sign_in_btn')
+        const domRefs = {}
+
+        function getRef(elementId){
+            if(!domRefs.elementId)
+                domRefs[elementId] = document.getElementById(elementId)
+            return domRefs[elementId]
+        }
+
+
+        //Checks for internet connection status
+        if (!navigator.onLine)
+            notify('There seems to be a problem connecting to the internet, Please check you internet connection.', 'error', '', true)
+        window.addEventListener('offline', () => {
+            notify('There seems to be a problem connecting to the internet, Please check you internet connection.', 'error', true, true)
         })
-        let myCustomLogin = function () {
-            return new Promise((resolve, reject) => {
-                hideLoader()
-                showPopup('sign_in', false);
-                let container = document.getElementById('priv_key_sign_in'),
-                    signIn = document.getElementById('sign_in'),
-                    privField = document.getElementById('priv_key_field'),
-                    btn = document.getElementById('back_to_main_page');
-                document.getElementById('guest_btn').onclick = function () {
-                    hidePopup()
-                    reject(null);
+        window.addEventListener('online', () => {
+            getRef('notification_drawer').clearAll()
+            notify('We are back online.', 'success')
+        })
+
+        const   themeSwitcher = getRef('theme_switcher'),
+                hapticFeedbackSwitcher = getRef('haptic_feedback_switcher')
+
+        if(themeSwitcher){
+            if (localStorage.theme === "dark") {
+                nightlight()
+                themeSwitcher.checked = true;
+            } else {
+                daylight()
+                themeSwitcher.checked = false;
+            }
+    
+            function daylight() {
+                document.body.setAttribute("data-theme", "light");
+            }
+    
+            function nightlight() {
+                document.body.setAttribute("data-theme", "dark");
+            }
+            themeSwitcher.addEventListener('change', function (e) {
+                if (this.checked) {
+                    nightlight();
+                    localStorage.setItem("theme", "dark");
                 }
-                document.getElementById('priv_key_btn').onclick = function () {
-                    container.classList.remove('hide-completely')
-                    signIn.children[2].classList.add('hide-completely')
-                    btn.classList.remove('hide-completely')
-                    privField.focus()
-                }
-                btn.onclick = function () {
-                    container.classList.add('hide-completely')
-                    signIn.children[2].classList.remove('hide-completely')
-                    btn.classList.add('hide-completely')
-                }
-                privField.addEventListener('keyup', e => {
-                    if (privField.value.trim() !== '')
-                        enableBtn('sign_in_btn')
-                    else
-                        disableBtn('sign_in_btn')
-                    if (e.key === "Enter") {
-                        if (privField.value.trim().length > 40) {
-                            resolve(privField.value.trim())
-                            hidePopup()
-                            showLoader()
-                        } else {
-                            showMessage('error', 'Please enter correct private key.')
-                        }
-                    }
-                })
-                document.getElementById('sign_in_btn').onclick = function () {
-                    if (privField.value.trim().length > 40) {
-                        resolve(privField.value.trim())
-                        hidePopup()
-                        showLoader()
-                    } else {
-                        showMessage('error', 'Please enter correct private key.')
-                    }
+                else {
+                    daylight();
+                    localStorage.setItem("theme", "light");
                 }
             })
         }
 
-        function enableBtn(btn) {
-            if (typeof btn === 'string')
-                btn = document.getElementById(btn);
-            if (btn.disabled)
-                btn.disabled = false;
-        }
-
-        function disableBtn(btn) {
-            if (typeof btn === 'string')
-                btn = document.getElementById(btn);
-            if (!btn.disabled)
-                btn.disabled = true;
-        }
-
-        //helper functions
-
-        function setAttributes(el, attrs) {
-            for (var key in attrs) {
-                el.setAttribute(key, attrs[key]);
+        let isHapticOn
+        if(hapticFeedbackSwitcher){
+            if(localStorage.getItem('haptic') === null)
+                localStorage.setItem("haptic", "on");
+        
+            if (localStorage.haptic === "on") {
+                isHapticOn = true
+                hapticFeedbackSwitcher.checked = true;
+            } else {
+                isHapticOn = false
+                hapticFeedbackSwitcher.checked = false;
             }
-        }
-
-        function clearAllInputs(parent) {
-            parent.querySelectorAll("input, textarea").forEach((field) => {
-                field.value = '';
+            hapticFeedbackSwitcher.addEventListener('change', function (e) {
+                if (this.checked) {
+                    isHapticOn = true
+                    localStorage.setItem("haptic", "on");
+                }
+                else {
+                    isHapticOn = false
+                    localStorage.setItem("haptic", "off");
+                }
             })
         }
 
@@ -353,43 +355,350 @@
         }
         let popupStack = new Stack(),
             zIndex = 10;
-        function showPopup(popup, permission) {
-            let thisPopup = document.getElementById(popup);
-            thisPopup.parentNode.classList.remove('hide');
-            thisPopup.classList.add('no-transformations');
-            popupStack.push({ popup, permission })
-            zIndex++;
-            thisPopup.parentNode.setAttribute('style', `z-index: ${zIndex}`)
-            if (popup === 'main_loader') {
-                loader.classList.add('animate-loader')
-                document.querySelector('main').classList.add('hide-completely')
-            }
+
+        async function showPopup(popup, pinned) {
+            zIndex++
+            getRef(popup).setAttribute('style', `z-index: ${zIndex}`)
+            popupStack = getRef(popup).show(pinned, popupStack)
+            return getRef(popup);
         }
 
         // hides the popup or modal 
         function hidePopup() {
             if (popupStack.peek() === undefined)
-                return
-            let { popup, permission } = popupStack.pop();
-            thisPopup = document.getElementById(popup);
-            thisPopup.closest('.popup-container').classList.add('hide');
-            thisPopup.closest('.popup').classList.remove('no-transformations');
-            setTimeout(() => {
-                clearAllInputs(thisPopup)
-                zIndex--;
-                thisPopup.parentNode.setAttribute('style', `z-index: ${zIndex}`)
-            }, 400)
-            if (popup === 'main_loader') {
-                loader.classList.remove('animate-loader')
-                document.querySelector('main').classList.remove('hide-completely')
+                return;
+            popupStack.peek().popup.hide()
+        }
+
+        document.addEventListener('popupopened', async e => {
+            let thisPopup = e.detail.popup,
+                firstInput = thisPopup.querySelector('sm-input')
+
+            //pushes popup as seprate entry in history
+            history.pushState({type: 'popup'}, null, null)
+
+            if (window.innerWidth > 720 && firstInput)
+                firstInput.focusIn()
+
+            switch (e.detail.popup.id) {
+            }
+        })
+
+        document.addEventListener('popupclosed', e => {
+            popupStack = e.detail.popupStack
+            let thisPopup = e.detail.popup
+            switch (e.detail.popup.id) {
+            }
+        })
+
+        window.addEventListener('popstate', e => {
+            if(!e.state) return
+            console.log(e.state)
+            switch (e.state.type){
+                case 'popup':
+                    hidePopup()
+                    break;
+                case 'page':
+                    showPage(e.state.id)
+                    break;
+                case 'subpage':
+                    showPage(e.state.id, true)
+                    break;
+            }
+        })
+
+        function setAttributes(el, attrs) {
+            for (key in attrs) {
+                el.setAttribute(key, attrs[key]);
             }
         }
 
-        addEventListener('mousedown', e => {
-            if (e.target.classList.contains('popup-container') && popupStack.peek() !== undefined && popupStack.peek().permission !== false) {
-                hidePopup()
+        function randomHsl(saturation = 80, lightness = 80) {
+            let hue = Math.random() * 360
+            let color = {
+                primary: `hsla( ${hue}, ${saturation}%, ${lightness}%, 1)`,
+                light: `hsla( ${hue}, ${saturation}%, 90%, 0.6)`
             }
+            return color;
+        }
+
+        const selectedColors = ['#FF1744', '#F50057', '#8E24AA', '#5E35B1', '#3F51B5', '#3D5AFE', '#00B0FF', '#00BCD4', '#16c79a', '#66BB6A', '#8BC34A', '#11698e', '#FF6F00', '#FF9100', '#FF3D00']
+        function randomColor(){
+            return selectedColors[Math.floor(Math.random() * selectedColors.length)]
+        }
+
+        const contactsInfo = {}
+        function contactColor(floID){
+            if(!contactsInfo[floID]){
+                contactsInfo[floID] = randomColor()
+            }
+            return contactsInfo[floID]
+        }
+
+        function clearElements(array = []) {
+            array.forEach(item => {
+                getRef(item).innerHTML = ``
+            })
+        }
+
+        //Function for displaying toast notifications. pass in error for mode param if you want to show an error.
+        function notify(message, mode, pinned, sound) {
+
+            if (mode === 'error')
+                console.error(message)
+            else
+                console.log(message)
+            getRef('notification_drawer').push(message, mode, pinned)
+            if (navigator.onLine && sound) {
+                getRef('notification_sound').currentTime = 0;
+                getRef('notification_sound').play();
+            }
+        }
+
+        // displays a popup for asking permission. Use this instead of JS confirm
+        let confirmation = (title, message, cancelText = 'Cancel', confirmText = 'OK') => {
+            return new Promise(resolve => {
+                showPopup('confirmation_popup')
+                getRef('confirm_title').textContent = title;
+                getRef('confirm_message').textContent = message;
+                let cancelButton = getRef('confirmation_popup').children[2].children[0],
+                    submitButton = getRef('confirmation_popup').children[2].children[1]  
+                submitButton.textContent = confirmText
+                cancelButton.textContent = cancelText 
+                submitButton.onclick = () => {
+                    hidePopup()
+                    resolve(true);
+                }
+                cancelButton.onclick = () => {
+                    hidePopup()
+                    resolve(false);
+                }
+            })
+        }
+
+        const currentYear = new Date().getFullYear()
+        function getFormatedTime(time, relative) {
+            try {
+                if (String(time).indexOf('_'))
+                time = String(time).split('_')[0]
+                const intTime = parseInt(time)
+                if(String(intTime).length < 13)
+                    time *= 1000
+                let timeFrag = new Date(intTime).toString().split(' '),
+                    day = timeFrag[0],
+                    month = timeFrag[1],
+                    date = timeFrag[2],
+                    year = timeFrag[3],
+                    minutes = new Date(intTime).getMinutes(),
+                    hours = new Date(intTime).getHours(),
+                    currentTime = new Date().toString().split(' ')
+
+                minutes = minutes < 10 ? `0${minutes}` : minutes
+                let finalHours = ``;
+                if (hours > 12)
+                    finalHours = `${hours - 12}:${minutes}`
+                else if (hours === 0)
+                    finalHours = `12:${minutes}`
+                else
+                    finalHours = `${hours}:${minutes}`
+
+                finalHours = hours >= 12 ? `${finalHours} PM` : `${finalHours} AM`
+                if (relative) {
+                    if (year == currentYear) {
+                        if (currentTime[1] === month){
+                            const dateDiff = (parseInt(currentTime[2]) - parseInt(date))
+                            if(dateDiff === 0)
+                                return `${finalHours}`;
+                            else if(dateDiff === 1)
+                                return `Yesterday`;
+                            else if(dateDiff > 1 && dateDiff < 8)
+                                return currentTime[0];
+                            else
+                                return ` ${date} ${month}`;
+                        }
+                        else
+                            return ` ${date} ${month}`;
+                    }
+                    else
+                        return `${month} ${year}`;
+                }
+                else
+                    return `${finalHours} ${month} ${date} ${year}`;
+            } catch (e) {
+                console.error(e);
+                return time;
+            }
+        }
+
+
+        function areInputsValid(parent) {
+            let allInputs = parent.querySelectorAll("sm-input:not([disable]), pin-input:not([disable])"),
+                inputsFilled = [...allInputs].every(input => {
+                    if (input.hasAttribute('floId')) {
+                        if (floCrypto.validateAddr(input.value.trim())) return true
+                    }
+                    else if (input.hasAttribute('privateKey')) {
+                        if (floCrypto.getPubKeyHex(input.value.trim())) return true
+                    }
+                    else
+                        return input.isValid
+                })
+            let allRadios = parent.querySelectorAll("input[type='radio']")
+            if (allRadios.length)
+                return inputsFilled && parent.querySelector('[checked]')
+            else
+                return inputsFilled
+        }
+
+        function formValidation(formElement) {
+            let parent = formElement.closest('sm-popup') || formElement.closest('form'),
+                submitBtn
+            if(parent)
+                submitBtn = parent.querySelector("button[type='submit'], sm-button[variant='primary']");
+            if (!submitBtn) return;
+            if (areInputsValid(parent))
+                submitBtn.disabled = false;
+            else
+                submitBtn.disabled = true;
+        }
+
+        window.addEventListener('load', () => {
+            document.addEventListener('input', e => {
+                if (e.target.closest('sm-input')) {
+                    let input = e.target.closest('sm-input')
+                    formValidation(input)
+                    if (input.value === '')
+                        input.setValidity('')
+                    let validityState = input.validity
+                    if (input.hasAttribute('floId')) {
+                        if (floCrypto.validateAddr(input.value.trim()) || input.value.trim() === '')
+                            input.setValidity('')
+                        else
+                            input.setValidity('Invalid FLO address.')
+                    }
+                    else if (input.hasAttribute('privateKey')) {
+                        if (floCrypto.getPubKeyHex(input.value.trim()) || input.value.trim() === '')
+                            input.setValidity('')
+                        else
+                            input.setValidity('Invalid FLO private key.')
+                    }
+                }
+                else if(e.target.closest('pin-input')){
+                    formValidation(e.target.closest('pin-input'))
+                }
+            })
+            document.addEventListener('keyup', (e) => {
+                if (e.target.closest('sm-input, pin-input')) {
+                    if (e.key === 'Enter') {
+                        let parent = e.target.closest('sm-popup') || e.target.closest('form')
+                        parent.querySelector("button[type='submit'], sm-button[variant='primary'], sm-button[type='submit']")
+                            .click();
+                    }
+                }
+                if(e.code === 'Escape'){
+                    hidePopup()
+                }
+            })
+
+            document.addEventListener('pointerdown', (e) => {
+                if (e.target.closest('button, sm-button:not([disabled]), .interact')) {
+                    createRipple(e, e.target.closest('button, sm-button, .interact'))
+                }
+            })
+
         })
+        function createRipple(event, target) {
+            const circle = document.createElement("span");
+            const diameter = Math.max(target.clientWidth, target.clientHeight);
+            const radius = diameter / 2;
+            const targetDimensions = target.getBoundingClientRect()
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - (targetDimensions.left + radius)}px`;
+            circle.style.top = `${event.clientY - (targetDimensions.top + radius)}px`;
+            circle.classList.add("ripple");
+            const rippleAnimation = circle.animate([
+
+                {
+                    transform: 'scale(3)',
+                    opacity: 0
+                }
+            ],
+                {
+                    duration: 1000,
+                    fill: "forwards",
+                    easing: 'ease-out'
+                })
+            target.append(circle);
+            rippleAnimation.onfinish = () => {
+                circle.remove()
+            }
+        }
+
+       async function loadPage(){
+            if(location.hash === ''){
+                history.pushState({type: 'subpage', id: 'chat_page'}, null, '#chat_page')
+                showPage('chat_page', true)
+            }
+            else{
+                showPage(location.hash.split('#')[1], true)
+            }
+        }
+        function debounce(func, wait, immediate) {
+            let timeout;
+            return function() {
+                let context = this, args = arguments;
+                let later = function() {
+                    timeout = null;
+                    if (!immediate) func.apply(context, args);
+                };
+                let callNow = immediate && !timeout;
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+                if (callNow) func.apply(context, args);
+            };
+        };
+    </script>
+    <script>
+        let myCustomLogin = function () {
+            return new Promise((resolve, reject) => {
+                hideLoader()
+                showPopup('sign_in', true);
+                let container = document.getElementById('priv_key_sign_in'),
+                    signIn = document.getElementById('sign_in'),
+                    privField = document.getElementById('priv_key_field'),
+                    backButton = document.getElementById('back_to_main_page');
+                document.getElementById('guest_btn').onclick = function () {
+                    hidePopup()
+                    showLoader()
+                    reject(null);
+                }
+                document.getElementById('priv_key_btn').onclick = function () {
+                    container.classList.remove('hide-completely')
+                    signIn.children[2].classList.add('hide-completely')
+                    backButton.classList.remove('hide-completely')
+                    privField.focusIn()
+                }
+                backButton.onclick = function () {
+                    container.classList.add('hide-completely')
+                    signIn.children[2].classList.remove('hide-completely')
+                    backButton.classList.add('hide-completely')
+                }
+                document.getElementById('sign_in_button').onclick = function () {
+                    hidePopup()
+                    showLoader()
+                    resolve(privField.value)
+                }
+            })
+        }
+
+        //helper functions
+
+        function setAttributes(el, attrs) {
+            for (var key in attrs) {
+                el.setAttribute(key, attrs[key]);
+            }
+        }
+
         function prevArticle(container) {
             let observer = new IntersectionObserver((entries) => {
                 if (entries[0].isIntersecting)
@@ -426,28 +735,10 @@
                 behavior: 'smooth'
             });
         }
-        let askConfirmation = (message) => {
-            return new Promise((resolve, reject) => {
-                let popup = document.getElementById('confirmation');
-                showPopup('confirmation')
-                popup.children[0].textContent = message;
-                popup.children[1].firstElementChild.onclick = function () {
-                    hidePopup('confirmation')
-                    reject(false)
-                }
-                popup.children[1].children[1].onclick = function () {
-                    hidePopup('confirmation')
-                    resolve(true);
-                }
-            })
-        }
         function showMessage(msg) {
             document.getElementById('show_log_events').textContent = msg;
             if (document.getElementById('loader_container').classList.contains('hide')) {
                 showLoader()
-                setTimeout(() => {
-                    hideLoader()
-                }, 1000);
             }
         }
         function showLoader() {
@@ -462,81 +753,91 @@
             spinner.classList.add('hide');
         }
 
+       /*  document.getElementById('clear_local_default').onclick = function () {
+            cloudArticleApp.setLocalDefault(null);
+            cloudArticleApp.retrieveLatestContent();
+            hidePopup()
+        } */
+
+        function showArticle(articleId) {
+            cloudArticleApp.setLocalDefault(articleId);
+            cloudArticleApp.retrieveLatestContent(true);
+        }
+
+        async function incScore(value){
+            let currentScore = parseFloat(getRef('update_score_field').value)
+            if(!currentScore){
+                currentScore = 0
+            }
+            if(currentScore + value <= 100){
+                currentScore += value;
+                getRef('update_score_field').value = currentScore.toFixed(1)
+            }
+            else{
+                notify(`You can't give score more than 100.`, 'error')
+            }
+        }
+
+        async function getNewScore(currentScore){
+            return new Promise((resolve, reject) => {
+                getRef('update_score_field').value = currentScore
+                showPopup('scoring_popup')
+                getRef('get_new_score').addEventListener('clicked', e = () => {
+                    const score = getRef('update_score_field').value
+                    hidePopup()
+                    resolve(score)
+                })
+                getRef('scoring_popup__close_button').onclick = () => {
+                    hidePopup()
+                    reject(false)
+                }
+            })
+        }
+
         function buildAdminUI() {
 
-            let article_list = ``;
+            let articleList = ``;
             let articles = floGlobals.appObjects["ContentCollaboration"]["ArticleLists"]
-            for (let a in articles)
-                article_list += `<sm-option value="${a}">${articles[a]}</sm-option>`;
-
-            let userdivui = `<section class="popup-container hide">
-                    <div id="article_list_div" class="popup">
-                        <h3>Select an Article</h3>
-                        
-                        <sm-select id="article_list">
-                        ${article_list}
-                        </sm-select>
-                        <div class="flex">    
-                            <button id="clear_local_default">Cancel</button>
-                            <button id="select_article_btn">View</button>
-                        </div>
-                        
-                    </div>
-                </section>`;
-
-            document.getElementById('userdiv').innerHTML = userdivui;
-
-            document.getElementById('clear_local_default').onclick = function () {
-                cloudArticleApp.setLocalDefault(null);
-                cloudArticleApp.retrieveLatestContent();
-                hidePopup()
-            }
-
-            document.getElementById('select_article_btn').onclick = function () {
-                let article_id = document.getElementById("article_list").value;
-                cloudArticleApp.setLocalDefault(article_id);
-                cloudArticleApp.retrieveLatestContent(true);
-                hidePopup()
-            }
+            renderAllArticlesPreview(articles)
 
             if (floGlobals.subAdmins.includes(myFloID)) {
-                let admindivui = `<section class="popup-container hide" id="article_creation_div">
-                    <div id="article_creation_modal" class="popup">
-                        <header class="heading">
-                        <svg class="icon" viewBox="0 0 64 64" onclick="hidePopup()">
-                            <title>close</title>
-                            <line x1="64" y1="0" x2="0" y2="64"/>
-                            <line x1="64" y1="64" x2="0" y2="0"/>
-                        </svg>
-                        <h3>Create a new article</h3>
-                        <button id="create_article_btn">Create</button>
+                let admindivui = `
+                    <sm-popup id="article_creation_popup">
+                        <header class="popup__header" slot="header">
+                            <button class="close-button" onclick="hidePopup()">
+                                <svg class="icon icon-only close-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></svg>
+                            </button>
+                            <h3>Create a new article</h3>
+                            <button class="button button--primary" id="create_article_btn" type="submit">Create</button>
                         </header>
                         <input type="text" id="article_name" placeholder="Article name">
                         <input type="number" id="section_nums" placeholder="Number of sections">
-                        <label class="default-article-checkbox">
-                            <input type="checkbox" id="set_default_article"/>
-                            Set as default
-                        </label>            
-                    </div>
-                </section>
-                <div class="popup-container hide">
-                    <div id="edit_article" class="popup">
-                        <header class="heading">
+                        <sm-checkbox id="set_default_article" class="default-article__checkbox margin-top-1-5">
+                            <span class="checkbox__label">
+                                Set as default
+                            </span>
+                        </sm-checkbox>
+                    </sm-popup>
+                    <sm-popup id="edit_article_popup">
+                        <header class="popup__header" slot="header">
+                            <button class="close-button" onclick="hidePopup()">
+                                <svg class="icon icon-only close-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></svg>
+                            </button>
                             <h3>Edit section names</h3>
-                            <button onclick="cloudArticleApp.update_section_names()">
-                                <svg class="icon" viewBox="0 0 64 64">
-                                    <title>tick</title>
-                                    <polyline points="0.35 31.82 21.45 52.98 63.65 10.66"/>
-                                </svg>
-                                Done</button>
+                            <button class="button button--primary" onclick="cloudArticleApp.update_section_names()" type="submit">
+                                <svg class="icon option__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"/></svg>
+                                <span class="option__label">
+                                    Done
+                                </span>
+                            </button>
                         </header>
-                        <label class="default-article-checkbox">
-                            <input type="checkbox" id="edit_default_article"/>
-                            Set as default
-                        </label>
+                        <sm-checkbox id="edit_default_article" class="default-article__checkbox margin-bottom-1-5">
+                            <span class="checkbox__label">
+                                Set as default
+                            </span>
+                        </sm-checkbox>
                         <div id="edit_section_container"></div>
-                    </div>
-                </div>`;
+                    </sm-popup>`;
 
                 document.getElementById('admindiv').innerHTML = admindivui;
 
@@ -549,16 +850,18 @@
                     option.classList.remove('hide-completely');
                 })
 
-                let sectionPlotUI = `<section class="popup-container hide">
-                        <div id="section_plot_modal" class="popup">
-                            <header class="heading">
-                            <svg class="icon" viewBox="0 0 64 64" onclick="hidePopup()">
-                                <title>close</title>
-                                <line x1="64" y1="0" x2="0" y2="64"/>
-                            <line x1="64" y1="64" x2="0" y2="0"/>
-                            </svg>
-                            <h3>Create Plot Diagram</h3>
-                            <button id="section_plot_btn">Create</button>
+                let sectionPlotUI = `
+                        <sm-popup id="section_plot_popup">
+                            <header class="popup__header" slot="header">
+                                <button class="close-button" onclick="hidePopup()">
+                                    <svg class="icon icon-only close-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></svg>
+                                </button>
+                                <h3>Create Plot Diagram</h3>
+                                <button id="section_plot_btn" class="button button--primary" type="submit">
+                                    <span class="option__label">
+                                        Create
+                                    </span>
+                                </button>
                             </header>
                             <details>
                             <summary class="label">How it works?</summary>
@@ -579,8 +882,7 @@
                             </p>
                             </details>
                             <textarea id="section_plot_txt" rows="12" placeholder="Write a plot diagram for the article. eg. ( Heading1 ) -> ( Heading2 ) ..."></textarea>
-                        </div>
-                    </section>`;
+                        </sm-popup>`;
 
                 function parsePlot(plottext) {
 
@@ -630,6 +932,12 @@
 
                 }
             }
+            else{
+                document.querySelectorAll('.admin-options').forEach((option) => {
+                    option.classList.add('hide-completely');
+                })
+
+            }
 
         }
         function buttonVisibility(mode, parent) {
@@ -640,13 +948,47 @@
             }
             if (mode === 'show' && button.classList.contains('hide')){
                 button.classList.remove('hide')
-                document.getElementById('refresh_button').classList.add('hide-completely')
+                // document.getElementById('refresh_button').classList.add('hide-completely')
             }
             if (mode === 'hide' && !button.classList.contains('hide')){
                 button.classList.add('hide')
-                document.getElementById('refresh_button').classList.remove('hide-completely')
+                // document.getElementById('refresh_button').classList.remove('hide-completely')
             }
         }   
+
+        function renderAllArticlesPreview(articles){
+            getRef('article_list').innerHTML = '';
+            articles = Object.keys(articles).sort().reduce((r, k) => (r[k] = articles[k], r), {})
+            const frag = document.createDocumentFragment()
+            for (let articleId in articles){
+                const li = document.createElement('li')
+                const button = document.createElement('button')
+                button.classList.add('article-list__item')
+                button.setAttribute('data-unique-id', articleId)
+                button.textContent = articles[articleId]
+                li.append(button)
+                frag.append(li)
+            }
+            getRef('article_list').append(frag);
+        }
+
+        document.getElementById('article_list_popup').addEventListener('click', e => {
+            if(e.target.closest('.article-list__item')){
+                const articleId = e.target.closest('.article-list__item').dataset.uniqueId
+                showArticle(articleId)
+                hidePopup()
+            }
+        })
+        document.getElementById('article_list__search').addEventListener('input', function(e) {
+            const articles = floGlobals.appObjects["ContentCollaboration"]["ArticleLists"]
+            const filteredArticles = {}
+            for (let articleId in articles){
+                if(articles[articleId].toLowerCase().includes(this.value.trim().toLowerCase())){
+                    filteredArticles[articleId] = articles[articleId]
+                }
+            }
+            renderAllArticlesPreview(filteredArticles)
+        })
     </script>
     <script id="init_lib">
         //All util libraries required for Standard operations (DO NOT EDIT ANY)
@@ -9852,9 +10194,11 @@
 
                 for (key in obj) {
                     if (Object.keys(articleSubject).includes(key)) {
-                        article_structure += `<div class="section-title">
-                            <svg onclick="showPopup('article_list_div')" id="articles_list__button" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="5" width="4" height="4"/><rect x="10" y="5" width="4" height="4"/><rect x="15" y="5" width="4" height="4"/><rect x="5" y="10" width="4" height="4"/><rect x="10" y="10" width="4" height="4"/><rect x="15" y="10" width="4" height="4"/><rect x="5" y="15" width="4" height="4"/><rect x="10" y="15" width="4" height="4"/><rect x="15" y="15" width="4" height="4"/></svg>
-                            <h2>${key}</h2>
+                        article_structure += `<div class="article__header">
+                            <button onclick="showPopup('article_list_popup')" id="articles_list__button">
+                                <svg class="icon icon-only" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="4" height="4"/><rect x="10" y="4" width="4" height="4"/><rect x="16" y="4" width="4" height="4"/><rect x="4" y="10" width="4" height="4"/><rect x="10" y="10" width="4" height="4"/><rect x="16" y="10" width="4" height="4"/><rect x="4" y="16" width="4" height="4"/><rect x="10" y="16" width="4" height="4"/><rect x="16" y="16" width="4" height="4"/></svg>
+                            </button>
+                            <h2 id="article__title">${key}</h2>
                             <div class="edit-article"></div>
                         </div>`;
                     }
@@ -9922,21 +10266,20 @@
                             article_structure +=
                                 `<div class="article-body" id="boxid_${article_data.contentSHA256Hash}">
                             <div class="article-header">
-                                <h5 title="Article author">${article_data.content_creator}</h5>
+                                <h5 class="article__author" title="Article author">${article_data.content_creator}</h5>
                             </div>
                             <div class="card-body">
-                                <div class="content-div" id="${gen_div_id}" data-gramm="false" data-value="${key}__${secKey}" contenteditable="true" onkeyup="buttonVisibility('show', this.parentNode)">
+                                <div class="content-div" id="${gen_div_id}" data-value="${key}__${secKey}" contenteditable="true" oninput="buttonVisibility('show', this.parentNode)">
                                     ${article_data.content.trim()}
                                 </div>
                                 <input type="hidden" id="hash_${gen_div_id}" value="${content_hash}"/>
-                                <button class="hide submit-btn" onclick="cloudArticleApp.edit_onfocuout(this.parentNode)">Submit</button>
+                                <button class="hide button button--primary" onclick="cloudArticleApp.edit_onfocuout(this.parentNode)">Submit</button>
                             </div>
                             <div class="card-footer">
                                 <h5 id="exp_${gen_div_id}" title="Add this article as selected" class="select-for-export" onclick="cloudArticleApp.register_content_to_export(event)">Select</h5>
-                                <h5 title="Give score to this article">
+                                <h5 id="score_${vc}" class="score-star" onclick="cloudArticleApp.upgrade_article(event, ${article_data.score})" title="Give score to this article">
                                     <svg viewBox="0 0 16.55 16" style="enable-background:new 0 0 16.55 16;" xml:space="preserve" fill="${fill}">
                                         <polygon
-                                        id="score_${vc}" onclick="cloudArticleApp.upgrade_article(event)"
                                          points="8.28,13.27 3.16,16 4.14,10.21 0,6.11 5.72,5.27 8.28,0 10.83,5.27 16.55,6.11 12.41,10.21 13.39,16"/>
                                     </svg>
                                     ${article_data.score}
@@ -9947,14 +10290,10 @@
                         }
                         if ((tempCounter > 1 && window.innerWidth < 720) || (tempCounter > 3 && window.innerWidth > 720))
                             article_structure += `
-                    </div>
-                        <svg class="navigation-arrows hide" onclick="prevArticle(this.parentNode)"  viewBox="0 0 50.91 90.51" style="enable-background:new 0 0 50.91 90.51;" xml:space="preserve">
-                            <polygon points="5.66,50.91 45.25,90.51 50.91,84.85 11.31,45.25 50.91,5.66 45.25,0 5.66,39.6 0,45.25    "/>
-                        </svg>
-
-                        <svg class="navigation-arrows" onclick="nextArticle(this.parentNode)" viewBox="0 0 50.91 90.51" style="enable-background:new 0 0 50.91 90.51;" xml:space="preserve">
-                            <polygon points="45.25,39.6 5.66,0 0,5.66 39.6,45.25 0,84.85 5.66,90.51 45.25,50.91 50.91,45.25 "/>
-                        </svg>`;
+                        </div>
+                        <svg class="navigation-arrows hide" onclick="prevArticle(this.parentNode)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M10.828 12l4.95 4.95-1.414 1.414L8 12l6.364-6.364 1.414 1.414z"/></svg>
+                        <svg class="navigation-arrows" onclick="nextArticle(this.parentNode)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M13.172 12l-4.95-4.95 1.414-1.414L16 12l-6.364 6.364-1.414-1.414z"/></svg>
+                        `;
                         article_structure += `</div>`;
                     }
 
@@ -9967,15 +10306,13 @@
                 let topics = document.querySelectorAll('.edit-article');
                 for (let i = 0; i < Object.keys(floGlobals.appObjects[this.SUBJECT]).length; i++) {
                     topics[i].innerHTML = `<button title="Edit article sections" id="${Object.keys(floGlobals.appObjects[this.SUBJECT])[i]}" onclick="cloudArticleApp.editArticleSectionNames(this.id)">
-                    <svg class="icon" viewBox="0 0 64 64">
-                    <title>edit</title>
-                    <path d="M46.73,14.81l7,7,7.65-7.6A7.15,7.15,0,0,0,61.39,4L60.11,2.77a7.23,7.23,0,0,0-10.19,0L3.87,48.57a5,5,0,0,0-1.39,2.6L.53,61.27a1.74,1.74,0,0,0,2,2l10.15-1.94A5.06,5.06,0,0,0,15.34,60L49.6,25.9"/>
-                    </svg>Edit</button>`;
+                        <svg class="icon icon-only" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M9.243 19H21v2H3v-4.243l9.9-9.9 4.242 4.244L9.242 19zm5.07-13.556l2.122-2.122a1 1 0 0 1 1.414 0l2.829 2.829a1 1 0 0 1 0 1.414l-2.122 2.121-4.242-4.242z"/></svg>
+                    </button>`;
                 }
             },
 
             editArticleSectionNames: function (Topic) {
-                showPopup('edit_article');
+                showPopup('edit_article_popup');
                 let sec_counter = 1,
                     sectionSettingsHtml = ``,
                     sectionSettingsList = document.getElementById("edit_section_container");
@@ -10060,7 +10397,7 @@
                 for (let j = 0; j < number_of_sections; j++) {
                     i = j + 1;
                     let content = '';
-                    //if (div == 'article_creation_modal') {
+                    //if (div == 'article_creation_popup') {
                     //content = document.getElementById(`article_content${i}`).value;
                     new_article[article_name].data[`section${i}`] = {
                         section_details: {},
@@ -10209,7 +10546,6 @@
 
                 //showMessage(`Adding new iteration to article ${article_name}`);
                 // todo - add updating score notification 
-                notifications.push('Updating score')
 
                 if (floGlobals.subAdmins.includes(myFloID)) {
                     floCloudAPI.updateObjectData(this.SUBJECT);
@@ -10230,6 +10566,7 @@
                 }
 
                 await this.retrieveLatestContent();
+                notify('Score updated', 'success')
                 // todo - Add updated score notification
             },
 
@@ -10256,26 +10593,36 @@
                 buttonVisibility('hide', parent)
             },
 
-            upgrade_article: function (event) {
+            upgrade_article: async function (event, currentScore) {
                 if(floGlobals.subAdmins.includes(myFloID)){
-                     
-                    let new_score = prompt("Enter Score: ", 0);
-                    new_score = Number(new_score);
-                    if (typeof new_score !== "number" || new_score <= 0) return;
-                    let target = cloudArticleApp.getEventTarget(event);
-                    let article_vc = target.id.substr(6);
-                    let contents = floGlobals.appObjects[this.SUBJECT];
-                    for (title of Object.keys(contents)) {
-                        for (sections of Object.keys(contents[title].data)) {
-                            for (iters of Object.values(contents[title].data[sections].section_iters)) {
-                                if (typeof iters.vectorClock === "string"
-                                    && iters.vectorClock == article_vc) {
-                                    cloudArticleApp.addArticleContent(title, sections, iters.content,
-                                        iters.content_creator, new_score, article_vc);
-                                    break;
+                    try{                        
+                        let new_score = await getNewScore(currentScore);
+                        console.log(new_score)
+                        new_score = Number(new_score);
+                        if (typeof new_score !== "number" || new_score <= 0);
+                        if(new_score < currentScore){
+                            notify(`You can't score less than previous.`, 'error')
+                            return
+                        }
+                        notify('Updating score...')
+                        let target = event.target.closest('.score-star')
+                        let article_vc = target.id.substr(6);
+                        let contents = floGlobals.appObjects[this.SUBJECT];
+                        for (title of Object.keys(contents)) {
+                            for (sections of Object.keys(contents[title].data)) {
+                                for (iters of Object.values(contents[title].data[sections].section_iters)) {
+                                    if (typeof iters.vectorClock === "string"
+                                        && iters.vectorClock == article_vc) {
+                                        cloudArticleApp.addArticleContent(title, sections, iters.content,
+                                            iters.content_creator, new_score, article_vc);
+                                        break;
+                                    }
                                 }
                             }
                         }
+                    }
+                    catch(err){
+                        console.log(err)
                     }
                 }
             },
@@ -10283,10 +10630,10 @@
             register_content_to_export: function (event) {
                 let target = cloudArticleApp.getEventTarget(event),
                     article_id = target.id.substring(4),
-                    parent_heading_id = target.closest('.gallery-container').previousElementSibling.id,
-                    options = document.getElementById('context_menu'),
+                    parent_heading_id = target.closest('.gallery-container').previousElementSibling.id
+/*                     options = document.getElementById('context_menu'),
                     top = target.getBoundingClientRect().top,
-                    left = target.getBoundingClientRect().left;
+                    left = target.getBoundingClientRect().left; */
 
                 if (typeof cloudArticleApp.export_file_object[parent_heading_id] !== "object") {
                     this.register_heading_to_export(parent_heading_id);
@@ -10303,21 +10650,19 @@
                 console.log(cloudArticleApp.export_file_object)
                 target.classList.add("snippet-selected");
                 target.textContent = 'Selected';
-                options.classList.remove('hide')
+/*                 options.classList.remove('hide')
                 let y = document.addEventListener("touchend", function (event) {
                     if (event.target.closest('#context_menu') || event.target.closest('.select-for-export')) return;
                     options.classList.add('hide')
                     document.removeEventListener('click', y);
-                });
-                if (window.innerWidth > 640) {
-                    document.querySelectorAll('.export-options').forEach((option) => {
-                        option.classList.remove('hide-completely')
-                    })
-                }
-                if (top > window.innerHeight - 100)
+                }); */
+                // if (window.innerWidth > 640) {
+                    getRef('export_option_list').classList.remove('hide-completely')
+                // }
+/*                 if (top > window.innerHeight - 100)
                     options.setAttribute('style', `transform: translate(${left}px, ${top - 160}px)`)
                 else
-                    options.setAttribute('style', `transform: translate(${left}px, ${top}px)`)
+                    options.setAttribute('style', `transform: translate(${left}px, ${top}px)`) */
             },
 
             register_heading_to_export: function (heading_id = "") {
@@ -10354,7 +10699,7 @@
                 let file_name = "content_collaboration" + new Date().getTime();
 
                 this.downloadInnerHtml(file_name, template, 'text/html');
-                document.getElementById('context_menu').classList.add('hide')
+                // document.getElementById('context_menu').classList.add('hide')
 
             },
 
@@ -10379,28 +10724,28 @@
                     cl.textContent = 'Select';
                     cl.classList.remove("snippet-selected");
                 })
-                document.getElementById('context_menu').classList.add('hide')
-                document.querySelectorAll('.export-options').forEach((option) => {
-                    option.classList.add('hide-completely')
-                })
+                // document.getElementById('context_menu').classList.add('hide')
+                getRef('export_option_list').classList.add('hide-completely')
             },
 
-            logout: function () {
-                askConfirmation("Do you want to logout?").then(result => {
-                    floDapps.clearCredentials()
-                    compactIDB.deleteDB().then((message) => {
-                        console.log(message)
-                        localStorage.removeItem("defaultArticle")
-                        myFloID = myPrivKey = myPubKey = null;
-                        onLoadStartUp()
-                        showMessage('You have logged out successfully.')
-                    }).catch((error) => {
-                        console.log(error)
-                    })
-                })
-                    .catch(error => {
-                        console.log(error)
-                    })
+            async logout() {
+                try{
+                    if(await confirmation("logout", "Do you want to logout?", 'No', 'Yes')){
+                        floDapps.clearCredentials()
+                        compactIDB.deleteDB().then((message) => {
+                            console.log(message)
+                            localStorage.removeItem("defaultArticle")
+                            myFloID = myPrivKey = myPubKey = null;
+                            onLoadStartUp()
+                            notify('You have logged out.', 'success')
+                        }).catch((error) => {
+                            console.log(error)
+                        })
+                    }
+                }
+                catch(error){
+                    console.log(error)
+                }
             },
 
             html_template: function (mid_section = '') {
