@@ -1930,17 +1930,6 @@ smPopup.innerHTML = `
     --backdrop: rgba(0, 0, 0, 0.6);
     --border-radius: 0.8rem 0.8rem 0 0;
 }
-::-webkit-scrollbar{
-    width: 0.5rem;
-}
-
-::-webkit-scrollbar-thumb{
-    background: rgba(var(--text-color), 0.3);
-    border-radius: 1rem;
-    &:hover{
-        background: rgba(var(--text-color), 0.5);
-    }
-}
 .popup-container{
     display: -ms-grid;
     display: grid;
@@ -2055,6 +2044,19 @@ smPopup.innerHTML = `
         background: rgba(var(--text-color), .4);
         border-radius: 1rem;
         margin: 0.5rem 0;
+    }
+}
+@media (any-hover: hover){
+    ::-webkit-scrollbar{
+        width: 0.5rem;
+    }
+    
+    ::-webkit-scrollbar-thumb{
+        background: rgba(var(--text-color), 0.3);
+        border-radius: 1rem;
+        &:hover{
+            background: rgba(var(--text-color), 0.5);
+        }
     }
 }
 </style>
