@@ -224,6 +224,7 @@
         </svg>
         <h4 id="show_log_events"></h4>
         <sm-button class="margin-top-1-5" onclick="cloudArticleApp.logout()">Logout</sm-button>
+        <sm-button class="margin-top-1-5 hide" id="back-article-btn" onclick="backArticle()">Back</sm-button>
     </div>
 
     <section id="article_container">
@@ -759,9 +760,14 @@
             hidePopup()
         } */
 
-        function showArticle(articleId) {
+        function backArticle() {
+            showArticle(cloudArticleApp.SUBJECT)
+        }
+
+        async function showArticle(articleId) {
+            document.getElementById("back-article-btn").classList.remove("hide")
+            await cloudArticleApp.retrieveLatestContent(true, articleId);
             cloudArticleApp.setLocalDefault(articleId);
-            cloudArticleApp.retrieveLatestContent(true);
         }
 
         async function incScore(value){
@@ -972,10 +978,10 @@
             getRef('article_list').append(frag);
         }
 
-        document.getElementById('article_list_popup').addEventListener('click', e => {
+        document.getElementById('article_list_popup').addEventListener('click', async e => {
             if(e.target.closest('.article-list__item')){
                 const articleId = e.target.closest('.article-list__item').dataset.uniqueId
-                showArticle(articleId)
+                await showArticle(articleId)
                 hidePopup()
             }
         })
@@ -10168,11 +10174,11 @@
                     showMessage('only subAdmins can update the default Article')
             },
 
-            showFullContentOfArticle: function (obj) {
+            showFullContentOfArticle: function (obj, subject) {
                 const full_data_div = document.getElementById('current_data'),
-                    articleSubject = floGlobals.appObjects[this.SUBJECT];
+                    articleSubject = floGlobals.appObjects[subject];
 
-                const new_generalData = floDapps.getNextGeneralData(this.SUBJECT, '0');// floGlobals.generalData[JSON.stringify({ application: floGlobals.application, type: cloudArticleApp.CONTENT_TYPE })]
+                const new_generalData = floDapps.getNextGeneralData(subject, '0');// floGlobals.generalData[JSON.stringify({ application: floGlobals.application, type: cloudArticleApp.CONTENT_TYPE })]
 
                 let new_entries_array = [];
 
@@ -10302,10 +10308,10 @@
                 hideLoader();
                 //section_settings
                 if (!floGlobals.subAdmins.includes(myFloID)) return false;
-                if (typeof floGlobals.appObjects[this.SUBJECT] !== "object") return false;
+                if (typeof floGlobals.appObjects[subject] !== "object") return false;
                 let topics = document.querySelectorAll('.edit-article');
-                for (let i = 0; i < Object.keys(floGlobals.appObjects[this.SUBJECT]).length; i++) {
-                    topics[i].innerHTML = `<button title="Edit article sections" id="${Object.keys(floGlobals.appObjects[this.SUBJECT])[i]}" onclick="cloudArticleApp.editArticleSectionNames(this.id)">
+                for (let i = 0; i < Object.keys(floGlobals.appObjects[subject]).length; i++) {
+                    topics[i].innerHTML = `<button title="Edit article sections" id="${Object.keys(floGlobals.appObjects[subject])[i]}" onclick="cloudArticleApp.editArticleSectionNames(this.id)">
                         <svg class="icon icon-only" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M9.243 19H21v2H3v-4.243l9.9-9.9 4.242 4.244L9.242 19zm5.07-13.556l2.122-2.122a1 1 0 0 1 1.414 0l2.829 2.829a1 1 0 0 1 0 1.414l-2.122 2.121-4.242-4.242z"/></svg>
                     </button>`;
                 }
@@ -10361,15 +10367,15 @@
                 hidePopup()
             },
 
-            retrieveLatestContent: async function (loader=false, receiverID = floGlobals.adminID, senderIDs = floGlobals.subAdmins) {
+            retrieveLatestContent: async function (loader=false, subject = this.SUBJECT, receiverID = floGlobals.adminID, senderIDs = floGlobals.subAdmins) {
                 console.trace('Inside retrieveLatestContent')
                 if(loader == true){
                     showMessage('Loading the latest content')
                 }
-                await floCloudAPI.requestObjectData(this.SUBJECT, { receiverID, senderIDs });
-                await floCloudAPI.requestGeneralData(this.SUBJECT);
+                await floCloudAPI.requestObjectData(subject, { receiverID, senderIDs });
+                await floCloudAPI.requestGeneralData(subject);
                 document.getElementById('current_data').innerHTML = '';
-                cloudArticleApp.showFullContentOfArticle(floGlobals.appObjects[cloudArticleApp.SUBJECT]);
+                cloudArticleApp.showFullContentOfArticle(floGlobals.appObjects[subject], subject);
                 if(loader == true){
                     hideLoader()
                 }
@@ -10441,9 +10447,8 @@
                     floGlobals.appObjects["ContentCollaboration"]["defaultArticle"] = article_id;
                 await floCloudAPI.updateObjectData("ContentCollaboration")
 
+                await this.retrieveLatestContent(true, article_id);
                 this.setLocalDefault(article_id)
-
-                await this.retrieveLatestContent(true);
             },
 
             addSections: async function (sections) {
