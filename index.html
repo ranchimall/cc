@@ -231,6 +231,7 @@
         <div id="current_data"></div>
     </section>
     <script src="components.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
     <script id="floGlobals">
         /* Constants for FLO blockchain operations !!Make sure to add this at begining!! */
         const floGlobals = {
@@ -985,15 +986,19 @@
                 hidePopup()
             }
         })
+
         document.getElementById('article_list__search').addEventListener('input', function(e) {
-            const articles = floGlobals.appObjects["ContentCollaboration"]["ArticleLists"]
+            const allArticles = floGlobals.appObjects["ContentCollaboration"]["ArticleLists"]
             const filteredArticles = {}
-            for (let articleId in articles){
-                if(articles[articleId].toLowerCase().includes(this.value.trim().toLowerCase())){
-                    filteredArticles[articleId] = articles[articleId]
-                }
+            fuse.search(this.value.trim()).forEach(item => {
+                filteredArticles[item.item.replace(/ /, '')] = item.item
+            })
+            if(this.value.trim() !== ''){
+                renderAllArticlesPreview(filteredArticles)
             }
-            renderAllArticlesPreview(filteredArticles)
+            else{
+                renderAllArticlesPreview(allArticles)
+            }
         })
     </script>
     <script id="init_lib">
@@ -10091,6 +10096,7 @@
         reactor.addEventListener("startUpErrorLog", log => console.error(log))
     </script>
     <script id="onLoadStartUp">
+        let fuse
         function onLoadStartUp() {
             showLoader()
             //floDapps.addStartUpFunction('Sample', Promised Function)
@@ -10104,6 +10110,7 @@
                 cloudArticleApp.refreshMasterObject().then(result => {
                     cloudArticleApp.retrieveLatestContent(true);
                     buildAdminUI();
+                    fuse = new Fuse(Object.values(floGlobals.appObjects["ContentCollaboration"]["ArticleLists"]), {threshold: 0.3})
                 }).catch(error => console.error(error))
             }).catch(error => console.error(error))
         }
