@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description"
         content="This web app can be used to collaborate between various teams using blockchain technology.">
-    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/main.min.css">
 </head>
 
 <body onload="onLoadStartUp()" data-theme="dark">
@@ -982,7 +982,7 @@
         document.getElementById('article_list_popup').addEventListener('click', async e => {
             if(e.target.closest('.article-list__item')){
                 const articleId = e.target.closest('.article-list__item').dataset.uniqueId
-                await showArticle(articleId)
+                showArticle(articleId)
                 hidePopup()
             }
         })
@@ -991,7 +991,7 @@
             const allArticles = floGlobals.appObjects["ContentCollaboration"]["ArticleLists"]
             const filteredArticles = {}
             fuse.search(this.value.trim()).forEach(item => {
-                filteredArticles[item.item.replace(/ /, '')] = item.item
+                filteredArticles[item.item.replace(/ /g,'')] = item.item
             })
             if(this.value.trim() !== ''){
                 renderAllArticlesPreview(filteredArticles)
