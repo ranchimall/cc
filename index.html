@@ -817,8 +817,8 @@
                             <h3>Create a new article</h3>
                             <button class="button button--primary" id="create_article_btn" type="submit">Create</button>
                         </header>
-                        <input type="text" id="article_name" placeholder="Article name">
-                        <input type="number" id="section_nums" placeholder="Number of sections">
+                        <sm-input type="text" id="article_name" class="outlined margin-bottom-1-5" placeholder="Article name" animate></sm-input>
+                        <sm-input type="number" id="section_nums" class="outlined" placeholder="Number of sections" animate></sm-input>
                         <sm-checkbox id="set_default_article" class="default-article__checkbox margin-top-1-5">
                             <span class="checkbox__label">
                                 Set as default
@@ -843,7 +843,7 @@
                                 Set as default
                             </span>
                         </sm-checkbox>
-                        <div id="edit_section_container"></div>
+                        <div id="edit_section_container" class="grid"></div>
                     </sm-popup>`;
 
                 document.getElementById('admindiv').innerHTML = admindivui;
@@ -10333,8 +10333,8 @@
                 if (!Object.keys(floGlobals.appObjects[this.SUBJECT]).includes(Topic)) return;
                 sectionSettingsList.innerHTML = ``;
                 for (vals of Object.values(floGlobals.appObjects[this.SUBJECT][Topic].data)) {
-                    sectionSettingsHtml += `<label for="section${sec_counter}">Section ${sec_counter}</label>
-                    <input type="text" id="section${sec_counter}" name="section_names_ip" value="${vals.section_details.section_name}">`;
+                    sectionSettingsHtml += `
+                    <sm-input type="text" class="outlined" placeholder="Section ${sec_counter}" id="section${sec_counter}" name="section_names_ip" value="${vals.section_details.section_name}" animate></sm-input>`;
                     sec_counter++;
                 }
 

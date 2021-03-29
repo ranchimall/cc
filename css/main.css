@@ -96,6 +96,10 @@ ul {
   grid-auto-flow: column;
 }
 
+.gap-1r {
+  gap: 1rem;
+}
+
 .align-center {
   -webkit-box-align: center;
       -ms-flex-align: center;
@@ -368,9 +372,9 @@ textarea {
   width: 100%;
 }
 
-#edit_article_popup #edit_section_container {
-  max-height: 50vh;
-  overflow-y: auto;
+#edit_section_container {
+  gap: 1.5rem;
+  padding: 1rem 0;
 }
 
 .gallery-container {

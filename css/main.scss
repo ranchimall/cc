@@ -79,6 +79,9 @@ ul{
 .flow-column{
     grid-auto-flow: column;
 }
+.gap-1r{
+    gap: 1rem;
+}
 .align-center{
     align-items: center;
 }
@@ -311,9 +314,9 @@ textarea {
     width: 100%;
 }
 
-#edit_article_popup #edit_section_container {
-    max-height: 50vh;
-    overflow-y: auto;
+#edit_section_container {
+    gap: 1.5rem;
+    padding: 1rem 0;
 }
 
 .gallery-container {

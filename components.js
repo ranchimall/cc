@@ -807,7 +807,7 @@ smCheckbox.innerHTML = `
         --border-radius: 0.2rem;
         --border-color: rgba(var(--text-color), 0.7);
     }
-    :host([disable]) {
+    :host([disabled]) {
         opacity: 0.6;
         pointer-events: none;
     }
@@ -903,9 +903,9 @@ customElements.define('sm-checkbox', class extends HTMLElement {
 
     set disabled(val) {
         if (val) {
-            this.setAttribute('disable', '')
+            this.setAttribute('disabled', '')
         } else {
-            this.removeAttribute('disable')
+            this.removeAttribute('disabled')
         }
     }
 
@@ -965,7 +965,7 @@ customElements.define('sm-checkbox', class extends HTMLElement {
     }
     attributeChangedCallback(name, oldValue, newValue) {
         if (oldValue !== newValue) {
-            if (name === 'disable') {
+            if (name === 'disabled') {
                 if (newValue === 'true') {
                     this.isDisabled = true
                 } else {
@@ -1020,11 +1020,11 @@ smSwitch.innerHTML = `
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
     }
-    :host(:not([disable])) label:focus-visible{
+    :host(:not([disabled])) label:focus-visible{
         -webkit-box-shadow: 0 0 0 0.1rem var(--accent-color);
             box-shadow: 0 0 0 0.1rem var(--accent-color);
     }
-    :host([disable]) {
+    :host([disabled]) {
         cursor: not-allowed;
         opacity: 0.6;
         pointer-events: none;
@@ -1143,7 +1143,7 @@ customElements.define('sm-switch', class extends HTMLElement {
     }
 
     static get observedAttributes() {
-        return ['disable', 'checked']
+        return ['disabled', 'checked']
     }
 
     get disabled() {
@@ -1152,9 +1152,9 @@ customElements.define('sm-switch', class extends HTMLElement {
 
     set disabled(val) {
         if (val) {
-            this.setAttribute('disable', '')
+            this.setAttribute('disabled', '')
         } else {
-            this.removeAttribute('disable')
+            this.removeAttribute('disabled')
         }
     }
 
@@ -1193,8 +1193,8 @@ customElements.define('sm-switch', class extends HTMLElement {
     }
     attributeChangedCallback(name, oldValue, newValue) {
         if (oldValue !== newValue) {
-            if (name === 'disable') {
-                if (this.hasAttribute('disable')) {
+            if (name === 'disabled') {
+                if (this.hasAttribute('disabled')) {
                     this.disabled = true                
                 }
                 else {
