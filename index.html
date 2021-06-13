@@ -10221,7 +10221,7 @@
 
                     for (secKey in articleSubject[key].data) {
                         let tempCounter = 0;
-                        const secObject = articleSubject[key].data[secKey];
+                        const secObject = JSON.parse(JSON.stringify(articleSubject[key].data[secKey]));
 
                         if (typeof secObject.section_details === "object"
                             && secObject.section_details.section_name.length) {
@@ -10520,16 +10520,17 @@
                 //     article = full_data[article_name];
                 // }
 
-                let iterNumber = Object.keys(article.data[section]["section_iters"]).map(f => {
-                    return f.match(/\d+/)[0];
-                }).reduce(function (prev, current) {
-                    return (prev.y > current.y) ? prev : current
-                });
-
+                let iterNumber = 0;
+                Object.keys(article.data[section]["section_iters"]).forEach(a => {
+                    if(a.startsWith("iteration")){
+                        let i = parseInt(a.match(/\d+/)[0]);
+                        iterNumber = (i > iterNumber) ? i : iterNumber;
+                    }
+                })
 
                 let oldArticle = article.data[section]["section_iters"][`iteration${iterNumber}`];
                 let iterNum = Number(iterNumber) + 1;
-
+                console.info("Iteration:", iterNum)
                 // Convert line breaks into br
                 newcontent = newcontent.replace(/\n/g, '<br>').trim(); //.replace(/\r\n|\r|\n/g,"</br>")
 
