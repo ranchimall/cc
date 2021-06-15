@@ -10279,10 +10279,11 @@
                                 fill = 'mediumspringgreen'
                             else
                                 fill = 'none'
+                            let entryBox = article_data.contentSHA256Hash ? false : true;
                             article_structure +=
                                 `<div class="article-body" id="boxid_${article_data.contentSHA256Hash}">
                             <div class="article-header">
-                                <h5 class="article__author" title="Article author">${article_data.content_creator}</h5>
+                                <h5 class="article__author" title="Article author">${entryBox ? '(New)'+myFloID :article_data.content_creator}</h5>
                             </div>
                             <div class="card-body">
                                 <div class="content-div" id="${gen_div_id}" data-value="${key}__${secKey}" contenteditable="true" oninput="buttonVisibility('show', this.parentNode)">
@@ -10530,7 +10531,6 @@
 
                 let oldArticle = article.data[section]["section_iters"][`iteration${iterNumber}`];
                 let iterNum = Number(iterNumber) + 1;
-                console.info("Iteration:", iterNum)
                 // Convert line breaks into br
                 newcontent = newcontent.replace(/\n/g, '<br>').trim(); //.replace(/\r\n|\r|\n/g,"</br>")
 
