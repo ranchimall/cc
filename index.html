@@ -10221,7 +10221,7 @@
 
                     for (secKey in articleSubject[key].data) {
                         let tempCounter = 0;
-                        const secObject = JSON.parse(JSON.stringify(articleSubject[key].data[secKey]));
+                        const secObject = articleSubject[key].data[secKey];
 
                         if (typeof secObject.section_details === "object"
                             && secObject.section_details.section_name.length) {
