@@ -114,29 +114,6 @@
     <div id="admindiv"></div>
     <div id="sectionplotdiv"></div>
     <div id="userdiv"></div>
-<!--     <ul id="context_menu" class="hide">
-        <li>
-            <button onclick="cloudArticleApp.reset_export_list()">
-                <svg class="icon option__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></svg>
-                <span class="option__label">
-                    Clear Selection
-                </span>
-            </button>
-        </li>
-        <li>
-            <button onclick="cloudArticleApp.export_as_file()">
-                <svg class="icon option__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M10 3v2H5v14h14v-5h2v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h6zm7.707 4.707L12 13.414 10.586 12l5.707-5.707L13 3h8v8l-3.293-3.293z"/></svg>
-                <span class="option__label">
-                    Export as file
-                </span>
-            </button>
-        </li>
-    </ul> -->
-    <!-- <div class="floating-btn">
-        <button id="refresh_button" onclick="cloudArticleApp.retrieveLatestContent(true)">
-            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M18.537 19.567A9.961 9.961 0 0 1 12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10c0 2.136-.67 4.116-1.81 5.74L17 12h3a8 8 0 1 0-2.46 5.772l.997 1.795z"/></svg>
-        </button>
-    </div> -->
     <nav id="navbar">
         <svg id="icon" viewBox="0 0 99.555 117.877" title="Content collaboration logo">
             <style type="text/css">
@@ -165,13 +142,6 @@
             </span>
         </span>
         <div class="spacer"></div>
-<!--         <button id="refresh_btn" title="Refresh the content" class="button hide-on-mobile"
-            onclick="cloudArticleApp.retrieveLatestContent(true)">
-            <svg class="icon option__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M18.537 19.567A9.961 9.961 0 0 1 12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10c0 2.136-.67 4.116-1.81 5.74L17 12h3a8 8 0 1 0-2.46 5.772l.997 1.795z"/></svg>
-            <span class="option__label">
-                Refresh
-            </span>
-        </button> -->
         <ul id="export_option_list" class="grid align-center hide-completely">
             <li>
                 <button id="clear_export" title="Clear article selection" class="button"
@@ -265,10 +235,24 @@
 
         const domRefs = {}
 
-        function getRef(elementId){
-            if(!domRefs.elementId)
-                domRefs[elementId] = document.getElementById(elementId)
-            return domRefs[elementId]
+        // Use instead of document.getElementById
+        function getRef(elementId) {
+            if (!domRefs.hasOwnProperty(elementId)) {
+                domRefs[elementId] = {
+                    count: 1,
+                    ref: null,
+                };
+                return document.getElementById(elementId);
+            } else {
+                if (domRefs[elementId].count < 3) {
+                    domRefs[elementId].count = domRefs[elementId].count + 1;
+                    return document.getElementById(elementId);
+                } else {
+                    if (!domRefs[elementId].ref)
+                        domRefs[elementId].ref = document.getElementById(elementId);
+                    return domRefs[elementId].ref;
+                }
+            }
         }
 
 
