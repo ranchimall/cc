@@ -56,103 +56,126 @@
             <sm-button variant="no-outline" class="submit-btn">OK</sm-button>
         </div>
     </sm-popup>
-    <header id="main_header">
-        <div class="logo">
-            <svg class="main-logo" width="23" height="22" viewBox="0 0 23 22" fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" clip-rule="evenodd"
-                    d="M15 0.749881C10.9026 2.35002 8 6.33604 8 11C8 15.664 10.9026 19.65 15 21.2501C13.7603 21.7343 12.4112 22 11 22C4.92487 22 0 17.0751 0 11C0 4.92487 4.92487 0 11 0C12.4112 0 13.7603 0.26573 15 0.749881Z" />
-                <path fill-rule="evenodd" clip-rule="evenodd"
-                    d="M14 16.591C16.2349 15.7182 17.8182 13.544 17.8182 11C17.8182 8.45602 16.2349 6.28183 14 5.40903C14.6762 5.14494 15.4121 5 16.1818 5C19.4955 5 22.1818 7.68629 22.1818 11C22.1818 14.3137 19.4955 17 16.1818 17C15.4121 17 14.6762 16.8551 14 16.591Z" />
-            </svg>
-            <div class="grid">
-                <span class="label">RanchiMall</span>
-                <h4>Content Collab</h4>
+    <article id="main_page" class="grid">
+        <header id="main_header">
+            <div class="logo">
+                <svg class="main-logo" width="23" height="22" viewBox="0 0 23 22" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M15 0.749881C10.9026 2.35002 8 6.33604 8 11C8 15.664 10.9026 19.65 15 21.2501C13.7603 21.7343 12.4112 22 11 22C4.92487 22 0 17.0751 0 11C0 4.92487 4.92487 0 11 0C12.4112 0 13.7603 0.26573 15 0.749881Z" />
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M14 16.591C16.2349 15.7182 17.8182 13.544 17.8182 11C17.8182 8.45602 16.2349 6.28183 14 5.40903C14.6762 5.14494 15.4121 5 16.1818 5C19.4955 5 22.1818 7.68629 22.1818 11C22.1818 14.3137 19.4955 17 16.1818 17C15.4121 17 14.6762 16.8551 14 16.591Z" />
+                </svg>
+                <div class="grid">
+                    <span class="label">RanchiMall</span>
+                    <h4>Content Collab</h4>
+                </div>
             </div>
-        </div>
-        <div id="article_name_wrapper" class="flex align-center justify-center">
-            <button title="Create new article" class="button__icon--left" onclick="showPopup('create_article_popup')">
+            <div id="article_name_wrapper" class="flex align-center justify-center">
+                <button title="Create new article" class="button__icon--left"
+                    onclick="showPopup('create_article_popup')">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                        fill="#000000">
+                        <path d="M0 0h24v24H0V0z" fill="none" />
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                    </svg>
+                </button>
+                <h4 id="current_article_name"></h4>
+                <button class="button__icon--right" onclick="showPopup('article_list_popup')">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                        fill="#000000">
+                        <path d="M24 24H0V0h24v24z" fill="none" opacity=".87" />
+                        <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6-1.41-1.41z" />
+                    </svg>
+                </button>
+            </div>
+            <theme-toggle></theme-toggle>
+            <button onclick="showPopup('user_popup')">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" height="24px" viewBox="0 0 24 24" width="24px"
+                    fill="#000000">
+                    <path d="M0 0h24v24H0V0z" fill="none" />
+                    <path
+                        d="M12 5.9c1.16 0 2.1.94 2.1 2.1s-.94 2.1-2.1 2.1S9.9 9.16 9.9 8s.94-2.1 2.1-2.1m0 9c2.97 0 6.1 1.46 6.1 2.1v1.1H5.9V17c0-.64 3.13-2.1 6.1-2.1M12 4C9.79 4 8 5.79 8 8s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 9c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z" />
+                </svg>
+            </button>
+        </header>
+        <div id="text_toolbar" class="hide-completely">
+            <button id="strong_button" title="Bold (ctrl+b)" class="formatting-button" onclick="formatDoc('bold')">
                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                     fill="#000000">
                     <path d="M0 0h24v24H0V0z" fill="none" />
-                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                    <path
+                        d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z" />
                 </svg>
             </button>
-            <h4 id="current_article_name"></h4>
-            <button class="button__icon--right" onclick="showPopup('article_list_popup')">
-                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
-                    fill="#000000">
-                    <path d="M24 24H0V0h24v24z" fill="none" opacity=".87" />
-                    <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6-1.41-1.41z" />
-                </svg>
-            </button>
-        </div>
-        <theme-toggle></theme-toggle>
-        <button onclick="showPopup('user_popup')">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon" height="24px" viewBox="0 0 24 24" width="24px"
-                fill="#000000">
-                <path d="M0 0h24v24H0V0z" fill="none" />
-                <path
-                    d="M12 5.9c1.16 0 2.1.94 2.1 2.1s-.94 2.1-2.1 2.1S9.9 9.16 9.9 8s.94-2.1 2.1-2.1m0 9c2.97 0 6.1 1.46 6.1 2.1v1.1H5.9V17c0-.64 3.13-2.1 6.1-2.1M12 4C9.79 4 8 5.79 8 8s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 9c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z" />
-            </svg>
-        </button>
-    </header>
-    <div id="text_toolbar" class="hide-completely">
-        <button id="strong_button" class="formatting-button" onclick="formatDoc('bold')">
-            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
-                fill="#000000">
-                <path d="M0 0h24v24H0V0z" fill="none" />
-                <path
-                    d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z" />
-            </svg>
-        </button>
-        <button id="em_button" class="formatting-button" onclick="formatDoc('italic');">
-            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
-                fill="#000000">
-                <path d="M0 0h24v24H0V0z" fill="none" />
-                <path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4h-8z" />
-            </svg>
-        </button>
-        <button id="u_button" class="formatting-button" onclick="formatDoc('underline');">
-            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
-                fill="#000000">
-                <path d="M0 0h24v24H0V0z" fill="none" />
-                <path
-                    d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z" />
-            </svg>
-        </button>
-    </div>
-    <div id="article_wrapper" class="grid page-layout"></div>
-    <section class="grid page-layout">
-        <div id="action_button_group" class="flex align-center gap-0-5">
-            <span>
-                <b>
-                    Add
-                </b>
-            </span>
-            <button class="actionable-button" title="Add paragraph">
+            <button id="em_button" title="Italic (ctrl+i)" class="formatting-button" onclick="formatDoc('italic');">
                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                     fill="#000000">
                     <path d="M0 0h24v24H0V0z" fill="none" />
-                    <path d="M14 17H4v2h10v-2zm6-8H4v2h16V9zM4 15h16v-2H4v2zM4 5v2h16V5H4z" />
+                    <path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4h-8z" />
                 </svg>
-                <span class="actionable-button__title">
-                    Section
-                </span>
             </button>
-            <button class="actionable-button" title="Add paragraph" onclick="insertBlockquote()">
+            <button id="u_button" title="Underline (ctrl+u)" class="formatting-button"
+                onclick="formatDoc('underline');">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                    fill="#000000">
+                    <path d="M0 0h24v24H0V0z" fill="none" />
+                    <path
+                        d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z" />
+                </svg>
+            </button>
+            <button class="formatting-button" title="Add quote" onclick="insertBlockquote()">
                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                     fill="#000000">
                     <path d="M0 0h24v24H0V0z" fill="none" />
                     <path
                         d="M18.62 18h-5.24l2-4H13V6h8v7.24L18.62 18zm-2-2h.76L19 12.76V8h-4v4h3.62l-2 4zm-8 2H3.38l2-4H3V6h8v7.24L8.62 18zm-2-2h.76L9 12.76V8H5v4h3.62l-2 4z" />
                 </svg>
-                <span class="actionable-button__title">
-                    Quote
-                </span>
             </button>
         </div>
-    </section>
+        <div id="article_wrapper" class="grid page-layout"></div>
+        <section class="grid page-layout">
+            <div id="action_button_group" class="flex align-center gap-0-5">
+                <span>
+                    <b>
+                        Add
+                    </b>
+                </span>
+                <button class="actionable-button" title="Add paragraph">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                        fill="#000000">
+                        <path d="M0 0h24v24H0V0z" fill="none" />
+                        <path d="M14 17H4v2h10v-2zm6-8H4v2h16V9zM4 15h16v-2H4v2zM4 5v2h16V5H4z" />
+                    </svg>
+                    <span class="actionable-button__title">
+                        Section
+                    </span>
+                </button>
+            </div>
+        </section>
+        <aside id="version_history_panel" class="flex direction-column hide-completely">
+            <div class="flex align-center space-between">
+                <div class="flex align-center">
+                    <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" height="24px"
+                        viewBox="0 0 24 24" width="24px" fill="#000000">
+                        <path d="M0 0h24v24H0V0z" fill="none" />
+                        <path
+                            d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8z" />
+                    </svg>
+                    <h4>Version history</h4>
+                </div>
+                <button onclick="hideVersionHistory()">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                        fill="#000000">
+                        <path d="M0 0h24v24H0V0z" fill="none" />
+                        <path
+                            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
+                    </svg>
+                </button>
+            </div>
+            <ul id="version_timeline" class="flex direction-column gap-0-5"></ul>
+        </aside>
+    </article>
     <sm-popup id="article_list_popup">
         <header slot="header" class="popup__header">
             <div class="grid">
@@ -199,7 +222,7 @@
     </sm-popup>
     <template id="section_template">
         <h4 class="heading"></h4>
-        <section class="article-section flex gap-1">
+        <section class="article-section">
             <div class="content-card content-card--empty">
                 <div class="content__area" data-type="origin" placeholder="Write something new or edit existing content"
                     contenteditable="true"></div>
@@ -211,24 +234,28 @@
     <template id="content_card_template">
         <div class="content-card">
             <div class="content__area"></div>
-            <div class="content__options grid align-center">
-                <button class="version-history-button" title="See version history">
-                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
-                        fill="#000000">
-                        <path d="M0 0h24v24H0V0z" fill="none" />
-                        <path
-                            d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8z" />
-                    </svg>
-                </button>
-                <button title="Give score">
-                    <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" height="24px"
-                        viewBox="0 0 24 24" width="24px" fill="#000000">
-                        <path d="M0 0h24v24H0V0z" fill="none" />
-                        <path
-                            d="M12 7.13l.97 2.29.47 1.11 1.2.1 2.47.21-1.88 1.63-.91.79.27 1.18.56 2.41-2.12-1.28-1.03-.64-1.03.62-2.12 1.28.56-2.41.27-1.18-.91-.79-1.88-1.63 2.47-.21 1.2-.1.47-1.11.97-2.27M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2z" />
-                    </svg>
-                    <span class="content__score">47</span>
-                </button>
+            <div class="flex align-center space-between">
+                <div class="content__options grid align-center">
+                    <button class="version-history-button" title="See version history">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                            width="24px" fill="#000000">
+                            <path d="M0 0h24v24H0V0z" fill="none" />
+                            <path
+                                d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8z" />
+                        </svg>
+                    </button>
+                    <button title="Give score">
+                        <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" height="24px"
+                            viewBox="0 0 24 24" width="24px" fill="#000000">
+                            <path d="M0 0h24v24H0V0z" fill="none" />
+                            <path
+                                d="M12 7.13l.97 2.29.47 1.11 1.2.1 2.47.21-1.88 1.63-.91.79.27 1.18.56 2.41-2.12-1.28-1.03-.64-1.03.62-2.12 1.28.56-2.41.27-1.18-.91-.79-1.88-1.63 2.47-.21 1.2-.1.47-1.11.97-2.27M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2z" />
+                        </svg>
+                        <span class="content__score">47</span>
+                    </button>
+                </div>
+                <div class="content__editor"></div>
+                <button class="submit-entry">Submit</button>
             </div>
         </div>
     </template>
@@ -240,6 +267,19 @@
             <figcaption class="flex"><span class="by" contenteditable="true"></span><cite class="citation"
                     contenteditable="true"></cite></figcaption>
         </figure>
+        <p><br></p>
+    </template>
+    <template id="history_entry_template">
+        <li class="history-entry interact grid gap-0-5">
+            <div class="flex align-center space-between">
+                <time class="entry__time"></time>
+                <span class="entry__score"></span>
+            </div>
+            <div class="grid">
+                <div class="label">Author</div>
+                <span class="entry__author breakable"></span>
+            </div>
+        </li>
     </template>
     <script id="ui_utils">
         // Global letiables
@@ -385,31 +425,6 @@
             })
         }
 
-        // displays a popup for asking user input. Use this instead of JS prompt
-        function getPromptInput(title, message = '', options = {}) {
-            const { isPassword = true, cancelText = 'Cancel', confirmText = 'OK' } = options
-            showPopup('prompt_popup', true)
-            getRef('prompt_title').textContent = title;
-            getRef('prompt_message').textContent = message;
-            let buttons = getRef('prompt_popup').querySelectorAll("sm-button");
-            if (isPassword)
-                getRef('prompt_input').setAttribute("type", "password")
-            getRef('prompt_input').focusIn()
-            buttons[0].textContent = cancelText;
-            buttons[1].textContent = confirmText;
-            return new Promise((resolve, reject) => {
-                buttons[0].onclick = () => {
-                    hidePopup()
-                    return (null);
-                }
-                buttons[1].onclick = () => {
-                    const value = getRef('prompt_input').value;
-                    hidePopup()
-                    resolve(value)
-                }
-            })
-        }
-
         //Function for displaying toast notifications. pass in error for mode param if you want to show an error.
         function notify(message, mode, options = {}) {
             const { pinned = false, sound = false } = options
@@ -432,17 +447,21 @@
             }
         }
 
-        function getFormattedTime(timeString, relative) {
+        function getFormattedTime(time, relative) {
             try {
-                const [date, time] = timeString.split('T')
-                const [year, month, day] = date.split('-').map(v => parseInt(v))
-                let [hours, minutes] = time.split(':').map(v => parseInt(v))
-                const currentTime = new Date()
-                const currentTimeFrag = currentTime.toString().split(' ')
-                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-                ];
-                const monthName = monthNames[month]
+                if (String(time).indexOf('_'))
+                    time = String(time).split('_')[0]
+                const intTime = parseInt(time)
+                if (String(intTime).length < 13)
+                    time *= 1000
+                let timeFrag = new Date(intTime).toString().split(' '),
+                    day = timeFrag[0],
+                    month = timeFrag[1],
+                    date = timeFrag[2],
+                    year = timeFrag[3],
+                    minutes = new Date(intTime).getMinutes(),
+                    hours = new Date(intTime).getHours(),
+                    currentTime = new Date().toString().split(' ')
 
                 minutes = minutes < 10 ? `0${minutes}` : minutes
                 let finalHours = ``;
@@ -456,25 +475,25 @@
                 finalHours = hours >= 12 ? `${finalHours} PM` : `${finalHours} AM`
                 if (relative) {
                     if (year == currentYear) {
-                        if ((currentTime.getMonth() + 1) === month) {
-                            const dateDiff = (parseInt(currentTimeFrag[2]) - parseInt(day))
+                        if (currentTime[1] === month) {
+                            const dateDiff = (parseInt(currentTime[2]) - parseInt(date))
                             if (dateDiff === 0)
                                 return `${finalHours}`;
                             else if (dateDiff === 1)
                                 return `Yesterday`;
                             else if (dateDiff > 1 && dateDiff < 8)
-                                return currentTimeFrag[0];
+                                return currentTime[0];
                             else
-                                return ` ${day} ${monthName}`;
+                                return ` ${date} ${month}`;
                         }
                         else
-                            return ` ${day} ${monthName}`;
+                            return ` ${date} ${month}`;
                     }
                     else
-                        return `${monthName} ${year}`;
+                        return `${month} ${year}`;
                 }
                 else
-                    return `${finalHours}, ${monthName} ${day} ${year}`;
+                    return `${month} ${date} ${year}, ${finalHours}`;
             } catch (e) {
                 console.error(e);
                 return time;
@@ -706,21 +725,32 @@
 
         getRef('article_wrapper').addEventListener('click', e => {
             if (e.target.closest('.submit-entry')) {
-                const parent = e.target.parentNode.querySelector('.content__area')
-                parent.querySelectorAll('[style=""]').forEach((el) => {
+                const contentCard = e.target.closest('.content-card')
+                const contentArea = contentCard.querySelector('.content__area')
+                const uid = contentCard.dataset.uid
+                const isUniqueEntry = contentArea.dataset.type === 'origin'
+                contentArea.querySelectorAll('[style=""]').forEach((el) => {
                     el.removeAttribute('style')
                 })
-                const clean = DOMPurify.sanitize(parent.innerHTML);
-                floCloudAPI.sendGeneralData({
-                    section: parent.closest('.article-section').dataset.id,
-                    origin: parent.dataset.type === 'origin' ? floCrypto.randString(16, true) : parent.parentNode.dataset.uid,
-                    data: parent.dataset.type === 'origin' ? clean : getDiff('', clean),
-                }, `${currentArticle.id}_gd`)
+                const clean = DOMPurify.sanitize(contentArea.innerHTML);
+                if (clean.trim() === '') return
+                let previousVersion, contributors
+                if (!isUniqueEntry)
+                    ({ data: previousVersion, contributors } = getIterationDetails(uid))
+                const entry = {
+                    section: contentCard.closest('.article-section').dataset.id,
+                    origin: isUniqueEntry ? floCrypto.randString(16, true) : uid,
+                    data: isUniqueEntry ? clean : getDiff(previousVersion, clean),
+                }
+                floCloudAPI.sendGeneralData(entry, `${currentArticle.id}_gd`)
                     .then((res) => {
                         console.log(res)
                         notify('sent data', 'success')
-                        parent.innerHTML = ''
+                        if (isUniqueEntry)
+                            contentArea.innerHTML = ''
                     })
+            } else if (e.target.closest('.version-history-button')) {
+                showVersionHistory(e.target.closest('.content-card').dataset.uid)
             }
         })
         getRef('article_wrapper').addEventListener("paste", e => {
@@ -735,6 +765,8 @@
         })
         getRef('article_wrapper').addEventListener("focusin", e => {
             if (e.target.closest('.content__area')) {
+                document.addEventListener('selectionchange', detectFormatting)
+
                 const target = e.target.closest('.content__area')
                 if (target.childNodes[0] === undefined) {
                     target.innerHTML = `<p><br/></p>`
@@ -746,17 +778,25 @@
         })
         getRef('article_wrapper').addEventListener("focusout", e => {
             if (e.target.closest('.content__area')) {
+                document.removeEventListener('selectionchange', detectFormatting)
                 childObserver.disconnect()
+                normalizeText(e.target.closest('.content__area'))
+                const selection = window.getSelection()
+                if (!e.relatedTarget?.closest('#text_toolbar')) {
+                    getRef('text_toolbar').classList.add('hide-completely')
+                }
             }
         })
         const childObserver = new MutationObserver((mutations, observer) => {
             mutations.forEach(mutation => {
-                if (mutation.type === 'childList' && mutation.target.childNodes[0] === undefined) {
-                    observer.disconnect()
-                    mutation.target.innerHTML = `<p><br/></p>`
-                    childObserver.observe(mutation.target, {
-                        childList: true
-                    })
+                if (mutation.type === 'childList') {
+                    if (mutation.removedNodes.length && mutation.target.childNodes[0] === undefined) {
+                        observer.disconnect()
+                        mutation.target.innerHTML = `<p><br/></p>`
+                        childObserver.observe(mutation.target, {
+                            childList: true
+                        })
+                    }
                 }
             })
         })
@@ -766,60 +806,6 @@
         }
     </script>
     <script>
-        const CC = {
-            defaultArticle: '',
-            he78r1he74187er1h8e: 'Big Techs And Their Dominance'
-        }
-        const genData = [
-            {
-                section: 'edg4ewr8g4e98r',
-                origin: 'erg1e98r1ge9r1',
-                data: '',
-                score: 45,
-                editor: '',
-                timestamp: 1636485447518
-            },
-            {
-                section: 'edg4ewr8g4e98r',
-                origin: 'erg1e98r1ge9r1',
-                data: 'u2',
-                score: 45,
-                editor: '',
-                timestamp: 1636485393538
-            },
-            {
-                section: 'edg4ewr8g4e98r',
-                origin: 'erg1e98r1ge9r1',
-                data: '',
-                score: 45,
-                editor: '',
-                timestamp: 1636485459328
-            },
-            {
-                section: 'edg4ewr8g4e98r',
-                origin: 'er98g4er8g1erg',
-                data: 'u1',
-                score: 45,
-                editor: '',
-                timestamp: 1636485440013
-            },
-            {
-                section: 'edg4ewr8g4e98r',
-                origin: 'erg1e98r1ge9r1',
-                data: '',
-                score: 45,
-                editor: '',
-                timestamp: 1636485477636
-            },
-            {
-                section: 'edg4ewr8g4e98r',
-                origin: 'er98g4er8g1erg',
-                data: '',
-                score: 45,
-                editor: '',
-                timestamp: 1636485484595
-            },
-        ]
         let currentArticle = {}
         const render = {
             section(sectionID, { title, uniqueEntries }) {
@@ -827,26 +813,22 @@
                 const frag = document.createDocumentFragment()
                 section.children[1].dataset.id = sectionID
                 section.querySelector('.heading').textContent = title
-                currentArticle.sect
+                currentArticle.sections[sectionID].uniqueEntries.forEach(entry => {
+                    frag.append(render.contentCard(entry))
+                })
                 section.querySelector('.content-card-container').append(frag)
                 return section
             },
             contentCard(id, version = 0) {
                 const clone = getRef('content_card_template').content.cloneNode(true).firstElementChild;
-                const { paragraphs, score } = articles[currentArticle.id].pieces[piece]
-                for (const paraKey in paragraphs) {
-                    const versions = paragraphs[paraKey]
-                    const { content, writer } = articles[currentArticle.id].versionHistory[versions[version]]
-                    const paragraph = createElement('div', {
-                        className: 'content__area',
-                        textContent: content,
-                        attributes: { contentEditable: true }
-                    })
-                    frag.append(paragraph)
+                clone.dataset.uid = id
+                if (!floGlobals.subAdmins.includes(myFloID)) {
+                    clone.querySelector('.content__area').setAttribute('contentEditable', true)
                 }
-                clone.querySelector('.paragraph-wrapper').append(frag)
-                clone.querySelector('.content__score').textContent = score;
-
+                const { data, contributors } = getIterationDetails(id)
+                clone.querySelector('.content__area').innerHTML = DOMPurify.sanitize(data)
+                clone.querySelector('.content__editor').textContent = `by ${contributors}`;
+                // clone.querySelector('.content__score').textContent = score;
                 return clone
             },
             article(id) {
@@ -861,6 +843,13 @@
                 getRef('current_article_name').textContent = title
                 getRef('article_wrapper').innerHTML = ''
                 getRef('article_wrapper').append(frag)
+            },
+            historyEntry(details) {
+                const { editor, timestamp } = details
+                const clone = getRef('history_entry_template').content.cloneNode(true).firstElementChild;
+                clone.querySelector('.entry__time').textContent = getFormattedTime(timestamp)
+                clone.querySelector('.entry__author').textContent = editor
+                return clone
             }
         }
 
@@ -871,21 +860,22 @@
             sections.forEach(({ id, title }) => {
                 currentArticle['sections'][id] = {
                     title,
-                    uniqueEntries: []
+                    uniqueEntries: new Set()
                 }
             })
             currentArticle['uniqueEntries'] = {}
             for (const key in generalData) {
-                const { section, data, origin } = generalData[key].message
+                const { message: { section, data, origin }, senderID } = generalData[key]
                 if (!currentArticle.uniqueEntries.hasOwnProperty(origin)) {
                     currentArticle.uniqueEntries[origin] = {
                         iterations: []
                     }
                 }
-                currentArticle.sections[section].uniqueEntries.push(origin)
+                currentArticle.sections[section].uniqueEntries.add(origin)
                 currentArticle.uniqueEntries[origin]['iterations'].push({
                     timestamp: generalData[key].time,
-                    data
+                    data,
+                    editor: senderID
                 })
             }
             for (const entry in currentArticle.uniqueEntries) {
@@ -893,12 +883,38 @@
             }
         }
 
-        const splitAt = (string, index) => [string.slice(0, index), string.slice(index)]
-        getRef('article_wrapper').addEventListener('focusout', e => {
-            if (e.target.closest('.content__area')) {
-                normalizeText(e.target.closest('.content__area'))
+        function getIterationDetails(uid, targetIndex) {
+            let merged
+            const contributors = new Set()
+            const limit = targetIndex || currentArticle.uniqueEntries[uid].iterations.length - 1
+            for (let i = 0; i <= limit; i++) {
+                const { data, editor } = currentArticle.uniqueEntries[uid].iterations[i]
+                merged = i ? updateString(merged, data) : data
+                contributors.add(editor)
             }
-        })
+            return {
+                data: merged,
+                contributors
+            }
+        }
+
+        function showVersionHistory(uid) {
+            const { iterations } = currentArticle.uniqueEntries[uid]
+            const frag = document.createDocumentFragment()
+            iterations.forEach(iter => {
+                frag.prepend(render.historyEntry(iter))
+            })
+            getRef('version_timeline').innerHTML = ''
+            getRef('version_timeline').append(frag)
+            getRef('version_history_panel').classList.remove('hide-completely')
+        }
+
+        function hideVersionHistory() {
+            getRef('version_history_panel').classList.add('hide-completely')
+            getRef('version_timeline').innerHTML = ''
+        }
+
+        const splitAt = (string, index) => [string.slice(0, index), string.slice(index)]
 
         function normalizeText(target) {
             if (target) {
@@ -914,15 +930,23 @@
             }
         }
 
-        const detectFormatting = debounce(() => {
+        function manageFormattingOptions() {
             const selection = window.getSelection();
-            if (selection.isCollapsed) {
+            if (selection.isCollapsed && selection.focusNode.textContent.trim() !== '') {
                 getRef('text_toolbar').classList.add('hide-completely')
                 document.querySelectorAll('.formatting-button').forEach(elem => elem.classList.remove('active'))
             } else {
+                const pos = selection.isCollapsed ? selection.anchorNode.getBoundingClientRect() : selection.getRangeAt(0).getBoundingClientRect()
+                getRef('text_toolbar').style.transform = `translate(${pos.left}px, calc(${pos.bottom + window.pageYOffset}px + 1rem))`
                 getRef('text_toolbar').classList.remove('hide-completely')
-                const pos = selection.getRangeAt(0).getBoundingClientRect()
                 getRef('text_toolbar').style.transform = `translate(${pos.left}px, calc(${pos.bottom + window.pageYOffset}px + 0.3rem))`
+            }
+        }
+
+        const detectFormatting = debounce((e) => {
+            const selection = window.getSelection();
+            manageFormattingOptions()
+            if (!selection.isCollapsed) {
                 const isBold = document.queryCommandState('bold')
                 const isItalic = document.queryCommandState('italic')
                 const isUnderlined = document.queryCommandState('underline')
@@ -944,8 +968,6 @@
             }
         },
             200)
-        document.addEventListener('selectionchange', detectFormatting)
-
 
         const replaceBetween = (origin, startIndex, endIndex, insertion) =>
             `${origin.substring(0, startIndex)}${insertion}${origin.substring(endIndex)}`;
