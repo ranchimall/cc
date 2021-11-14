@@ -395,9 +395,6 @@ button:active,
   padding: 0.5rem;
   cursor: pointer;
 }
-
-#main_page {
-}
 .logo {
   display: grid;
   align-items: center;
@@ -484,9 +481,14 @@ sm-checkbox {
   fill: var(--danger-color);
 }
 
+#main_page {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 #article_wrapper {
-  justify-self: center;
-  padding: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
   gap: 1rem 0;
 }
 
@@ -506,6 +508,7 @@ sm-checkbox {
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
+  flex-shrink: 0;
   &:not(:last-of-type) {
     margin-bottom: 1.5rem;
   }
@@ -629,26 +632,24 @@ sm-checkbox {
 }
 
 #version_history_panel {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  margin: 1rem;
   border-radius: 0.5rem;
-  padding: 1rem;
-  width: min(22rem, 100%);
+  width: min(24rem, 100%);
   background-color: var(--foreground-color);
-  box-shadow: -0.5rem 0 1rem rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  & > :first-child {
+    padding: 1rem;
+  }
 }
 #version_timeline {
+  padding: 1rem;
   height: 100%;
-  margin-top: 1.5rem;
   overflow-y: auto;
 }
 .history-entry {
-  padding: 1rem;
-  border-radius: 0.3rem;
-  user-select: none;
+  &:not(:last-of-type) {
+    padding-bottom: 1rem;
+    border-bottom: thin solid rgba(var(--text-color), 0.3);
+  }
   &:last-of-type::before {
     content: "CREATED";
     letter-spacing: 0.03em;
@@ -656,14 +657,23 @@ sm-checkbox {
     justify-self: flex-start;
     font-weight: 500;
     padding: 0.2rem 0.3rem;
-    font-size: 0.8rem;
-    background-color: rgba(var(--text-color), 0.06);
+    font-size: 0.7rem;
+    border-radius: 0.2rem;
+    border: solid thin rgba(var(--text-color), 0.5);
   }
 }
 .entry__time,
 .entry__author {
   font-size: 0.8rem;
   font-weight: 500;
+}
+.entry__changes {
+  .added {
+    background-color: #00e67650;
+  }
+  .removed {
+    background-color: #ff3a4a50;
+  }
 }
 
 @media screen and (max-width: 40rem) and (any-hover: none) {
@@ -701,6 +711,7 @@ sm-checkbox {
     font-size: 1rem;
   }
   .popup__header {
+    grid-column: 1/-1;
     padding: 1rem 1.5rem 0 0.5rem;
   }
   #confirmation_popup {
@@ -711,6 +722,18 @@ sm-checkbox {
   }
   .hide-on-desktop {
     display: none;
+  }
+  #main_page {
+    &.active-sidebar {
+      height: 100%;
+      overflow-y: hidden;
+      grid-template-rows: auto 1fr;
+      grid-template-columns: minmax(0, 1fr) 24rem;
+      #article_wrapper {
+        height: 100%;
+        overflow-y: auto;
+      }
+    }
   }
 }
 @media (any-hover: hover) {

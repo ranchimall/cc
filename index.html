@@ -133,8 +133,8 @@
                 </svg>
             </button>
         </div>
-        <div id="article_wrapper" class="grid page-layout"></div>
-        <section class="grid page-layout">
+        <div id="article_wrapper"></div>
+        <!-- <div class="grid page-layout">
             <div id="action_button_group" class="flex align-center gap-0-5">
                 <span>
                     <b>
@@ -142,8 +142,8 @@
                     </b>
                 </span>
                 <button class="actionable-button" title="Add paragraph">
-                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
-                        fill="#000000">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                        width="24px" fill="#000000">
                         <path d="M0 0h24v24H0V0z" fill="none" />
                         <path d="M14 17H4v2h10v-2zm6-8H4v2h16V9zM4 15h16v-2H4v2zM4 5v2h16V5H4z" />
                     </svg>
@@ -152,7 +152,7 @@
                     </span>
                 </button>
             </div>
-        </section>
+        </div> -->
         <aside id="version_history_panel" class="flex direction-column hide-completely">
             <div class="flex align-center space-between">
                 <div class="flex align-center">
@@ -173,7 +173,7 @@
                     </svg>
                 </button>
             </div>
-            <ul id="version_timeline" class="flex direction-column gap-0-5"></ul>
+            <ul id="version_timeline" class="flex direction-column gap-1-5"></ul>
         </aside>
     </article>
     <sm-popup id="article_list_popup">
@@ -270,7 +270,7 @@
         <p><br></p>
     </template>
     <template id="history_entry_template">
-        <li class="history-entry interact grid gap-0-5">
+        <li class="history-entry grid gap-0-5">
             <div class="flex align-center space-between">
                 <time class="entry__time"></time>
                 <span class="entry__score"></span>
@@ -279,6 +279,7 @@
                 <div class="label">Author</div>
                 <span class="entry__author breakable"></span>
             </div>
+            <div class="entry__changes"></div>
         </li>
     </template>
     <script id="ui_utils">
@@ -673,8 +674,16 @@
         returns newStr
         */
 
+        function splitHTML(string) {
+            const el = createElement('div', {
+                innerHTML: string
+            });
+            return Array.from(el.childNodes).map(e => (e.outerHTML || e.innerHTML || e.nodeValue).split(' ').filter(t => t)).flat();
+        }
+
         function getDiff(oldStr, newStr) {
-            let d = patienceDiff(oldStr.split(" "), newStr.split(" "), true);
+            console.log(splitHTML(oldStr), splitHTML(newStr))
+            let d = patienceDiff(splitHTML(oldStr), splitHTML(newStr), true);
             return [d.aMoveIndex, d.bMove, d.bMoveIndex]
         }
 
@@ -732,16 +741,17 @@
                 contentArea.querySelectorAll('[style=""]').forEach((el) => {
                     el.removeAttribute('style')
                 })
-                const clean = DOMPurify.sanitize(contentArea.innerHTML);
+                const clean = DOMPurify.sanitize(contentArea.innerHTML.split('\n').map(v => v.trim()).filter(v => v));
                 if (clean.trim() === '') return
                 let previousVersion, contributors
                 if (!isUniqueEntry)
                     ({ data: previousVersion, contributors } = getIterationDetails(uid))
                 const entry = {
-                    section: contentCard.closest('.article-section').dataset.id,
+                    section: contentCard.closest('.article-section').dataset.sectionId,
                     origin: isUniqueEntry ? floCrypto.randString(16, true) : uid,
                     data: isUniqueEntry ? clean : getDiff(previousVersion, clean),
                 }
+                console.log(entry)
                 floCloudAPI.sendGeneralData(entry, `${currentArticle.id}_gd`)
                     .then((res) => {
                         console.log(res)
@@ -750,7 +760,10 @@
                             contentArea.innerHTML = ''
                     })
             } else if (e.target.closest('.version-history-button')) {
-                showVersionHistory(e.target.closest('.content-card').dataset.uid)
+                if (isHistoryPanelOpen)
+                    hideVersionHistory()
+                else
+                    showVersionHistory(e.target.closest('.content-card').dataset.uid)
             }
         })
         getRef('article_wrapper').addEventListener("paste", e => {
@@ -776,6 +789,15 @@
                 })
             }
         })
+        getRef('article_wrapper').addEventListener("dblclick", e => {
+            if (e.target.closest('.heading')) {
+                const target = e.target.closest('.heading')
+                if (!target.isContentEditable) {
+                    target.contentEditable = true
+                    target.focus()
+                }
+            }
+        })
         getRef('article_wrapper').addEventListener("focusout", e => {
             if (e.target.closest('.content__area')) {
                 document.removeEventListener('selectionchange', detectFormatting)
@@ -784,6 +806,12 @@
                 const selection = window.getSelection()
                 if (!e.relatedTarget?.closest('#text_toolbar')) {
                     getRef('text_toolbar').classList.add('hide-completely')
+                }
+            } else if (e.target.closest('.heading')) {
+                const target = e.target.closest('.heading')
+                if (target.isContentEditable) {
+                    floGlobals.appObjects[currentArticle.id].sections[target.dataset.index].title = target.textContent.trim()
+                    target.contentEditable = false
                 }
             }
         })
@@ -808,10 +836,11 @@
     <script>
         let currentArticle = {}
         const render = {
-            section(sectionID, { title, uniqueEntries }) {
+            section(sectionID, { title, uniqueEntries }, index) {
                 const section = getRef('section_template').content.cloneNode(true)
                 const frag = document.createDocumentFragment()
-                section.children[1].dataset.id = sectionID
+                section.children[0].dataset.index = index
+                section.children[1].dataset.sectionId = sectionID
                 section.querySelector('.heading').textContent = title
                 currentArticle.sections[sectionID].uniqueEntries.forEach(entry => {
                     frag.append(render.contentCard(entry))
@@ -837,18 +866,33 @@
                 const { title } = floGlobals.appObjects.cc.articleList[id]
                 const { writer, sections } = currentArticle
                 const frag = document.createDocumentFragment()
+                let index = 0
                 for (const sectionID in sections) {
-                    frag.append(render.section(sectionID, sections[sectionID]))
+                    frag.append(render.section(sectionID, sections[sectionID], index))
+                    index += 1
                 }
                 getRef('current_article_name').textContent = title
                 getRef('article_wrapper').innerHTML = ''
                 getRef('article_wrapper').append(frag)
             },
-            historyEntry(details) {
-                const { editor, timestamp } = details
+            historyEntry(details, oldText) {
+                const { editor, timestamp, data } = details
                 const clone = getRef('history_entry_template').content.cloneNode(true).firstElementChild;
                 clone.querySelector('.entry__time').textContent = getFormattedTime(timestamp)
                 clone.querySelector('.entry__author').textContent = editor
+                if (Array.isArray(data)) {
+                    console.log(data)
+                    const [removedAt, addedWords, addedAt] = data
+                    const changed = oldText.split(' ')
+                    let firstAddedPlace
+                    let startIndex, endIndex
+                    let addedNodes
+                    addedAt.forEach((place, index) => {
+                        changed.splice(place, 0, `<span class="added">${addedWords[index]}</span>`)
+                    })
+                    removedAt.forEach(place => changed[place] = `<span class="removed">${changed[place]}</span>`)
+                    clone.querySelector('.entry__changes').innerHTML = changed.join(' ')
+                }
                 return clone
             }
         }
@@ -866,7 +910,7 @@
             currentArticle['uniqueEntries'] = {}
             for (const key in generalData) {
                 const { message: { section, data, origin }, senderID } = generalData[key]
-                if (!currentArticle.uniqueEntries.hasOwnProperty(origin)) {
+                if (!currentArticle.uniqueEntries.hasOwnProperty(origin)) { // check if  gen data has origin that's already defined
                     currentArticle.uniqueEntries[origin] = {
                         iterations: []
                     }
@@ -877,6 +921,9 @@
                     data,
                     editor: senderID
                 })
+            }
+            for (const sectionID in currentArticle.sections) {
+                currentArticle.sections[sectionID].uniqueEntries = [...currentArticle.sections[sectionID].uniqueEntries].reverse()
             }
             for (const entry in currentArticle.uniqueEntries) {
                 currentArticle.uniqueEntries[entry]['iterations'].sort((a, b) => a.timestamp - b.timestamp)
@@ -898,20 +945,47 @@
             }
         }
 
+        let isHistoryPanelOpen = false
         function showVersionHistory(uid) {
             const { iterations } = currentArticle.uniqueEntries[uid]
             const frag = document.createDocumentFragment()
-            iterations.forEach(iter => {
-                frag.prepend(render.historyEntry(iter))
+            let mergedChanges/* , oldText */
+            // oldText = createElement('div', {
+            //     innerHTML: mergedChanges
+            // }).textContent
+            iterations.forEach((iter, index) => {
+                // const tempText = createElement('div', {
+                //     innerHTML: tempMergedChanges
+                // }).textContent
+                // const changes = {
+                //     diff: getDiff(oldText, tempText),
+                // }
+                // const versions = {
+                //     oldText: mergedChanges,
+                //     newText: tempMergedChanges
+                // }
+                // oldText = tempText
+                // console.log(mergedChanges, iter.data, tempMergedChanges)
+                frag.prepend(render.historyEntry(iter, mergedChanges))
+                mergedChanges = index ? updateString(mergedChanges, iter.data) : iter.data
+                // mergedChanges = tempMergedChanges
             })
             getRef('version_timeline').innerHTML = ''
             getRef('version_timeline').append(frag)
-            getRef('version_history_panel').classList.remove('hide-completely')
+            if (!isHistoryPanelOpen) {
+                getRef('version_history_panel').classList.remove('hide-completely')
+                getRef('main_page').classList.add('active-sidebar')
+                isHistoryPanelOpen = true
+            }
         }
 
         function hideVersionHistory() {
-            getRef('version_history_panel').classList.add('hide-completely')
-            getRef('version_timeline').innerHTML = ''
+            if (isHistoryPanelOpen) {
+                getRef('version_history_panel').classList.add('hide-completely')
+                getRef('version_timeline').innerHTML = ''
+                getRef('main_page').classList.remove('active-sidebar')
+                isHistoryPanelOpen = false
+            }
         }
 
         const splitAt = (string, index) => [string.slice(0, index), string.slice(index)]
