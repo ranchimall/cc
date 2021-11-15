@@ -509,6 +509,7 @@ sm-checkbox {
   gap: 0.5rem;
   overflow-x: auto;
   flex-shrink: 0;
+  scroll-snap-type: x mandatory;
   &:not(:last-of-type) {
     margin-bottom: 1.5rem;
   }
@@ -519,7 +520,8 @@ sm-checkbox {
 }
 
 .content-card {
-  width: min(50ch, 100%);
+  scroll-snap-align: start;
+  width: min(46ch, 100%);
   flex-shrink: 0;
   border-radius: 0.5rem;
   background-color: var(--foreground-color);
@@ -668,6 +670,13 @@ sm-checkbox {
   font-weight: 500;
 }
 .entry__changes {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: rgba(var(--text-color), 0.8);
+  .added > *,
+  .removed > * {
+    background-color: inherit;
+  }
   .added {
     background-color: #00e67650;
   }

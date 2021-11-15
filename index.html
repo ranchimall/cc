@@ -682,7 +682,7 @@
         }
 
         function getDiff(oldStr, newStr) {
-            console.log(splitHTML(oldStr), splitHTML(newStr))
+            // console.log(splitHTML(oldStr), splitHTML(newStr))
             let d = patienceDiff(splitHTML(oldStr), splitHTML(newStr), true);
             return [d.aMoveIndex, d.bMove, d.bMoveIndex]
         }
@@ -742,23 +742,33 @@
                     el.removeAttribute('style')
                 })
                 const clean = DOMPurify.sanitize(contentArea.innerHTML.split('\n').map(v => v.trim()).filter(v => v));
-                if (clean.trim() === '') return
+                // const clean = contentArea.innerText.trim();
+
+                if (clean === '') return
+                const hash = Crypto.SHA256(clean)
                 let previousVersion, contributors
                 if (!isUniqueEntry)
-                    ({ data: previousVersion, contributors } = getIterationDetails(uid))
-                const entry = {
-                    section: contentCard.closest('.article-section').dataset.sectionId,
-                    origin: isUniqueEntry ? floCrypto.randString(16, true) : uid,
-                    data: isUniqueEntry ? clean : getDiff(previousVersion, clean),
+                    ({ data: previousVersion, contributors, hash: previousHash } = getIterationDetails(uid))
+                if (previousHash !== hash) {
+                    const entry = {
+                        section: contentCard.closest('.article-section').dataset.sectionId,
+                        origin: isUniqueEntry ? floCrypto.randString(16, true) : uid,
+                        data: isUniqueEntry ? clean : getDiff(previousVersion, clean),
+                        hash
+                    }
+                    floCloudAPI.sendGeneralData(entry, `${currentArticle.id}_gd`)
+                        .then((res) => {
+                            console.log(res)
+                            notify('sent data', 'success')
+                            if (isUniqueEntry)
+                                contentArea.innerHTML = ''
+                            else {
+
+                            }
+                        })
+                } else {
+                    notify("Duplicate entry!", 'error')
                 }
-                console.log(entry)
-                floCloudAPI.sendGeneralData(entry, `${currentArticle.id}_gd`)
-                    .then((res) => {
-                        console.log(res)
-                        notify('sent data', 'success')
-                        if (isUniqueEntry)
-                            contentArea.innerHTML = ''
-                    })
             } else if (e.target.closest('.version-history-button')) {
                 if (isHistoryPanelOpen)
                     hideVersionHistory()
@@ -785,7 +795,7 @@
                     target.innerHTML = `<p><br/></p>`
                 }
                 childObserver.observe(target, {
-                    childList: true
+                    childList: true,
                 })
             }
         })
@@ -800,12 +810,12 @@
         })
         getRef('article_wrapper').addEventListener("focusout", e => {
             if (e.target.closest('.content__area')) {
-                document.removeEventListener('selectionchange', detectFormatting)
-                childObserver.disconnect()
                 normalizeText(e.target.closest('.content__area'))
+                document.removeEventListener('selectionchange', detectFormatting)
                 const selection = window.getSelection()
                 if (!e.relatedTarget?.closest('#text_toolbar')) {
                     getRef('text_toolbar').classList.add('hide-completely')
+                    childObserver.disconnect()
                 }
             } else if (e.target.closest('.heading')) {
                 const target = e.target.closest('.heading')
@@ -822,7 +832,7 @@
                         observer.disconnect()
                         mutation.target.innerHTML = `<p><br/></p>`
                         childObserver.observe(mutation.target, {
-                            childList: true
+                            childList: true,
                         })
                     }
                 }
@@ -881,17 +891,26 @@
                 clone.querySelector('.entry__time').textContent = getFormattedTime(timestamp)
                 clone.querySelector('.entry__author').textContent = editor
                 if (Array.isArray(data)) {
-                    console.log(data)
                     const [removedAt, addedWords, addedAt] = data
                     const changed = oldText.split(' ')
-                    let firstAddedPlace
-                    let startIndex, endIndex
-                    let addedNodes
                     addedAt.forEach((place, index) => {
-                        changed.splice(place, 0, `<span class="added">${addedWords[index]}</span>`)
+                        changed.splice(place, 0, { added: true, content: addedWords[index] })
                     })
-                    removedAt.forEach(place => changed[place] = `<span class="removed">${changed[place]}</span>`)
-                    clone.querySelector('.entry__changes').innerHTML = changed.join(' ')
+                    removedAt.forEach(place => changed[place] = { added: false, content: changed[place] })
+                    const final = changed.map((word, index) => {
+                        if (word.hasOwnProperty('added')) {
+                            let consecutiveWords = [word.content],
+                                i
+                            const type = word.added
+                            for (i = index + 1; (changed[i + 1] && changed[i + 1].hasOwnProperty('added') && changed[i + 1].added === type); i++) {
+                                consecutiveWords.push(changed[i].content)
+                            }
+                            changed.splice(index, i - index)
+                            console.log(consecutiveWords)
+                            return `<span class="${type ? 'added' : 'removed'}">${consecutiveWords.join(' ')}</span>`
+                        } else return word
+                    })
+                    clone.querySelector('.entry__changes').innerHTML = final.join(' ')
                 }
                 return clone
             }
@@ -909,7 +928,7 @@
             })
             currentArticle['uniqueEntries'] = {}
             for (const key in generalData) {
-                const { message: { section, data, origin }, senderID } = generalData[key]
+                const { message: { section, data, origin, hash }, senderID } = generalData[key]
                 if (!currentArticle.uniqueEntries.hasOwnProperty(origin)) { // check if  gen data has origin that's already defined
                     currentArticle.uniqueEntries[origin] = {
                         iterations: []
@@ -919,7 +938,8 @@
                 currentArticle.uniqueEntries[origin]['iterations'].push({
                     timestamp: generalData[key].time,
                     data,
-                    editor: senderID
+                    editor: senderID,
+                    hash
                 })
             }
             for (const sectionID in currentArticle.sections) {
@@ -941,7 +961,8 @@
             }
             return {
                 data: merged,
-                contributors
+                contributors,
+                hash: currentArticle.uniqueEntries[uid].iterations[limit].hash
             }
         }
 

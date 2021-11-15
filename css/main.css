@@ -586,6 +586,8 @@ sm-checkbox {
   overflow-x: auto;
   -ms-flex-negative: 0;
       flex-shrink: 0;
+  -ms-scroll-snap-type: x mandatory;
+      scroll-snap-type: x mandatory;
 }
 .article-section:not(:last-of-type) {
   margin-bottom: 1.5rem;
@@ -599,7 +601,8 @@ sm-checkbox {
 }
 
 .content-card {
-  width: min(50ch, 100%);
+  scroll-snap-align: start;
+  width: min(46ch, 100%);
   -ms-flex-negative: 0;
       flex-shrink: 0;
   border-radius: 0.5rem;
@@ -768,6 +771,15 @@ sm-checkbox {
   font-weight: 500;
 }
 
+.entry__changes {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: rgba(var(--text-color), 0.8);
+}
+.entry__changes .added > *,
+.entry__changes .removed > * {
+  background-color: inherit;
+}
 .entry__changes .added {
   background-color: #00e67650;
 }
