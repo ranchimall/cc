@@ -80,7 +80,7 @@
                         <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                     </svg>
                 </button>
-                <h4 id="current_article_name"></h4>
+                <text-field id="current_article_title"></text-field>
                 <button class="button__icon--right" onclick="showPopup('article_list_popup')">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                         fill="#000000">
@@ -189,6 +189,7 @@
                 <sm-input placeholder="Search articles" type="search"></sm-input>
             </div>
         </header>
+        <div id="article_list"></div>
     </sm-popup>
     <sm-popup id="create_article_popup">
         <header slot="header" class="popup__header">
@@ -221,14 +222,14 @@
         </sm-form>
     </sm-popup>
     <template id="section_template">
-        <h4 class="heading"></h4>
+        <text-field class="heading"></text-field>
         <section class="article-section">
             <div class="content-card content-card--empty">
                 <div class="content__area" data-type="origin" placeholder="Write something new or edit existing content"
                     contenteditable="true"></div>
-                <button class="submit-entry">Submit</button>
+                <button class="submit-entry hide-completely">Submit</button>
             </div>
-            <div class="content-card-container"></div>
+            <!-- <div class="content-card-container"></div> -->
         </section>
     </template>
     <template id="content_card_template">
@@ -251,11 +252,11 @@
                             <path
                                 d="M12 7.13l.97 2.29.47 1.11 1.2.1 2.47.21-1.88 1.63-.91.79.27 1.18.56 2.41-2.12-1.28-1.03-.64-1.03.62-2.12 1.28.56-2.41.27-1.18-.91-.79-1.88-1.63 2.47-.21 1.2-.1.47-1.11.97-2.27M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2z" />
                         </svg>
-                        <span class="content__score">47</span>
+                        <span class="content__score">0</span>
                     </button>
                 </div>
                 <div class="content__editor"></div>
-                <button class="submit-entry">Submit</button>
+                <button class="submit-entry hide-completely">Submit</button>
             </div>
         </div>
     </template>
@@ -533,51 +534,26 @@
                 }
             } else {
                 if (targetPage.includes('/')) {
-                    const pages = targetPage.split('/')
-                    pageId = pages[1]
+                    if (targetPage.includes('?')) {
+                        const splitAddress = targetPage.split('?')
+                        searchParams = splitAddress.pop()
+                        const pages = splitAddress.pop().split('/')
+                        pageId = pages[1]
+                        subPageId = pages[2]
+                    } else {
+                        const pages = targetPage.split('/')
+                        pageId = pages[1]
+                        subPageId = pages[2]
+                    }
                 } else {
                     pageId = targetPage
                 }
             }
             if (pagesData.lastPage !== pageId) {
-                let target
-                switch (pageId) {
-                    case 'dashboard':
-                        target = 'dashboard'
-                        break;
-                    case 'my_orders':
-                        target = 'my_orders_section'
-                        break;
-                    case 'market':
-                        target = 'market_orders_section'
-                        break;
-                    case 'wallet':
-                        target = 'user_section'
-                        break;
-                }
-                if (target) {
-                    document.querySelectorAll('.mobile-page').forEach(elem => elem.classList.add('hide-on-mobile'))
-                    getRef(target).classList.remove('hide-on-mobile')
-                    document.querySelectorAll('.bottom_nav__item').forEach(elem => elem.classList.remove('bottom_nav__item--active'))
-                    document.querySelector(`.bottom_nav__item[href="#/${pageId}"]`).classList.add('bottom_nav__item--active')
-                    getRef(target)?.animate([
-                        {
-                            transform: 'translateY(1rem)',
-                            opacity: 0,
-                        },
-                        {
-                            transform: 'none',
-                            opacity: 1,
-                        },
-                    ],
-                        {
-                            duration: 300,
-                            easing: 'ease'
-                        })
-                    pagesData.lastPage = target
-                    if (!pagesData.openedPages.includes(target)) {
-                        pagesData.openedPages.push(target)
-                    }
+                document.querySelectorAll('.mobile-page').forEach(elem => elem.classList.add('hide-on-mobile'))
+                pagesData.lastPage = pageId
+                if (!pagesData.openedPages.includes(pageId)) {
+                    pagesData.openedPages.push(pageId)
                 }
             }
         }
@@ -732,26 +708,62 @@
             }
         }
 
+        const checkEntry = debounce(e => {
+            const contentCard = e.target.closest('.content-card')
+            const contentArea = contentCard.querySelector('.content__area')
+            const uid = contentCard.dataset.uid
+            const isUniqueEntry = contentArea.dataset.type === 'origin'
+            contentArea.querySelectorAll('[style=""]').forEach((el) => {
+                el.removeAttribute('style')
+            })
+            const clean = DOMPurify.sanitize(contentArea.innerHTML.split('\n').map(v => v.trim()).filter(v => v));
+            if (clean === '' || clean === '<p><br></p>') {
+                contentCard.querySelector('.submit-entry').classList.add('hide-completely')
+            } else {
+                const hash = Crypto.SHA256(clean)
+                let previousHash
+                if (!isUniqueEntry) {
+                    ({ hash: previousHash = '' } = getIterationDetails(uid))
+                } else {
+                    previousHash = ''
+                }
+                if (previousHash !== hash)
+                    contentCard.querySelector('.submit-entry').classList.remove('hide-completely')
+                else
+                    contentCard.querySelector('.submit-entry').classList.add('hide-completely')
+            }
+
+        }, 300)
+        getRef('article_wrapper').addEventListener('input', e => {
+            if (e.target.closest('.content__area')) {
+                checkEntry(e)
+            }
+        })
         getRef('article_wrapper').addEventListener('click', e => {
             if (e.target.closest('.submit-entry')) {
                 const contentCard = e.target.closest('.content-card')
                 const contentArea = contentCard.querySelector('.content__area')
                 const uid = contentCard.dataset.uid
                 const isUniqueEntry = contentArea.dataset.type === 'origin'
+                const parentSection = contentCard.closest('.article-section')
+                const sectionID = parentSection.dataset.sectionId
                 contentArea.querySelectorAll('[style=""]').forEach((el) => {
                     el.removeAttribute('style')
                 })
                 const clean = DOMPurify.sanitize(contentArea.innerHTML.split('\n').map(v => v.trim()).filter(v => v));
-                // const clean = contentArea.innerText.trim();
 
                 if (clean === '') return
                 const hash = Crypto.SHA256(clean)
-                let previousVersion, contributors
-                if (!isUniqueEntry)
-                    ({ data: previousVersion, contributors, hash: previousHash } = getIterationDetails(uid))
+                let previousVersion, previousHash
+                if (!isUniqueEntry) {
+                    ({ data: previousVersion, hash: previousHash = '' } = getIterationDetails(uid))
+                } else {
+                    previousHash = ''
+                }
                 if (previousHash !== hash) {
+                    const timestamp = Date.now()
                     const entry = {
-                        section: contentCard.closest('.article-section').dataset.sectionId,
+                        section: sectionID,
                         origin: isUniqueEntry ? floCrypto.randString(16, true) : uid,
                         data: isUniqueEntry ? clean : getDiff(previousVersion, clean),
                         hash
@@ -759,21 +771,26 @@
                     floCloudAPI.sendGeneralData(entry, `${currentArticle.id}_gd`)
                         .then((res) => {
                             console.log(res)
+                            e.target.closest('.submit-entry').classList.add('hide-completely')
                             notify('sent data', 'success')
-                            if (isUniqueEntry)
+                            if (isUniqueEntry) {
                                 contentArea.innerHTML = ''
-                            else {
-
+                                currentArticle.sections[sectionID].uniqueEntries.push(entry.origin)
+                                currentArticle.uniqueEntries[entry.origin] = { iterations: [{ ...entry, timestamp }] }
+                                parentSection.firstElementChild.after(render.contentCard(entry.origin))
+                            } else {
+                                currentArticle.uniqueEntries[entry.origin].iterations.push({ ...entry, timestamp })
                             }
                         })
                 } else {
                     notify("Duplicate entry!", 'error')
                 }
             } else if (e.target.closest('.version-history-button')) {
-                if (isHistoryPanelOpen)
+                const entryUid = e.target.closest('.content-card').dataset.uid
+                if (versionHistory.isOpen && entryUid === versionHistory.entryUid)
                     hideVersionHistory()
                 else
-                    showVersionHistory(e.target.closest('.content-card').dataset.uid)
+                    showVersionHistory(entryUid)
             }
         })
         getRef('article_wrapper').addEventListener("paste", e => {
@@ -786,11 +803,28 @@
 
             event.preventDefault();
         })
+        getRef('current_article_title').addEventListener("change", e => {
+            floGlobals.appObjects.cc.articleList[currentArticle.id].title = e.target.value.trim()
+            floCloudAPI.updateObjectData('cc')
+                .then((res) => {
+                    notify('Renamed article', 'success')
+                })
+                .catch(err => console.error(err))
+        })
+        getRef('article_wrapper').addEventListener("change", e => {
+            if (e.target.classList.contains('heading')) {
+                floGlobals.appObjects[currentArticle.id].sections[e.target.dataset.index].title = e.target.value.trim()
+                floCloudAPI.updateObjectData(currentArticle.id)
+                    .then((res) => {
+                        notify('Updated heading', 'success')
+                    })
+                    .catch(err => console.error(err))
+            }
+        })
         getRef('article_wrapper').addEventListener("focusin", e => {
             if (e.target.closest('.content__area')) {
-                document.addEventListener('selectionchange', detectFormatting)
-
                 const target = e.target.closest('.content__area')
+                document.addEventListener('selectionchange', detectFormatting)
                 if (target.childNodes[0] === undefined) {
                     target.innerHTML = `<p><br/></p>`
                 }
@@ -799,29 +833,15 @@
                 })
             }
         })
-        getRef('article_wrapper').addEventListener("dblclick", e => {
-            if (e.target.closest('.heading')) {
-                const target = e.target.closest('.heading')
-                if (!target.isContentEditable) {
-                    target.contentEditable = true
-                    target.focus()
-                }
-            }
-        })
         getRef('article_wrapper').addEventListener("focusout", e => {
             if (e.target.closest('.content__area')) {
+                const target = e.target.closest('.content__area')
                 normalizeText(e.target.closest('.content__area'))
                 document.removeEventListener('selectionchange', detectFormatting)
                 const selection = window.getSelection()
                 if (!e.relatedTarget?.closest('#text_toolbar')) {
                     getRef('text_toolbar').classList.add('hide-completely')
                     childObserver.disconnect()
-                }
-            } else if (e.target.closest('.heading')) {
-                const target = e.target.closest('.heading')
-                if (target.isContentEditable) {
-                    floGlobals.appObjects[currentArticle.id].sections[target.dataset.index].title = target.textContent.trim()
-                    target.contentEditable = false
                 }
             }
         })
@@ -846,17 +866,38 @@
     <script>
         let currentArticle = {}
         const render = {
-            section(sectionID, { title, uniqueEntries }, index) {
-                const section = getRef('section_template').content.cloneNode(true)
+            article(id) {
+                currentArticle.id = id
+                parseArticleData()
+                const { title } = floGlobals.appObjects.cc.articleList[id]
+                const { writer, sections } = currentArticle
                 const frag = document.createDocumentFragment()
-                section.children[0].dataset.index = index
-                section.children[1].dataset.sectionId = sectionID
-                section.querySelector('.heading').textContent = title
-                currentArticle.sections[sectionID].uniqueEntries.forEach(entry => {
-                    frag.append(render.contentCard(entry))
+                let index = 0
+                for (const sectionID in sections) {
+                    frag.append(render.section(sectionID, sections[sectionID], index))
+                    index += 1
+                }
+                if (!floGlobals.subAdmins.includes(myFloID)) {
+                    getRef('current_article_title').setAttribute('disabled', '')
+                }
+                getRef('current_article_title').value = title
+                getRef('article_wrapper').innerHTML = ''
+                getRef('article_wrapper').append(frag)
+            },
+            articleLink(uid, details, isDefaultArticle) {
+                const { timestamp, title } = details
+                const link = createElement('a', {
+                    textContent: title,
+                    attributes: { href: `#/home?articleID=${uid}` },
+                    className: 'article-link flex interact'
                 })
-                section.querySelector('.content-card-container').append(frag)
-                return section
+                if (isDefaultArticle) {
+                    link.append(createElement('span', {
+                        className: 'default-article',
+                        textContent: 'Active'
+                    }))
+                }
+                return link
             },
             contentCard(id, version = 0) {
                 const clone = getRef('content_card_template').content.cloneNode(true).firstElementChild;
@@ -869,21 +910,6 @@
                 clone.querySelector('.content__editor').textContent = `by ${contributors}`;
                 // clone.querySelector('.content__score').textContent = score;
                 return clone
-            },
-            article(id) {
-                currentArticle.id = id
-                parseArticleData()
-                const { title } = floGlobals.appObjects.cc.articleList[id]
-                const { writer, sections } = currentArticle
-                const frag = document.createDocumentFragment()
-                let index = 0
-                for (const sectionID in sections) {
-                    frag.append(render.section(sectionID, sections[sectionID], index))
-                    index += 1
-                }
-                getRef('current_article_name').textContent = title
-                getRef('article_wrapper').innerHTML = ''
-                getRef('article_wrapper').append(frag)
             },
             historyEntry(details, oldText) {
                 const { editor, timestamp, data } = details
@@ -905,15 +931,34 @@
                             for (i = index + 1; (changed[i + 1] && changed[i + 1].hasOwnProperty('added') && changed[i + 1].added === type); i++) {
                                 consecutiveWords.push(changed[i].content)
                             }
-                            changed.splice(index, i - index)
-                            console.log(consecutiveWords)
+                            if (i - index > 1)
+                                changed.splice((index + 1), (i - index - 1))
                             return `<span class="${type ? 'added' : 'removed'}">${consecutiveWords.join(' ')}</span>`
                         } else return word
                     })
-                    clone.querySelector('.entry__changes').innerHTML = final.join(' ')
+                    clone.querySelector('.entry__changes').innerHTML = DOMPurify.sanitize(final.join(' '))
+                } else {
+                    clone.querySelector('.entry__changes').innerHTML = DOMPurify.sanitize(data)
                 }
                 return clone
-            }
+            },
+            section(sectionID, { title, uniqueEntries }, index) {
+                const section = getRef('section_template').content.cloneNode(true)
+                const frag = document.createDocumentFragment()
+                section.children[0].dataset.index = index
+                section.children[1].dataset.sectionId = sectionID
+                if (floGlobals.subAdmins.includes(myFloID)) {
+                    section.querySelector('.content-card--empty').remove()
+                } else {
+                    section.querySelector('.heading').setAttribute('disabled', '')
+                }
+                section.querySelector('.heading').setAttribute('value', title)
+                currentArticle.sections[sectionID].uniqueEntries.forEach(entry => {
+                    frag.append(render.contentCard(entry))
+                })
+                section.querySelector('.article-section').append(frag)
+                return section
+            },
         }
 
         function parseArticleData() {
@@ -950,6 +995,17 @@
             }
         }
 
+        function renderArticleList() {
+            getRef('article_list').innerHTML = ``
+            const frag = document.createDocumentFragment()
+            const { articleList, defaultArticle } = floGlobals.appObjects.cc
+            for (articleKey in articleList) {
+                const isDefaultArticle = defaultArticle === articleKey
+                frag.prepend(render.articleLink(articleKey, articleList[articleKey], isDefaultArticle))
+            }
+            getRef('article_list').append(frag)
+        }
+
         function getIterationDetails(uid, targetIndex) {
             let merged
             const contributors = new Set()
@@ -965,47 +1021,34 @@
                 hash: currentArticle.uniqueEntries[uid].iterations[limit].hash
             }
         }
-
-        let isHistoryPanelOpen = false
+        const versionHistory = {
+            isOpen: false,
+            entryUid: ''
+        }
         function showVersionHistory(uid) {
+            versionHistory.entryUid = uid
             const { iterations } = currentArticle.uniqueEntries[uid]
             const frag = document.createDocumentFragment()
-            let mergedChanges/* , oldText */
-            // oldText = createElement('div', {
-            //     innerHTML: mergedChanges
-            // }).textContent
+            let mergedChanges
             iterations.forEach((iter, index) => {
-                // const tempText = createElement('div', {
-                //     innerHTML: tempMergedChanges
-                // }).textContent
-                // const changes = {
-                //     diff: getDiff(oldText, tempText),
-                // }
-                // const versions = {
-                //     oldText: mergedChanges,
-                //     newText: tempMergedChanges
-                // }
-                // oldText = tempText
-                // console.log(mergedChanges, iter.data, tempMergedChanges)
                 frag.prepend(render.historyEntry(iter, mergedChanges))
                 mergedChanges = index ? updateString(mergedChanges, iter.data) : iter.data
-                // mergedChanges = tempMergedChanges
             })
             getRef('version_timeline').innerHTML = ''
             getRef('version_timeline').append(frag)
-            if (!isHistoryPanelOpen) {
+            if (!versionHistory.isOpen) {
                 getRef('version_history_panel').classList.remove('hide-completely')
                 getRef('main_page').classList.add('active-sidebar')
-                isHistoryPanelOpen = true
+                versionHistory.isOpen = true
             }
         }
 
         function hideVersionHistory() {
-            if (isHistoryPanelOpen) {
+            if (versionHistory.isOpen) {
                 getRef('version_history_panel').classList.add('hide-completely')
                 getRef('version_timeline').innerHTML = ''
                 getRef('main_page').classList.remove('active-sidebar')
-                isHistoryPanelOpen = false
+                versionHistory.isOpen = false
             }
         }
 
@@ -1203,6 +1246,7 @@
                 ])
                     .then(() => {
                         render.article(floGlobals.appObjects.cc.defaultArticle)
+                        renderArticleList()
                     })
 
                 console.log(result)

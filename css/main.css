@@ -552,6 +552,31 @@ sm-checkbox {
   grid-template-columns: minmax(0, 1fr);
 }
 
+#current_article_title {
+  font-weight: 700;
+}
+
+.article-link {
+  padding: 1rem;
+  color: rgba(var(--text-color), 0.8);
+  font-weight: 500;
+  border-radius: 0.3rem;
+}
+.article-link::first-letter {
+  text-transform: uppercase;
+}
+
+.default-article {
+  margin-left: auto;
+  font-size: 0.7rem;
+  background-color: #00e67650;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.3rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: rgba(var(--text-color), 0.8);
+}
+
 #article_wrapper {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -565,6 +590,7 @@ sm-checkbox {
 }
 
 .heading {
+  font-weight: 700;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -592,16 +618,12 @@ sm-checkbox {
 .article-section:not(:last-of-type) {
   margin-bottom: 1.5rem;
 }
-
-.content-card-container {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  gap: 0.5rem;
+.article-section::-webkit-scrollbar {
+  display: none;
 }
 
 .content-card {
-  scroll-snap-align: start;
+  scroll-snap-align: center;
   width: min(46ch, 100%);
   -ms-flex-negative: 0;
       flex-shrink: 0;
@@ -778,7 +800,7 @@ sm-checkbox {
 }
 .entry__changes .added > *,
 .entry__changes .removed > * {
-  background-color: inherit;
+  background-color: transparent;
 }
 .entry__changes .added {
   background-color: #00e67650;
