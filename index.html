@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet">
     <script src="purify.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6" defer></script>
     <script id="floGlobals">
         /* Constants for FLO blockchain operations !!Make sure to add this at begining!! */
         const floGlobals = {
@@ -71,23 +72,36 @@
                     <h4>Content Collab</h4>
                 </div>
             </div>
-            <div id="article_name_wrapper" class="flex align-center justify-center">
-                <button title="Create new article" class="button__icon--left"
-                    onclick="showPopup('create_article_popup')">
+            <div id="article_name_wrapper" class="flex gap-0-5 align-center justify-center">
+                <button title="Show all articles list" onclick="showPopup('article_list_popup')">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                         fill="#000000">
                         <path d="M0 0h24v24H0V0z" fill="none" />
-                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                        <path
+                            d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z" />
                     </svg>
                 </button>
                 <text-field id="current_article_title"></text-field>
-                <button class="button__icon--right" onclick="showPopup('article_list_popup')">
-                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
-                        fill="#000000">
-                        <path d="M24 24H0V0h24v24z" fill="none" opacity=".87" />
-                        <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6-1.41-1.41z" />
-                    </svg>
-                </button>
+                <sm-menu align-options="right">
+                    <menu-option onclick="showPopup('create_article_popup')">
+                        <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" height="24px"
+                            viewBox="0 0 24 24" width="24px" fill="#000000">
+                            <path d="M0 0h24v24H0V0z" fill="none" />
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                        </svg>
+                        Create new article
+                    </menu-option>
+                    <menu-option onclick="showPopup('edit_sections_popup')">
+                        <svg class="icon button__icon--left" title="edit" xmlns="http://www.w3.org/2000/svg"
+                            height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
+                            <path d="M0 0h24v24H0z" fill="none"></path>
+                            <path
+                                d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z">
+                            </path>
+                        </svg>
+                        Edit sections
+                    </menu-option>
+                </sm-menu>
             </div>
             <theme-toggle></theme-toggle>
             <button onclick="showPopup('user_popup')">
@@ -134,25 +148,6 @@
             </button>
         </div>
         <div id="article_wrapper"></div>
-        <!-- <div class="grid page-layout">
-            <div id="action_button_group" class="flex align-center gap-0-5">
-                <span>
-                    <b>
-                        Add
-                    </b>
-                </span>
-                <button class="actionable-button" title="Add paragraph">
-                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
-                        width="24px" fill="#000000">
-                        <path d="M0 0h24v24H0V0z" fill="none" />
-                        <path d="M14 17H4v2h10v-2zm6-8H4v2h16V9zM4 15h16v-2H4v2zM4 5v2h16V5H4z" />
-                    </svg>
-                    <span class="actionable-button__title">
-                        Section
-                    </span>
-                </button>
-            </div>
-        </div> -->
         <aside id="version_history_panel" class="flex direction-column hide-completely">
             <div class="flex align-center space-between">
                 <div class="flex align-center">
@@ -178,18 +173,24 @@
     </article>
     <sm-popup id="article_list_popup">
         <header slot="header" class="popup__header">
-            <div class="grid">
-                <div class="flex align-center space-between">
-                    <h3>All articles</h3>
-                    <sm-select label="Sort by:">
-                        <sm-option value="time">Date created</sm-option>
-                        <sm-option value="az">A-Z</sm-option>
-                    </sm-select>
-                </div>
-                <sm-input placeholder="Search articles" type="search"></sm-input>
-            </div>
+            <h3>All articles</h3>
+            <sm-input id="article_list_search" placeholder="Search articles" type="search" autofocus>
+                <svg slot="icon" class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                    width="24px" fill="#000000">
+                    <path d="M0 0h24v24H0z" fill="none" />
+                    <path
+                        d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+                </svg>
+            </sm-input>
+            <sm-select id="sort_article_list" label="Sort by:">
+                <sm-option value="time">Most recent</sm-option>
+                <sm-option value="az">A-Z</sm-option>
+            </sm-select>
         </header>
-        <div id="article_list"></div>
+        <div id="article_list" class="observe-empty-state grid"></div>
+        <h4 class="empty-state">
+            No related article
+        </h4>
     </sm-popup>
     <sm-popup id="create_article_popup">
         <header slot="header" class="popup__header">
@@ -204,7 +205,7 @@
             <h3>Create article</h3>
         </header>
         <sm-form>
-            <sm-input placeholder="Article title" required></sm-input>
+            <sm-input placeholder="Article title" required autofocus></sm-input>
             <sm-checkbox checked>
                 <div class="grid button__icon--right gap-0-5">
                     Set as default
@@ -220,6 +221,44 @@
             </sm-switch> -->
             <sm-button variant="primary">Create</sm-button>
         </sm-form>
+    </sm-popup>
+    <sm-popup id="edit_sections_popup" open>
+        <header slot="header" class="popup__header">
+            <button class="popup__header__close" onclick="hidePopup()">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                    fill="#000000">
+                    <path d="M0 0h24v24H0V0z" fill="none" />
+                    <path
+                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
+                </svg>
+            </button>
+            <h3>Edit sections</h3>
+        </header>
+        <h5 class="label">Existing sections</h5>
+        <div id="section_list_container" class="observe-empty-state"></div>
+        <p class="empty-state">
+            There are no sections so far, you can add section with button below.
+        </p>
+        <button id="insert_section_button" onclick="insertEmptySection()" class="button">
+            <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24"
+                height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
+                <g>
+                    <rect fill="none" height="24" width="24" />
+                </g>
+                <g>
+                    <g />
+                    <g>
+                        <path
+                            d="M17,19.22H5V7h7V5H5C3.9,5,3,5.9,3,7v12c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2v-7h-2V19.22z" />
+                        <path d="M19,2h-2v3h-3c0.01,0.01,0,2,0,2h3v2.99c0.01,0.01,2,0,2,0V7h3V5h-3V2z" />
+                        <rect height="2" width="8" x="7" y="9" />
+                        <polygon points="7,12 7,14 15,14 15,12 12,12" />
+                        <rect height="2" width="8" x="7" y="15" />
+                    </g>
+                </g>
+            </svg>
+            Add new section
+        </button>
     </sm-popup>
     <template id="section_template">
         <text-field class="heading"></text-field>
@@ -263,10 +302,11 @@
     <template id="quote_template">
         <figure class="quote-template grid gap-0-5" contenteditable="false">
             <blockquote class="flex">
-                <p class="quote" contenteditable="true"></p>
+                <p class="quote" contenteditable="true">Words can be like X-rays, if you use them properly—they’ll go
+                    through anything. You read and you’re pierced.</p>
             </blockquote>
-            <figcaption class="flex"><span class="by" contenteditable="true"></span><cite class="citation"
-                    contenteditable="true"></cite></figcaption>
+            <figcaption class="flex"><span class="by" contenteditable="true">Aldous Huxley</span><cite class="citation"
+                    contenteditable="true">Brave New World</cite></figcaption>
         </figure>
         <p><br></p>
     </template>
@@ -504,7 +544,6 @@
 
         window.addEventListener('hashchange', e => showPage(window.location.hash))
         window.addEventListener("load", () => {
-            showPage(window.location.hash)
             document.body.classList.remove('hide-completely')
             document.querySelectorAll('sm-input[data-private-key]').forEach(input => input.customValidation = floCrypto.getPubKeyHex)
             document.addEventListener('keyup', (e) => {
@@ -525,7 +564,8 @@
         async function showPage(targetPage, options = {}) {
             const { firstLoad, hashChange } = options
             let pageId
-            let params
+            let params = {}
+            let searchParams
             if (targetPage === '') {
                 if (typeof myFloID === "undefined") {
                     pageId = 'landing'
@@ -549,8 +589,26 @@
                     pageId = targetPage
                 }
             }
+            if (searchParams) {
+                const urlSearchParams = new URLSearchParams('?' + searchParams);
+                params = Object.fromEntries(urlSearchParams.entries());
+                pagesData.params = params
+            }
+            switch (pageId) {
+                case 'home':
+                    if (!params.articleID)
+                        params['articleID'] = floGlobals.appObjects.cc.defaultArticle
+                    Promise.all([
+                        floCloudAPI.requestObjectData(params.articleID),
+                        floCloudAPI.requestGeneralData(`${params.articleID}_gd`)
+                    ]).then(() => {
+                        hidePopup()
+                        render.article(params.articleID)
+                        window.history.replaceState('', '', `#/home?articleID=${params.articleID}`)
+                    })
+                    break
+            }
             if (pagesData.lastPage !== pageId) {
-                document.querySelectorAll('.mobile-page').forEach(elem => elem.classList.add('hide-on-mobile'))
                 pagesData.lastPage = pageId
                 if (!pagesData.openedPages.includes(pageId)) {
                     pagesData.openedPages.push(pageId)
@@ -872,20 +930,23 @@
                 const { title } = floGlobals.appObjects.cc.articleList[id]
                 const { writer, sections } = currentArticle
                 const frag = document.createDocumentFragment()
+                const isSubAdmin = floGlobals.subAdmins.includes(myFloID)
                 let index = 0
                 for (const sectionID in sections) {
                     frag.append(render.section(sectionID, sections[sectionID], index))
                     index += 1
                 }
-                if (!floGlobals.subAdmins.includes(myFloID)) {
+                if (!isSubAdmin) {
                     getRef('current_article_title').setAttribute('disabled', '')
+                } else {
+                    renderSectionList()
                 }
                 getRef('current_article_title').value = title
                 getRef('article_wrapper').innerHTML = ''
                 getRef('article_wrapper').append(frag)
             },
-            articleLink(uid, details, isDefaultArticle) {
-                const { timestamp, title } = details
+            articleLink(details, isDefaultArticle) {
+                const { uid, timestamp, title } = details
                 const link = createElement('a', {
                     textContent: title,
                     attributes: { href: `#/home?articleID=${uid}` },
@@ -894,7 +955,7 @@
                 if (isDefaultArticle) {
                     link.append(createElement('span', {
                         className: 'default-article',
-                        textContent: 'Active'
+                        textContent: 'Actively written'
                     }))
                 }
                 return link
@@ -933,7 +994,7 @@
                             }
                             if (i - index > 1)
                                 changed.splice((index + 1), (i - index - 1))
-                            return `<span class="${type ? 'added' : 'removed'}">${consecutiveWords.join(' ')}</span>`
+                            return `<s${type ? 'pan' : ''} class="${type ? 'added' : 'removed'}">${consecutiveWords.join(' ')}</s${type ? 'pan' : ''}>`
                         } else return word
                     })
                     clone.querySelector('.entry__changes').innerHTML = DOMPurify.sanitize(final.join(' '))
@@ -959,6 +1020,16 @@
                 section.querySelector('.article-section').append(frag)
                 return section
             },
+            sectionCard(details) {
+                const { title } = details
+                return createElement('div', {
+                    className: 'section-card flex align-center',
+                    innerHTML: `
+                        <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><path d="M9,18h12v-2H9V18z M3,6v2h18V6H3z M9,13h12v-2H9V13z"/></g></svg>
+                        ${title}
+                    `
+                })
+            }
         }
 
         function parseArticleData() {
@@ -994,17 +1065,73 @@
                 currentArticle.uniqueEntries[entry]['iterations'].sort((a, b) => a.timestamp - b.timestamp)
             }
         }
+        function renderSectionList() {
+            const frag = document.createDocumentFragment()
+            floGlobals.appObjects[currentArticle.id].sections.forEach(section => {
+                frag.append(render.sectionCard(section))
+            })
+            getRef('section_list_container').innerHTML = ''
+            getRef('section_list_container').append(frag)
+        }
+        function insertEmptySection() {
+            const emptySection = createElement('div', {
+                className: 'section-card section-card--new flex align-center',
+                innerHTML: `
+                        <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><path d="M9,18h12v-2H9V18z M3,6v2h18V6H3z M9,13h12v-2H9V13z"/></g></svg>
+                        <input placeholder="New section title"/>
+                        <button class="remove">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
+                                <path d="M0 0h24v24H0V0z" fill="none"></path>
+                                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path>
+                            </svg>
+                        </button>
+                    `
+            })
+            getRef('section_list_container').append(emptySection)
+        }
 
-        function renderArticleList() {
+        function getArticleList() {
+            const articleList = floGlobals.appObjects.cc.articleList
+            const sortBy = getRef('sort_article_list').value
+            const arrayOfObject = []
+            for (const key in articleList) {
+                const { timestamp, title } = articleList[key]
+                arrayOfObject.push({
+                    uid: key,
+                    timestamp,
+                    title
+                })
+            }
+            if (sortBy === 'az') {
+                arrayOfObject.sort((a, b) => a.title.localeCompare(b.title, 'en', { numeric: true, sensitivity: 'base' }))
+            } else {
+                arrayOfObject.sort((a, b) => b.timestamp - a.timestamp)
+            }
+            return arrayOfObject
+        }
+
+        getRef('article_list_search').addEventListener('input', e => {
+            const searchKey = e.target.value.trim()
+            const options = {
+                keys: ['title'],
+                threshold: 0
+            }
+            const fuse = new Fuse(getArticleList(), options)
+            renderArticleList(searchKey === '' ? undefined : fuse.search(searchKey).map(v => v.item))
+        })
+        getRef('sort_article_list').addEventListener('change', e => { renderArticleList() })
+
+        function renderArticleList(articleList) {
             getRef('article_list').innerHTML = ``
             const frag = document.createDocumentFragment()
-            const { articleList, defaultArticle } = floGlobals.appObjects.cc
-            for (articleKey in articleList) {
-                const isDefaultArticle = defaultArticle === articleKey
-                frag.prepend(render.articleLink(articleKey, articleList[articleKey], isDefaultArticle))
-            }
+            const defaultArticle = floGlobals.appObjects.cc.defaultArticle;
+            (articleList || getArticleList()).forEach((article) => {
+                const isDefaultArticle = defaultArticle === article.uid
+                frag.append(render.articleLink(article, isDefaultArticle))
+            })
             getRef('article_list').append(frag)
         }
+
 
         function getIterationDetails(uid, targetIndex) {
             let merged
@@ -1111,7 +1238,7 @@
             `${origin.substring(0, startIndex)}${insertion}${origin.substring(endIndex)}`;
         const make = {
             bold() {
-                document.execCommand('bold')
+                replaceSelectedText(createElement('strong'))
             },
             italic() {
                 document.execCommand('italic')
@@ -1221,7 +1348,7 @@
         function createQuote() {
             const quote = getRef('quote_template').content.cloneNode(true)
             quote.querySelector('.quote').textContent = '"Words can be like X-rays, if you use them properly—they’ll go through anything. You read and you’re pierced."'
-            quote.querySelector('.by').textContent = `- Author`
+            quote.querySelector('.by').textContent = `- Aldous Huxley,`
             quote.querySelector('.citation').textContent = 'Brave New World'
             return quote
         }
@@ -1240,14 +1367,8 @@
                 await Promise.all([
                     floCloudAPI.requestObjectData('cc'),
                 ])
-                Promise.all([
-                    floCloudAPI.requestObjectData(floGlobals.appObjects.cc.defaultArticle),
-                    floCloudAPI.requestGeneralData(`${floGlobals.appObjects.cc.defaultArticle}_gd`)
-                ])
-                    .then(() => {
-                        render.article(floGlobals.appObjects.cc.defaultArticle)
-                        renderArticleList()
-                    })
+                showPage(window.location.hash)
+                renderArticleList()
 
                 console.log(result)
                 // alert(`Welcome FLO_ID: ${ myFloID }`)
