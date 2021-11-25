@@ -132,7 +132,8 @@ a:any-link:focus-visible {
   outline: rgba(var(--text-color), 1) 0.1rem solid;
 }
 
-sm-input {
+sm-input,
+sm-textarea {
   font-size: 0.9rem;
   --border-radius: 0.3rem;
 }
@@ -346,12 +347,8 @@ ul {
 
 .empty-state {
   display: grid;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  text-align: center;
   width: 100%;
-  padding: 1.5rem;
+  padding: 1.5rem 1rem;
 }
 
 .observe-empty-state:empty {
@@ -581,6 +578,11 @@ menu-option {
 }
 
 .article-link {
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  position: relative;
   padding: 1rem;
   color: rgba(var(--text-color), 0.8);
   font-weight: 500;
@@ -590,15 +592,17 @@ menu-option {
   text-transform: uppercase;
 }
 
-.default-article {
-  margin-left: auto;
+.default-article::before {
+  -ms-flex-item-align: start;
+      align-self: flex-start;
+  content: "Actively written";
+  margin-bottom: 0.3rem;
   font-size: 0.7rem;
-  background-color: #00e67650;
+  background-color: var(--accent-color);
   padding: 0.2rem 0.4rem;
-  border-radius: 0.3rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: rgba(var(--text-color), 0.8);
+  border-radius: 0.2rem;
+  font-weight: 500;
+  color: var(--foreground-color);
 }
 
 #edit_sections_popup {
@@ -614,20 +618,29 @@ menu-option {
 
 .section-card {
   font-weight: 500;
+  font-size: 0.9rem;
 }
 .section-card:not(.section-card--new) {
   padding: 0.8rem 0;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 .section-card--new input {
   border: none;
   font-size: inherit;
   background: inherit;
   color: inherit;
+  font-weight: inherit;
   width: 100%;
-  padding: 0.8rem 0;
+  padding: 0.8rem 0.2rem;
 }
 .section-card--new input:focus {
   outline: var(--accent-color) solid;
+}
+.section-card .remove {
+  padding: 0.3rem;
 }
 
 #insert_section_button {
@@ -776,7 +789,7 @@ menu-option {
   background-color: var(--accent-color);
 }
 .active .icon {
-  fill: white;
+  fill: var(--foreground-color);
 }
 
 .quote-template {
@@ -864,8 +877,9 @@ menu-option {
   background-color: #00e67650;
 }
 .entry__changes .removed {
-  -webkit-text-decoration-color: red;
-          text-decoration-color: red;
+  color: var(--danger-color);
+  -webkit-text-decoration-color: var(--danger-color);
+          text-decoration-color: var(--danger-color);
 }
 
 @media screen and (max-width: 40rem) and (any-hover: none) {

@@ -101,6 +101,20 @@
                         </svg>
                         Edit sections
                     </menu-option>
+                    <menu-option onclick="setDefaultArticle()">
+                        <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg"
+                            enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px"
+                            fill="#000000">
+                            <g>
+                                <path d="M0,0h24v24H0V0z" fill="none" />
+                            </g>
+                            <g>
+                                <path
+                                    d="M14,2H6C4.9,2,4.01,2.9,4.01,4L4,20c0,1.1,0.89,2,1.99,2H18c1.1,0,2-0.9,2-2V8L14,2z M18,20H6V4h7v5h5V20z M8.82,13.05 L7.4,14.46L10.94,18l5.66-5.66l-1.41-1.41l-4.24,4.24L8.82,13.05z" />
+                            </g>
+                        </svg>
+                        Make default article
+                    </menu-option>
                 </sm-menu>
             </div>
             <theme-toggle></theme-toggle>
@@ -205,8 +219,8 @@
             <h3>Create article</h3>
         </header>
         <sm-form>
-            <sm-input placeholder="Article title" required autofocus></sm-input>
-            <sm-checkbox checked>
+            <sm-input id="get_article_title" placeholder="Article title" required autofocus></sm-input>
+            <sm-checkbox id="set_default_checkbox" checked>
                 <div class="grid button__icon--right gap-0-5">
                     Set as default
                     <p style="font-size: 0.8rem;">
@@ -214,15 +228,29 @@
                     </p>
                 </div>
             </sm-checkbox>
-            <!-- <sm-switch>
-                <div slot="left">
-                    Make private
+            <div class="grid gap-1">
+                <div class="grid gap-0-5">
+                    <h4>Define sections (optional)</h4>
+                    <p>Create and name sections by writing title of each section separated by a comma (,)</p>
                 </div>
-            </sm-switch> -->
-            <sm-button variant="primary">Create</sm-button>
+                <sm-textarea id="get_section_titles" rows="4" placeholder="section title 1, section title 2, ...">
+                </sm-textarea>
+            </div>
+            <!-- <div class="grid gap-1">
+                <div class="grid gap-0-5">
+                    <sm-switch>
+                        <h4 slot="left">
+                            Make private
+                        </h4>
+                    </sm-switch>
+                    <p>Define the FLO IDs separated by a comma (,), which are allowed to contribute.</p>
+                </div>
+                <sm-textarea id="get_section_titles" rows="4"></sm-textarea>
+            </div> -->
+            <sm-button variant="primary" onclick="cc.createNewArticle()">Create</sm-button>
         </sm-form>
     </sm-popup>
-    <sm-popup id="edit_sections_popup" open>
+    <sm-popup id="edit_sections_popup">
         <header slot="header" class="popup__header">
             <button class="popup__header__close" onclick="hidePopup()">
                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
@@ -239,26 +267,29 @@
         <p class="empty-state">
             There are no sections so far, you can add section with button below.
         </p>
-        <button id="insert_section_button" onclick="insertEmptySection()" class="button">
-            <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24"
-                height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
-                <g>
-                    <rect fill="none" height="24" width="24" />
-                </g>
-                <g>
-                    <g />
+        <div class="flex space-between align-center">
+            <sm-button id="insert_section_button" onclick="insertEmptySection()">
+                <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg"
+                    enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
                     <g>
-                        <path
-                            d="M17,19.22H5V7h7V5H5C3.9,5,3,5.9,3,7v12c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2v-7h-2V19.22z" />
-                        <path d="M19,2h-2v3h-3c0.01,0.01,0,2,0,2h3v2.99c0.01,0.01,2,0,2,0V7h3V5h-3V2z" />
-                        <rect height="2" width="8" x="7" y="9" />
-                        <polygon points="7,12 7,14 15,14 15,12 12,12" />
-                        <rect height="2" width="8" x="7" y="15" />
+                        <rect fill="none" height="24" width="24" />
                     </g>
-                </g>
-            </svg>
-            Add new section
-        </button>
+                    <g>
+                        <g />
+                        <g>
+                            <path
+                                d="M17,19.22H5V7h7V5H5C3.9,5,3,5.9,3,7v12c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2v-7h-2V19.22z" />
+                            <path d="M19,2h-2v3h-3c0.01,0.01,0,2,0,2h3v2.99c0.01,0.01,2,0,2,0V7h3V5h-3V2z" />
+                            <rect height="2" width="8" x="7" y="9" />
+                            <polygon points="7,12 7,14 15,14 15,12 12,12" />
+                            <rect height="2" width="8" x="7" y="15" />
+                        </g>
+                    </g>
+                </svg>
+                Insert section
+            </sm-button>
+            <sm-button variant="primary" onclick="saveSectionEdit()">Save</sm-button>
+        </div>
     </sm-popup>
     <template id="section_template">
         <text-field class="heading"></text-field>
@@ -311,13 +342,20 @@
         <p><br></p>
     </template>
     <template id="history_entry_template">
-        <li class="history-entry grid gap-0-5">
+        <li class="history-entry grid gap-1">
             <div class="flex align-center space-between">
                 <time class="entry__time"></time>
                 <span class="entry__score"></span>
             </div>
             <div class="grid">
-                <div class="label">Author</div>
+                <div class="label flex align-center">
+                    <svg class="icon" style="margin-right: 0.2rem;" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd"
+                            d="M14.6243 7.99154C13.9395 8.14279 13.4165 8.69672 13.3047 9.38904C13.2248 9.88365 13.3664 10.3773 13.6735 10.7498L9.29125 15.0941C8.93718 15.4451 8.48852 15.6853 8.00011 15.7854L6.12418 16.1699L9.19811 13.1381C9.53438 12.8064 9.53812 12.265 9.20646 11.9287C8.8748 11.5924 8.33333 11.5887 7.99706 11.9203L4.97835 14.8977L5.47976 12.451C5.50451 12.3303 5.55656 12.2168 5.63191 12.1192L6.49083 11.0073C9.58386 7.00317 14.32 4.72705 19.2553 4.71054L16.3569 7.60884L14.6243 7.99154ZM2.79008 17.0559L3.8042 12.1076C3.88132 11.7313 4.0435 11.3776 4.27833 11.0736L5.13724 9.96172C8.89964 5.09105 14.861 2.53305 20.8954 3.07051C21.5971 3.133 22.2997 3.23735 23 3.38478L17.2133 9.1713L14.9932 9.66167L15.4238 9.91837C15.9039 10.2046 15.9849 10.8668 15.588 11.2603L10.4954 16.3088C9.90529 16.8938 9.15752 17.2941 8.34351 17.461L3.88965 18.3738L2.45572 19.788C2.11945 20.1197 1.57798 20.116 1.24632 19.7797C0.91466 19.4434 0.918397 18.9019 1.25467 18.5703L2.79008 17.0559Z" />
+                    </svg>
+                    Author
+                </div>
                 <span class="entry__author breakable"></span>
             </div>
             <div class="entry__changes"></div>
@@ -412,29 +450,12 @@
             }, delay);
         }
 
-        class Stack {
-            constructor() {
-                this.items = [];
-            }
-            push(element) {
-                this.items.push(element);
-            }
-            pop() {
-                if (this.items.length == 0)
-                    return "Underflow";
-                return this.items.pop();
-            }
-            peek() {
-                return this.items[this.items.length - 1];
-            }
-        }
-        let popupStack = new Stack()
         let zIndex = 10
         // function required for popups or modals to appear
         function showPopup(popupId, pinned) {
             zIndex++
             getRef(popupId).setAttribute('style', `z-index: ${zIndex}`)
-            popupStack = getRef(popupId).show({ pinned, popupStack })
+            getRef(popupId).show({ pinned })
             return getRef(popupId);
         }
 
@@ -444,6 +465,29 @@
                 return;
             popupStack.peek().popup.hide()
         }
+
+        document.addEventListener('popupopened', e => {
+            switch (e.target.id) {
+                case 'edit_sections_popup':
+                    renderSectionList()
+                    break;
+                case 'article_list_popup':
+                    renderArticleList()
+                    break;
+            }
+        })
+        document.addEventListener('popupclosed', e => {
+            zIndex--
+            switch (e.target.id) {
+                case 'edit_sections_popup':
+                    getRef('section_list_container').innerHTML = ''
+                    break;
+                case 'article_list_popup':
+                    getRef('article_list').innerHTML = ``
+
+                    break;
+            }
+        })
 
         // displays a popup for asking permission. Use this instead of JS confirm
         const getConfirmation = (title, options = {}) => {
@@ -734,35 +778,62 @@
     </script>
     <script id="cc">
         const cc = {
-            createNewArticle(title) {
-                const uid = floCrypto.randString(16, true)
-                floGlobals.appObjects.cc['defaultArticle'] = uid
-                floGlobals.appObjects.cc['articleList'][uid] = {
-                    title,
-                    timestamp: Date.now()
-                }
-                floCloudAPI.updateObjectData('cc')
-                    .then((res) => {
-                        console.log('created article entry', res)
-                    })
-                    .catch(err => console.error(err))
-                floGlobals.appObjects[uid] = {
-                    public: true,
-                    editors: [],
-                    sections: [{
-                        id: floCrypto.randString(16, true),
-                        title: 'Introduction',
-                    }, {
-                        id: floCrypto.randString(16, true),
-                        title: 'core',
+            createNewArticle() {
+                if (isSubAdmin) {
+                    const title = getRef('get_article_title').value.trim()
+                    const setDefault = getRef('set_default_checkbox').checked
+                    const sectionTitles = getRef('get_section_titles').value.trim()
+                    let sections = []
+                    if (sectionTitles !== '') {
+                        sections = sectionTitles.split(',').map(title => {
+                            return {
+                                id: floCrypto.randString(16, true),
+                                title: title.trim(),
+                            }
+                        })
                     }
-                    ]
+                    const uid = floCrypto.randString(16, true)
+                    if (setDefault)
+                        floGlobals.appObjects.cc['defaultArticle'] = uid
+                    floGlobals.appObjects.cc['articleList'][uid] = {
+                        title,
+                        timestamp: Date.now()
+                    }
+                    floGlobals.appObjects[uid] = {
+                        public: true,
+                        editors: [],
+                        sections
+                    }
+                    Promise.all([
+                        floCloudAPI.updateObjectData('cc'),
+                        floCloudAPI.resetObjectData(uid)
+                    ])
+                        .then((res) => {
+                            hidePopup()
+                            notify('created article', 'success')
+                            window.location.hash = `#/home?articleID=${uid}`
+                        })
+                        .catch(err => console.error(err))
+                } else {
+                    notify('This action requires sub-admin privileges', 'error')
                 }
-                floCloudAPI.resetObjectData(uid)
-                    .then((res) => {
-                        console.log('created article', res)
-                    })
-                    .catch(err => console.error(err))
+            }
+        }
+
+        function setDefaultArticle() {
+            if (isSubAdmin) {
+                getConfirmation('Set as default article?').then(res => {
+                    if (res) {
+                        floGlobals.appObjects.cc['defaultArticle'] = currentArticle.id
+                        floCloudAPI.updateObjectData('cc')
+                            .then((res) => {
+                                notify('Set current article as default', 'success')
+                            })
+                            .catch(err => console.error(err))
+                    }
+                })
+            } else {
+                notify('This action requires sub-admin privileges', 'error')
             }
         }
 
@@ -837,7 +908,7 @@
                                 currentArticle.uniqueEntries[entry.origin] = { iterations: [{ ...entry, timestamp }] }
                                 parentSection.firstElementChild.after(render.contentCard(entry.origin))
                             } else {
-                                currentArticle.uniqueEntries[entry.origin].iterations.push({ ...entry, timestamp })
+                                currentArticle.uniqueEntries[entry.origin].iterations.push({ ...entry, timestamp, editor: myFloID })
                             }
                         })
                 } else {
@@ -930,7 +1001,6 @@
                 const { title } = floGlobals.appObjects.cc.articleList[id]
                 const { writer, sections } = currentArticle
                 const frag = document.createDocumentFragment()
-                const isSubAdmin = floGlobals.subAdmins.includes(myFloID)
                 let index = 0
                 for (const sectionID in sections) {
                     frag.append(render.section(sectionID, sections[sectionID], index))
@@ -938,8 +1008,6 @@
                 }
                 if (!isSubAdmin) {
                     getRef('current_article_title').setAttribute('disabled', '')
-                } else {
-                    renderSectionList()
                 }
                 getRef('current_article_title').value = title
                 getRef('article_wrapper').innerHTML = ''
@@ -953,22 +1021,30 @@
                     className: 'article-link flex interact'
                 })
                 if (isDefaultArticle) {
-                    link.append(createElement('span', {
-                        className: 'default-article',
-                        textContent: 'Actively written'
-                    }))
+                    link.classList.add('default-article')
                 }
                 return link
             },
             contentCard(id, version = 0) {
                 const clone = getRef('content_card_template').content.cloneNode(true).firstElementChild;
                 clone.dataset.uid = id
-                if (!floGlobals.subAdmins.includes(myFloID)) {
+                if (!isSubAdmin) {
                     clone.querySelector('.content__area').setAttribute('contentEditable', true)
                 }
                 const { data, contributors } = getIterationDetails(id)
+                console.log(contributors)
                 clone.querySelector('.content__area').innerHTML = DOMPurify.sanitize(data)
-                clone.querySelector('.content__editor').textContent = `by ${contributors}`;
+                if (contributors.size === 1) {
+                    const [contributor] = contributors
+                    clone.querySelector('.content__editor').textContent = `by ${contributor}`;
+                } else {
+                    clone.querySelector('.content__editor').innerHTML = `
+                    <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M14.6243 7.99154C13.9395 8.14279 13.4165 8.69672 13.3047 9.38904C13.2248 9.88365 13.3664 10.3773 13.6735 10.7498L9.29125 15.0941C8.93718 15.4451 8.48852 15.6853 8.00011 15.7854L6.12418 16.1699L9.19811 13.1381C9.53438 12.8064 9.53812 12.265 9.20646 11.9287C8.8748 11.5924 8.33333 11.5887 7.99706 11.9203L4.97835 14.8977L5.47976 12.451C5.50451 12.3303 5.55656 12.2168 5.63191 12.1192L6.49083 11.0073C9.58386 7.00317 14.32 4.72705 19.2553 4.71054L16.3569 7.60884L14.6243 7.99154ZM2.79008 17.0559L3.8042 12.1076C3.88132 11.7313 4.0435 11.3776 4.27833 11.0736L5.13724 9.96172C8.89964 5.09105 14.861 2.53305 20.8954 3.07051C21.5971 3.133 22.2997 3.23735 23 3.38478L17.2133 9.1713L14.9932 9.66167L15.4238 9.91837C15.9039 10.2046 15.9849 10.8668 15.588 11.2603L10.4954 16.3088C9.90529 16.8938 9.15752 17.2941 8.34351 17.461L3.88965 18.3738L2.45572 19.788C2.11945 20.1197 1.57798 20.116 1.24632 19.7797C0.91466 19.4434 0.918397 18.9019 1.25467 18.5703L2.79008 17.0559Z"/>
+                    </svg>
+
+                    `
+                }
                 // clone.querySelector('.content__score').textContent = score;
                 return clone
             },
@@ -1008,7 +1084,7 @@
                 const frag = document.createDocumentFragment()
                 section.children[0].dataset.index = index
                 section.children[1].dataset.sectionId = sectionID
-                if (floGlobals.subAdmins.includes(myFloID)) {
+                if (isSubAdmin) {
                     section.querySelector('.content-card--empty').remove()
                 } else {
                     section.querySelector('.heading').setAttribute('disabled', '')
@@ -1066,6 +1142,7 @@
             }
         }
         function renderSectionList() {
+            if (!isSubAdmin) return
             const frag = document.createDocumentFragment()
             floGlobals.appObjects[currentArticle.id].sections.forEach(section => {
                 frag.append(render.sectionCard(section))
@@ -1088,7 +1165,49 @@
                     `
             })
             getRef('section_list_container').append(emptySection)
+            emptySection.querySelector('input').focus()
         }
+        getRef('section_list_container').addEventListener('click', e => {
+            if (e.target.closest('.remove')) {
+                e.target.closest('.section-card').remove()
+            }
+        })
+
+        function saveSectionEdit() {
+            const newSections = []
+            getRef('section_list_container').querySelectorAll('.section-card--new').forEach(section => {
+                const title = section.querySelector('input').value.trim()
+                if (title !== '')
+                    newSections.push({
+                        id: floCrypto.randString(16, true),
+                        title
+                    })
+            })
+            if (newSections.length) {
+                newSections.forEach(elem => {
+                    floGlobals.appObjects[currentArticle.id].sections.push(elem)
+                })
+                floCloudAPI.updateObjectData(currentArticle.id)
+                    .then((res) => {
+                        const frag = document.createDocumentFragment()
+                        const currentSectionCount = getRef('section_list_container').querySelectorAll('.section-card:not(.section-card--new)').length
+                        let index = currentSectionCount
+                        newSections.forEach(elem => {
+                            const { title, id } = elem
+                            currentArticle.sections[id] = { title, uniqueEntries: [] }
+                            frag.append(render.section(id, currentArticle.sections[id], index))
+                            index += 1
+                        })
+                        getRef('article_wrapper').append(frag)
+                        notify('Sections updated', 'success')
+                        hidePopup()
+                    })
+                    .catch(err => {
+                        notify(err, 'error')
+                    })
+            }
+        }
+
 
         function getArticleList() {
             const articleList = floGlobals.appObjects.cc.articleList
@@ -1114,7 +1233,7 @@
             const searchKey = e.target.value.trim()
             const options = {
                 keys: ['title'],
-                threshold: 0
+                threshold: 0.3
             }
             const fuse = new Fuse(getArticleList(), options)
             renderArticleList(searchKey === '' ? undefined : fuse.search(searchKey).map(v => v.item))
@@ -1233,6 +1352,7 @@
             }
         },
             200)
+
 
         const replaceBetween = (origin, startIndex, endIndex, insertion) =>
             `${origin.substring(0, startIndex)}${insertion}${origin.substring(endIndex)}`;
@@ -1357,6 +1477,7 @@
         }
     </script>
     <script id="onLoadStartUp">
+        let isSubAdmin = false
         function onLoadStartUp() {
 
             //floDapps.addStartUpFunction('Sample', Promised Function)
@@ -1364,11 +1485,11 @@
             //floDapps.setCustomPrivKeyInput( () => { FUNCTION BODY *must resolve private key* } )
 
             floDapps.launchStartUp().then(async result => {
+                isSubAdmin = floGlobals.subAdmins.includes(myFloID)
                 await Promise.all([
                     floCloudAPI.requestObjectData('cc'),
                 ])
                 showPage(window.location.hash)
-                renderArticleList()
 
                 console.log(result)
                 // alert(`Welcome FLO_ID: ${ myFloID }`)

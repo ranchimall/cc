@@ -113,7 +113,8 @@ a:any-link:focus-visible {
   outline: rgba(var(--text-color), 1) 0.1rem solid;
 }
 
-sm-input {
+sm-input,
+sm-textarea {
   font-size: 0.9rem;
   --border-radius: 0.3rem;
 }
@@ -309,10 +310,8 @@ ul {
 }
 .empty-state {
   display: grid;
-  justify-content: center;
-  text-align: center;
   width: 100%;
-  padding: 1.5rem;
+  padding: 1.5rem 1rem;
 }
 
 .observe-empty-state:empty {
@@ -488,7 +487,6 @@ menu-option {
 #main_page {
   grid-template-columns: minmax(0, 1fr);
 }
-
 #current_article_title {
   font-weight: 700;
 }
@@ -512,6 +510,8 @@ menu-option {
 }
 
 .article-link {
+  flex-direction: column;
+  position: relative;
   padding: 1rem;
   color: rgba(var(--text-color), 0.8);
   font-weight: 500;
@@ -521,14 +521,17 @@ menu-option {
   }
 }
 .default-article {
-  margin-left: auto;
-  font-size: 0.7rem;
-  background-color: #00e67650;
-  padding: 0.2rem 0.4rem;
-  border-radius: 0.3rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: rgba(var(--text-color), 0.8);
+  &::before {
+    align-self: flex-start;
+    content: "Actively written";
+    margin-bottom: 0.3rem;
+    font-size: 0.7rem;
+    background-color: var(--accent-color);
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.2rem;
+    font-weight: 500;
+    color: var(--foreground-color);
+  }
 }
 
 #edit_sections_popup {
@@ -542,8 +545,10 @@ menu-option {
 }
 .section-card {
   font-weight: 500;
+  font-size: 0.9rem;
   &:not(.section-card--new) {
     padding: 0.8rem 0;
+    user-select: none;
   }
   &--new {
     input {
@@ -551,12 +556,16 @@ menu-option {
       font-size: inherit;
       background: inherit;
       color: inherit;
+      font-weight: inherit;
       width: 100%;
-      padding: 0.8rem 0;
+      padding: 0.8rem 0.2rem;
       &:focus {
         outline: var(--accent-color) solid;
       }
     }
+  }
+  .remove {
+    padding: 0.3rem;
   }
 }
 #insert_section_button {
@@ -676,7 +685,7 @@ menu-option {
 .active {
   background-color: var(--accent-color);
   .icon {
-    fill: white;
+    fill: var(--foreground-color);
   }
 }
 
@@ -758,7 +767,8 @@ menu-option {
     background-color: #00e67650;
   }
   .removed {
-    text-decoration-color: red;
+    color: var(--danger-color);
+    text-decoration-color: var(--danger-color);
   }
 }
 
