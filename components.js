@@ -1236,21 +1236,24 @@ customElements.define('sm-popup', class extends HTMLElement {
     }
 
     setStateOpen() {
-        const animOptions = {
-            duration: 300,
-            easing: 'ease'
+        if (!this.isOpen || this.offset) {
+            const animOptions = {
+                duration: 300,
+                easing: 'ease'
+            }
+            const initialAnimation = (window.innerWidth > 640) ? 'scale(1.1)' : `translateY(${this.offset ? `${this.offset}px` : '100%'})`
+            this.animateTo(this.popup, [
+                {
+                    opacity: this.offset ? 1 : 0,
+                    transform: initialAnimation
+                },
+                {
+                    opacity: 1,
+                    transform: 'none'
+                },
+            ], animOptions)
+
         }
-        const initialAnimation = (window.innerWidth > 640) ? 'scale(1.1)' : `translateY(${this.offset ? `${this.offset}px` : '100%'})`
-        this.animateTo(this.popup, [
-            {
-                opacity: this.offset ? 1 : 0,
-                transform: initialAnimation
-            },
-            {
-                opacity: 1,
-                transform: 'none'
-            },
-        ], animOptions)
     }
 
     show(options = {}) {
@@ -1351,6 +1354,7 @@ customElements.define('sm-popup', class extends HTMLElement {
     }
 
     handleTouchStart(e) {
+        this.offset = 0
         this.popupHeader.addEventListener('touchmove', this.handleTouchMove, { passive: true });
         this.popupHeader.addEventListener('touchend', this.handleTouchEnd, { passive: true });
         this.touchStartY = e.changedTouches[0].clientY;
@@ -1371,7 +1375,6 @@ customElements.define('sm-popup', class extends HTMLElement {
         this.touchEndTime = e.timeStamp;
         cancelAnimationFrame(this.touchEndAnimation);
         this.touchEndY = e.changedTouches[0].clientY;
-        this.popup.style.transition = 'transform 0.3s';
         this.threshold = this.popup.getBoundingClientRect().height * 0.3;
         if (this.touchEndTime - this.touchStartTime > 200) {
             if (this.touchEndY - this.touchStartY > this.threshold) {
@@ -1726,9 +1729,14 @@ smCopy.innerHTML = `
     align-items: center;
     grid-template-columns: minmax(0, 1fr) auto;
 }
-.copy-content{
+:host(:not([clip-text])) .copy-content{
     overflow-wrap: break-word;
     word-wrap: break-word;
+}
+:host([clip-text]) .copy-content{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .copy-button{
     display: inline-flex;
@@ -3345,10 +3353,6 @@ smSwitch.innerHTML = `
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
     }
-    :host(:not([disabled])) label:focus-visible{
-        -webkit-box-shadow: 0 0 0 0.1rem var(--accent-color);
-            box-shadow: 0 0 0 0.1rem var(--accent-color);
-    }
     :host([disabled]) {
         cursor: not-allowed;
         opacity: 0.6;
@@ -3388,15 +3392,12 @@ smSwitch.innerHTML = `
         border-radius: 1rem;
     }
     
-    .switch:active .button::after,
-    .switch:focus .button::after{
-        opacity: 1
-    }
-    .switch:focus-visible .button::after{
-        opacity: 1
+    label:active .thumb::after,
+    label:focus-within .thumb::after{
+        opacity: 1;
     }
     
-    .button::after{
+    .thumb::after{
         content: '';
         display: -webkit-box;
         display: -ms-flexbox;
@@ -3412,7 +3413,7 @@ smSwitch.innerHTML = `
         transition: opacity 0.3s;
     }
     
-    .button {
+    .thumb {
         position: relative;
         display: -webkit-inline-box;
         display: -ms-inline-flexbox;
@@ -3436,7 +3437,7 @@ smSwitch.innerHTML = `
         border: solid 0.3rem white;
     }
     
-    input:checked ~ .button {
+    input:checked ~ .thumb {
         -webkit-transform: translateX(100%);
             -ms-transform: translateX(100%);
                 transform: translateX(100%);
@@ -3451,7 +3452,7 @@ smSwitch.innerHTML = `
     <div part="switch" class="switch">
         <input type="checkbox">
         <div class="track"></div>
-        <div class="button"></div>
+        <div class="thumb"></div>
     </div>
     <slot name="right"></slot>
 </label>`
