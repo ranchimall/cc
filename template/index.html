@@ -1821,24 +1821,23 @@ input{
                     duration: 150,
                     ease: 'easing',
                 }
-                const likeCount = parseInt(getRef('like_count').textContent)
-                const newCount = likeCount ? likeCount + 1 : 1
+                totalVotes++
                 getRef('like_count').animate(slideOutUp, animOptions)
                     .onfinish = (e) => {
                         e.target.cancel()
                     }
                 const tempCount = document.createElement('div')
                 tempCount.classList.add('temp-count')
-                tempCount.textContent = newCount
+                tempCount.textContent = totalVotes
                 getRef('like_count').after(tempCount)
                 tempCount.animate(slideInUp, animOptions)
                     .onfinish = () => {
-                        getRef('like_count').textContent = newCount
+                        getRef('like_count').textContent = totalVotes
                         tempCount.remove()
                     }
                 floCloudAPI.sendGeneralData({
                     articleID: currentArticleID,
-                }, 'article_votes')
+                }, `article_${currentArticleID}_votes`)
                     .then(res => {
                         console.log('upvoted')
                     })
@@ -1948,14 +1947,15 @@ input{
     <script id="onLoadStartUp">
         let isSubAdmin = false
         let isLoggedIn = false
+        let totalVotes = 0
         function onLoadStartUp() {
 
             //floDapps.addStartUpFunction('Sample', Promised Function)
             //floDapps.setAppObjectStores({sampleObs1:{}, sampleObs2:{options{autoIncrement:true, keyPath:'SampleKey'}, Indexes:{sampleIndex:{}}}})
             floDapps.setMidStartup(() => new Promise(async (resolve, reject) => {
-                await floCloudAPI.requestGeneralData('article_votes')
-                const allVotes = floGlobals.generalData[`article_votes|${floGlobals.adminID}|${floGlobals.application}`]
-                let totalVotes = 0
+                await floCloudAPI.requestObjectData('RMT')
+                await floCloudAPI.requestGeneralData(`article_${currentArticleID}_votes`)
+                const allVotes = floGlobals.generalData[`article_${currentArticleID}_votes|${floGlobals.adminID}|${floGlobals.application}`]
                 for (const vote in allVotes) {
                     const { message: { articleID } } = allVotes[vote]
                     if (allVotes[vote].message.articleID === currentArticleID) {
