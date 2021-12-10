@@ -2371,7 +2371,7 @@ smSelect.innerHTML = `
     -o-text-overflow: ellipsis;
        text-overflow: ellipsis;
     white-space: nowrap;
-    font-weight: 700;
+    font-weight: 500;
 }
 .selection{
     border-radius: 0.3rem;
