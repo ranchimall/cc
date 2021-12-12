@@ -128,7 +128,7 @@
                 </sm-menu>
             </div>
             <div id="selected_content_options" class="flex hide-completely">
-                <button class="button" onclick="formatSelectedContent()">
+                <button class="button" onclick="renderPreview()">
                     <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg"
                         enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
                         <g>
@@ -1267,6 +1267,11 @@
                 if (!composedDocumentStructure[section].length)
                     delete composedDocumentStructure[section]
             }
+            return composedDocumentStructure
+        }
+
+        function renderPreview() {
+            const composedDocumentStructure = formatSelectedContent()
             let frag = document.createDocumentFragment()
 
             for (const section in composedDocumentStructure) {
@@ -1302,6 +1307,7 @@
             window.location.hash = `#/preview?articleID=${currentArticle.id}`
         }
 
+
         function downloadHTML(string, options = {}) {
             const { title } = options
             const element = createElement('a', {
@@ -1321,15 +1327,7 @@
 
         function exportSelection() {
             const bodyTemplate = getRef('body_template').content.cloneNode(true)
-            const composedDocumentStructure = {}
-            floGlobals.appObjects[currentArticle.id].sections.forEach(section => composedDocumentStructure[section.id] = [])
-            selectedContent.forEach(({ content, sectionID }, uid) => {
-                composedDocumentStructure[sectionID].push({ content, uid })
-            })
-            for (const section in composedDocumentStructure) {
-                if (!composedDocumentStructure[section].length)
-                    delete composedDocumentStructure[section]
-            }
+            const composedDocumentStructure = formatSelectedContent()
             let frag = document.createDocumentFragment()
 
             for (const section in composedDocumentStructure) {
@@ -1363,7 +1361,7 @@
                         ${getRef('compactIDB').innerHTML}
                         ${getRef('floCloudAPI').innerHTML}
                         ${getRef('floDapps').innerHTML}
-                        <\/script>
+                     <\/script>
                     `
             }
             const bodyHTML = createElement('div')
@@ -12461,27 +12459,30 @@
                     ], animOptions).onfinish = e => e.target.cancel()
                 }
             })
+            function animateLikeCount() {
+                const animOptions = {
+                    fill: 'forwards',
+                    duration: 150,
+                    ease: 'easing',
+                }
+                totalVotes++
+                getRef('like_count').animate(slideOutUp, animOptions)
+                    .onfinish = (e) => {
+                        e.target.cancel()
+                    }
+                const tempCount = document.createElement('div')
+                tempCount.classList.add('temp-count')
+                tempCount.textContent = totalVotes
+                getRef('like_count').after(tempCount)
+                tempCount.animate(slideInUp, animOptions)
+                    .onfinish = () => {
+                        getRef('like_count').textContent = totalVotes
+                        tempCount.remove()
+                    }
+            }
             function upvote(elem) {
                 if (isLoggedIn) {
-                    const animOptions = {
-                        fill: 'forwards',
-                        duration: 150,
-                        ease: 'easing',
-                    }
-                    totalVotes++
-                    getRef('like_count').animate(slideOutUp, animOptions)
-                        .onfinish = (e) => {
-                            e.target.cancel()
-                        }
-                    const tempCount = document.createElement('div')
-                    tempCount.classList.add('temp-count')
-                    tempCount.textContent = totalVotes
-                    getRef('like_count').after(tempCount)
-                    tempCount.animate(slideInUp, animOptions)
-                        .onfinish = () => {
-                            getRef('like_count').textContent = totalVotes
-                            tempCount.remove()
-                        }
+                    // animateLikeCount()
                     floCloudAPI.sendGeneralData({
                         articleID: currentArticleID,
                     }, `article_${currentArticleID}_votes`)
@@ -12591,107 +12592,157 @@
                 }
             }
         </script>
+
+        <script id="onLoadStartUp">
+            let isSubAdmin = false
+            let isLoggedIn = false
+            let totalVotes = 0
+            function onLoadStartUp() {
+
+                //floDapps.addStartUpFunction('Sample', Promised Function)
+                //floDapps.setAppObjectStores({sampleObs1:{}, sampleObs2:{options{autoIncrement:true, keyPath:'SampleKey'}, Indexes:{sampleIndex:{}}}})
+                floDapps.setMidStartup(() => new Promise(async (resolve, reject) => {
+                    await floCloudAPI.requestObjectData('RMT')
+                    await floCloudAPI.requestGeneralData(`article_${currentArticleID}_votes`, {
+                        callback: (d, e) => {
+                            animateLikeCount()
+                        }
+                    })
+                    const allVotes = floGlobals.generalData[`article_${currentArticleID}_votes|${floGlobals.adminID}|${floGlobals.application}`]
+                    for (const vote in allVotes) {
+                        const { message: { articleID } } = allVotes[vote]
+                        if (allVotes[vote].message.articleID === currentArticleID) {
+                            totalVotes++
+                        }
+                    }
+                    getRef('like_count').textContent = totalVotes
+                    resolve(true)
+                }))
+                floDapps.setCustomPrivKeyInput(() => new Promise((resolve, reject) => {
+                    getRef('sign_in_button').onclick = () => {
+                        resolve(getRef('private_key_field').value.trim())
+                        getRef('private_key_field').value = ''
+                        hidePopup()
+                    }
+                    getRef('sign_up_button').onclick = () => {
+                        resolve(getRef('generated_private_key').value.trim())
+                        getRef('generated_private_key').value = ''
+                        hidePopup()
+                    }
+                }))
+
+
+                floDapps.launchStartUp().then(async result => {
+                    isLoggedIn = true
+                    isSubAdmin = floGlobals.subAdmins.includes(myFloID)
+
+                    console.log(result)
+                    // alert(`Welcome FLO_ID: ${ myFloID }`)
+                    //App functions....
+                }).catch(error => console.error(error))
+            }
+        </script>
         <script>
             const smButton = document.createElement('template')
             smButton.innerHTML = `
-        <style>     
-        *{
-            padding: 0;
-            margin: 0;
-            -webkit-box-sizing: border-box;
-                    box-sizing: border-box;
-        }       
-        :host{
-            display: -webkit-inline-box;
-            display: -ms-inline-flexbox;
-            display: inline-flex;
-            width: auto;
-            --accent-color: #4d2588;
-            --text-color: 17, 17, 17;
-            --background-color: 255, 255, 255;
-            --padding: 0.6rem 1.2rem;
-            --border-radius: 0.3rem;
-            --background: rgba(var(--text-color), 0.1);
-        }
-        :host([variant='primary']) .button{
-            background: var(--accent-color);
-            color: rgba(var(--background-color), 1);
-        }
-        :host([variant='outlined']) .button{
-            -webkit-box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset;
-                    box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset;
-            background: transparent; 
-            color: var(--accent-color);
-        }
-        :host([variant='no-outline']) .button{
-            background: inherit; 
-            color: var(--accent-color);
-        }
-        :host([disabled]){
-            pointer-events: none;
-            cursor: not-allowed;
-        }
-        .button {
-            position: relative;
-            display: -webkit-box;
-            display: -ms-flexbox;
-            display: flex;
-            width: 100%;
-            padding: var(--padding);
-            cursor: pointer;
-            -webkit-user-select: none;
-               -moz-user-select: none;
-                -ms-user-select: none;
-                    user-select: none;
-            border-radius: var(--border-radius); 
-            -webkit-box-pack: center; 
-                -ms-flex-pack: center; 
-                    justify-content: center;
-            transition: box-shadow 0.3s, background-color 0.3s;
-            font-family: inherit;
-            font-size: 0.9rem;
-            font-weight: 500;
-            background-color: var(--background); 
-            -webkit-tap-highlight-color: transparent;
-            outline: none;
-            overflow: hidden;
-            border: none;
-            color: inherit;
-            align-items: center;
-        }
-        :host([disabled]) .button{
-            pointer-events: none;
-            cursor: not-allowed;
-            opacity: 0.6;
-            color: rgba(var(--text-color), 1);
-            background-color: rgba(var(--text-color), 0.3);
-        }
-        @media (hover: hover){
-            :host(:not([disabled])) .button:hover,
-            :host(:focus-within:not([disabled])) .button{
-                -webkit-box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.12);
-                box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.12);
-            }
-            :host([variant='outlined']:not([disabled])) .button:hover,
-            :host(:focus-within[variant='outlined']:not([disabled])) .button:hover{
-                -webkit-box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.12);
-                        box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.12);
-            }
-        }
-        @media (hover: none){
-            :host(:not([disabled])) .button:active{
-                -webkit-box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.2);
-                        box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.2);
-            }
-            :host([variant='outlined']) .button:active{
-                -webkit-box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
-                        box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
-            }
-        }
-        </style>
-        <div part="button" class="button">
-            <slot></slot>   
-        </div>`;
+                <style>     
+                *{
+                    padding: 0;
+                    margin: 0;
+                    -webkit-box-sizing: border-box;
+                            box-sizing: border-box;
+                }       
+                :host{
+                    display: -webkit-inline-box;
+                    display: -ms-inline-flexbox;
+                    display: inline-flex;
+                    width: auto;
+                    --accent-color: #4d2588;
+                    --text-color: 17, 17, 17;
+                    --background-color: 255, 255, 255;
+                    --padding: 0.6rem 1.2rem;
+                    --border-radius: 0.3rem;
+                    --background: rgba(var(--text-color), 0.1);
+                }
+                :host([variant='primary']) .button{
+                    background: var(--accent-color);
+                    color: rgba(var(--background-color), 1);
+                }
+                :host([variant='outlined']) .button{
+                    -webkit-box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset;
+                            box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset;
+                    background: transparent; 
+                    color: var(--accent-color);
+                }
+                :host([variant='no-outline']) .button{
+                    background: inherit; 
+                    color: var(--accent-color);
+                }
+                :host([disabled]){
+                    pointer-events: none;
+                    cursor: not-allowed;
+                }
+                .button {
+                    position: relative;
+                    display: -webkit-box;
+                    display: -ms-flexbox;
+                    display: flex;
+                    width: 100%;
+                    padding: var(--padding);
+                    cursor: pointer;
+                    -webkit-user-select: none;
+                       -moz-user-select: none;
+                        -ms-user-select: none;
+                            user-select: none;
+                    border-radius: var(--border-radius); 
+                    -webkit-box-pack: center; 
+                        -ms-flex-pack: center; 
+                            justify-content: center;
+                    transition: box-shadow 0.3s, background-color 0.3s;
+                    font-family: inherit;
+                    font-size: 0.9rem;
+                    font-weight: 500;
+                    background-color: var(--background); 
+                    -webkit-tap-highlight-color: transparent;
+                    outline: none;
+                    overflow: hidden;
+                    border: none;
+                    color: inherit;
+                    align-items: center;
+                }
+                :host([disabled]) .button{
+                    pointer-events: none;
+                    cursor: not-allowed;
+                    opacity: 0.6;
+                    color: rgba(var(--text-color), 1);
+                    background-color: rgba(var(--text-color), 0.3);
+                }
+                @media (hover: hover){
+                    :host(:not([disabled])) .button:hover,
+                    :host(:focus-within:not([disabled])) .button{
+                        -webkit-box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.12);
+                        box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.12);
+                    }
+                    :host([variant='outlined']:not([disabled])) .button:hover,
+                    :host(:focus-within[variant='outlined']:not([disabled])) .button:hover{
+                        -webkit-box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.12);
+                                box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.12);
+                    }
+                }
+                @media (hover: none){
+                    :host(:not([disabled])) .button:active{
+                        -webkit-box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.2);
+                                box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.2);
+                    }
+                    :host([variant='outlined']) .button:active{
+                        -webkit-box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
+                                box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
+                    }
+                }
+                </style>
+                <div part="button" class="button">
+                    <slot></slot>   
+                </div>`;
             customElements.define('sm-button',
                 class extends HTMLElement {
                     constructor() {
@@ -12746,231 +12797,231 @@
                 })
             const smInput = document.createElement('template')
             smInput.innerHTML = `
-        <style>
-        *{
-            padding: 0;
-            margin: 0;
-            -webkit-box-sizing: border-box;
-                    box-sizing: border-box;
-        } 
-        input[type="search"]::-webkit-search-decoration,
-        input[type="search"]::-webkit-search-cancel-button,
-        input[type="search"]::-webkit-search-results-button,
-        input[type="search"]::-webkit-search-results-decoration { display: none; }
-        input[type=number] {
-        -moz-appearance:textfield;
-        }
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { 
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            margin: 0; 
-        }
-        input::-ms-reveal,
-        input::-ms-clear {
-          display: none;
-        }
-        input:invalid{
-            outline: none;
-            -webkit-box-shadow: none;
-                    box-shadow: none;
-        }
-        ::-moz-focus-inner{
-        border: none;
-        }
-        :host{
-            display: -webkit-box;
-            display: -ms-flexbox;
-            display: flex;
-            --accent-color: #4d2588;
-            --text-color: 17, 17, 17;
-            --background-color: 255, 255, 255;
-            --success-color: #00C853;
-            --danger-color: red;
-            --width: 100%;
-            --icon-gap: 0.5rem;
-            --border-radius: 0.3rem;
-            --padding: 0.7rem 1rem;
-            --background: rgba(var(--text-color), 0.06);
-        }
-        .hide{
-           opacity: 0 !important;
-           pointer-events: none !important;
-        }
-        .hide-completely{
-            display: none;
-        }
-        .icon {
-            fill: rgba(var(--text-color), 0.6);
-            height: 1.4rem;
-            width: 1.4rem;
-            border-radius: 1rem;
-            cursor: pointer;
-            min-width: 0;
-        }
-        
-        :host(.round) .input{
-            border-radius: 10rem;
-        }
-        .input {
-            display: -webkit-box;
-            display: -ms-flexbox;
-            display: flex;
-            cursor: text;
-            min-width: 0;
-            text-align: left;
-            -webkit-box-align: center;
-                -ms-flex-align: center;
+                <style>
+                *{
+                    padding: 0;
+                    margin: 0;
+                    -webkit-box-sizing: border-box;
+                            box-sizing: border-box;
+                } 
+                input[type="search"]::-webkit-search-decoration,
+                input[type="search"]::-webkit-search-cancel-button,
+                input[type="search"]::-webkit-search-results-button,
+                input[type="search"]::-webkit-search-results-decoration { display: none; }
+                input[type=number] {
+                -moz-appearance:textfield;
+                }
+                input[type=number]::-webkit-inner-spin-button, 
+                input[type=number]::-webkit-outer-spin-button { 
+                    -webkit-appearance: none;
+                    -moz-appearance: none;
+                    appearance: none;
+                    margin: 0; 
+                }
+                input::-ms-reveal,
+                input::-ms-clear {
+                  display: none;
+                }
+                input:invalid{
+                    outline: none;
+                    -webkit-box-shadow: none;
+                            box-shadow: none;
+                }
+                ::-moz-focus-inner{
+                border: none;
+                }
+                :host{
+                    display: -webkit-box;
+                    display: -ms-flexbox;
+                    display: flex;
+                    --accent-color: #4d2588;
+                    --text-color: 17, 17, 17;
+                    --background-color: 255, 255, 255;
+                    --success-color: #00C853;
+                    --danger-color: red;
+                    --width: 100%;
+                    --icon-gap: 0.5rem;
+                    --border-radius: 0.3rem;
+                    --padding: 0.7rem 1rem;
+                    --background: rgba(var(--text-color), 0.06);
+                }
+                .hide{
+                   opacity: 0 !important;
+                   pointer-events: none !important;
+                }
+                .hide-completely{
+                    display: none;
+                }
+                .icon {
+                    fill: rgba(var(--text-color), 0.6);
+                    height: 1.4rem;
+                    width: 1.4rem;
+                    border-radius: 1rem;
+                    cursor: pointer;
+                    min-width: 0;
+                }
+                
+                :host(.round) .input{
+                    border-radius: 10rem;
+                }
+                .input {
+                    display: -webkit-box;
+                    display: -ms-flexbox;
+                    display: flex;
+                    cursor: text;
+                    min-width: 0;
+                    text-align: left;
+                    -webkit-box-align: center;
+                        -ms-flex-align: center;
+                            align-items: center;
+                    position: relative;
+                    gap: var(--icon-gap);
+                    padding: var(--padding);
+                    border-radius: var(--border-radius);
+                    -webkit-transition: opacity 0.3s;
+                    -o-transition: opacity 0.3s;
+                    transition: opacity 0.3s;
+                    background: var(--background);
+                    width: 100%;
+                    outline: none;
+                }
+                .input.readonly .clear{
+                    opacity: 0 !important;
+                    margin-right: -2rem;
+                    pointer-events: none !important;
+                }
+                .readonly{
+                    pointer-events: none;
+                }
+                .input:focus-within:not(.readonly){
+                    box-shadow: 0 0 0 0.1rem var(--accent-color) inset !important;
+                }
+                .disabled{
+                    pointer-events: none;
+                    opacity: 0.6;
+                }
+                .label {
+                    font-size: inherit;
+                    opacity: .7;
+                    font-weight: 400;
+                    position: absolute;
+                    top: 0;
+                    -webkit-transition: -webkit-transform 0.3s;
+                    transition: -webkit-transform 0.3s;
+                    -o-transition: transform 0.3s;
+                    transition: transform 0.3s;
+                    transition: transform 0.3s, -webkit-transform 0.3s;
+                    -webkit-transform-origin: left;
+                    -ms-transform-origin: left;
+                        transform-origin: left;
+                    pointer-events: none;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    -o-text-overflow: ellipsis;
+                       text-overflow: ellipsis;
+                    width: 100%;
+                    user-select: none;
+                    will-change: transform;
+                }
+                .outer-container{
+                    position: relative;
+                    width: var(--width);
+                }
+                .container{
+                    width: 100%;
+                    display: -webkit-box;
+                    display: -ms-flexbox;
+                    display: flex;
+                    position: relative;
+                    -webkit-box-align: center;
+                        -ms-flex-align: center;
+                            align-items: center;
+                    -webkit-box-flex: 1;
+                        -ms-flex: 1;
+                            flex: 1;
+                }    
+                input{
+                    font-size: inherit;
+                    border: none;
+                    background: transparent;
+                    outline: none;
+                    color: rgba(var(--text-color), 1);
+                    width: 100%;
+                }
+                :host(:not([variant="outlined"])) .animate-label .container input {
+                    -webkit-transform: translateY(0.6rem);
+                            -ms-transform: translateY(0.6rem);
+                        transform: translateY(0.6rem);
+                    }
+                  
+                :host(:not([variant="outlined"])) .animate-label .label {
+                    -webkit-transform: translateY(-0.7em) scale(0.8);
+                            -ms-transform: translateY(-0.7em) scale(0.8);
+                        transform: translateY(-0.7em) scale(0.8);
+                    opacity: 1;
+                    color: var(--accent-color)
+                }
+                :host([variant="outlined"]) .input {
+                    box-shadow: 0 0 0 0.1rem var(--border-color, rgba(var(--text-color), 0.4)) inset;
+                    background: rgba(var(--background-color), 1);
+                }
+                :host([variant="outlined"]) .label {
+                    width: max-content;
+                    margin-left: -0.5rem;
+                    padding: 0 0.5rem;
+                }
+                :host([variant="outlined"]) .animate-label .label {
+                    -webkit-transform: translate(0.1rem, -1.5rem) scale(0.8);
+                            -ms-transform: translate(0.1rem, -1.5rem) scale(0.8);
+                        transform: translate(0.1rem, -1.5rem) scale(0.8);
+                    opacity: 1;
+                    background: rgba(var(--background-color), 1);
+                }
+                .animate-label:focus-within:not(.readonly) .label{
+                    color: var(--accent-color)
+                }
+                .feedback-text:not(:empty){
+                    display: flex;
+                    width: 100%;
+                    text-align: left;
+                    font-size: 0.9rem;
                     align-items: center;
-            position: relative;
-            gap: var(--icon-gap);
-            padding: var(--padding);
-            border-radius: var(--border-radius);
-            -webkit-transition: opacity 0.3s;
-            -o-transition: opacity 0.3s;
-            transition: opacity 0.3s;
-            background: var(--background);
-            width: 100%;
-            outline: none;
-        }
-        .input.readonly .clear{
-            opacity: 0 !important;
-            margin-right: -2rem;
-            pointer-events: none !important;
-        }
-        .readonly{
-            pointer-events: none;
-        }
-        .input:focus-within:not(.readonly){
-            box-shadow: 0 0 0 0.1rem var(--accent-color) inset !important;
-        }
-        .disabled{
-            pointer-events: none;
-            opacity: 0.6;
-        }
-        .label {
-            font-size: inherit;
-            opacity: .7;
-            font-weight: 400;
-            position: absolute;
-            top: 0;
-            -webkit-transition: -webkit-transform 0.3s;
-            transition: -webkit-transform 0.3s;
-            -o-transition: transform 0.3s;
-            transition: transform 0.3s;
-            transition: transform 0.3s, -webkit-transform 0.3s;
-            -webkit-transform-origin: left;
-            -ms-transform-origin: left;
-                transform-origin: left;
-            pointer-events: none;
-            white-space: nowrap;
-            overflow: hidden;
-            -o-text-overflow: ellipsis;
-               text-overflow: ellipsis;
-            width: 100%;
-            user-select: none;
-            will-change: transform;
-        }
-        .outer-container{
-            position: relative;
-            width: var(--width);
-        }
-        .container{
-            width: 100%;
-            display: -webkit-box;
-            display: -ms-flexbox;
-            display: flex;
-            position: relative;
-            -webkit-box-align: center;
-                -ms-flex-align: center;
-                    align-items: center;
-            -webkit-box-flex: 1;
-                -ms-flex: 1;
-                    flex: 1;
-        }    
-        input{
-            font-size: inherit;
-            border: none;
-            background: transparent;
-            outline: none;
-            color: rgba(var(--text-color), 1);
-            width: 100%;
-        }
-        :host(:not([variant="outlined"])) .animate-label .container input {
-            -webkit-transform: translateY(0.6rem);
-                    -ms-transform: translateY(0.6rem);
-                transform: translateY(0.6rem);
-            }
-          
-        :host(:not([variant="outlined"])) .animate-label .label {
-            -webkit-transform: translateY(-0.7em) scale(0.8);
-                    -ms-transform: translateY(-0.7em) scale(0.8);
-                transform: translateY(-0.7em) scale(0.8);
-            opacity: 1;
-            color: var(--accent-color)
-        }
-        :host([variant="outlined"]) .input {
-            box-shadow: 0 0 0 0.1rem var(--border-color, rgba(var(--text-color), 0.4)) inset;
-            background: rgba(var(--background-color), 1);
-        }
-        :host([variant="outlined"]) .label {
-            width: max-content;
-            margin-left: -0.5rem;
-            padding: 0 0.5rem;
-        }
-        :host([variant="outlined"]) .animate-label .label {
-            -webkit-transform: translate(0.1rem, -1.5rem) scale(0.8);
-                    -ms-transform: translate(0.1rem, -1.5rem) scale(0.8);
-                transform: translate(0.1rem, -1.5rem) scale(0.8);
-            opacity: 1;
-            background: rgba(var(--background-color), 1);
-        }
-        .animate-label:focus-within:not(.readonly) .label{
-            color: var(--accent-color)
-        }
-        .feedback-text:not(:empty){
-            display: flex;
-            width: 100%;
-            text-align: left;
-            font-size: 0.9rem;
-            align-items: center;
-            padding: 0.8rem 0;
-            color: rgba(var(--text-color), 0.8);
-        }
-        .success{
-            color: var(--success-color);
-        }
-        .error{
-            color: var(--danger-color);
-        }
-        .status-icon{
-            margin-right: 0.2rem;
-        }
-        .status-icon--error{
-            fill: var(--danger-color);
-        }
-        .status-icon--success{
-            fill: var(--success-color);
-        }
-        @media (any-hover: hover){
-            .icon:hover{
-                background: rgba(var(--text-color), 0.1);
-            }
-        }
-        </style>
-        <div class="outer-container">
-            <label part="input" class="input">
-                <slot name="icon"></slot>
-                <div class="container">
-                    <input type="text"/>
-                    <div part="placeholder" class="label"></div>
+                    padding: 0.8rem 0;
+                    color: rgba(var(--text-color), 0.8);
+                }
+                .success{
+                    color: var(--success-color);
+                }
+                .error{
+                    color: var(--danger-color);
+                }
+                .status-icon{
+                    margin-right: 0.2rem;
+                }
+                .status-icon--error{
+                    fill: var(--danger-color);
+                }
+                .status-icon--success{
+                    fill: var(--success-color);
+                }
+                @media (any-hover: hover){
+                    .icon:hover{
+                        background: rgba(var(--text-color), 0.1);
+                    }
+                }
+                </style>
+                <div class="outer-container">
+                    <label part="input" class="input">
+                        <slot name="icon"></slot>
+                        <div class="container">
+                            <input type="text"/>
+                            <div part="placeholder" class="label"></div>
+                        </div>
+                        <svg class="icon clear hide" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-11.414L9.172 7.757 7.757 9.172 10.586 12l-2.829 2.828 1.415 1.415L12 13.414l2.828 2.829 1.415-1.415L13.414 12l2.829-2.828-1.415-1.415L12 10.586z"/></svg>
+                    </label>
+                    <p class="feedback-text"></p>
                 </div>
-                <svg class="icon clear hide" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-11.414L9.172 7.757 7.757 9.172 10.586 12l-2.829 2.828 1.415 1.415L12 13.414l2.828 2.829 1.415-1.415L13.414 12l2.829-2.828-1.415-1.415L12 10.586z"/></svg>
-            </label>
-            <p class="feedback-text"></p>
-        </div>
-        `;
+                `;
             customElements.define('sm-input',
                 class extends HTMLElement {
 
@@ -13079,9 +13130,9 @@
                                     this.feedbackText.classList.add('error');
                                     this.feedbackText.classList.remove('success');
                                     this.feedbackText.innerHTML = `
-                                    <svg class="status-icon status-icon--error" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm0-8v6h2V7h-2z"/></svg>
-                                ${this._errorText}
-                                `;
+                                            <svg class="status-icon status-icon--error" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm0-8v6h2V7h-2z"/></svg>
+                                        ${this._errorText}
+                                        `;
                                 }
                             }
                             return (_isValid && _customValid);
@@ -13241,168 +13292,168 @@
 
             const smPopup = document.createElement('template');
             smPopup.innerHTML = `
-        <style>
-        *{
-            padding: 0;
-            margin: 0;
-            -webkit-box-sizing: border-box;
-                    box-sizing: border-box;
-        } 
-        :host{
-            position: fixed;
-            display: -ms-grid;
-            display: grid;
-            z-index: 10;
-            --accent-color: #4d2588;
-            --text-color: 17, 17, 17;
-            --background-color: 255, 255, 255;
-            --width: 100%;
-            --height: auto;
-            --min-width: auto;
-            --min-height: auto;
-            --backdrop-background: rgba(0, 0, 0, 0.6);
-            --border-radius: 0.8rem 0.8rem 0 0;
-        }
-        .popup-container{
-            display: -ms-grid;
-            display: grid;
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            place-items: center;
-            z-index: 10;
-            touch-action: none;
-        }
-        :host(.stacked) .popup{
-            -webkit-transform: scale(0.9) translateY(-2rem) !important;
-                    transform: scale(0.9) translateY(-2rem) !important;
-        }
-        .background{
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            pointer-events: none;
-            background: var(--backdrop-background);
-            -webkit-transition: opacity 0.3s;
-            -o-transition: opacity 0.3s;
-            transition: opacity 0.3s;
-        }
-        .popup{
-            display: -webkit-box;
-            display: -ms-flexbox;
-            display: flex;
-            -webkit-box-orient: vertical;
-            -webkit-box-direction: normal;
-                    flex-direction: column;
-            position: relative;
-            -ms-flex-item-align: end;
-                align-self: flex-end;
-            -webkit-box-align: start;
-                -ms-flex-align: start;
-                    align-items: flex-start;
-            width: var(--width);
-            min-width: var(--min-width);
-            height: var(--height);
-            min-height: var(--min-height);
-            max-height: 90vh;
-            border-radius: var(--border-radius);
-            background: rgba(var(--background-color), 1);
-            -webkit-box-shadow: 0 -1rem 2rem #00000020;
-                    box-shadow: 0 -1rem 2rem #00000020;
-            transition: transform 0.3s;
-        }
-        .container-header{
-            display: -webkit-box;
-            display: flex;
-            width: 100%;
-            touch-action: none;
-            -webkit-box-align: center;
-                -ms-flex-align: center;
-                    align-items: center;
-        }
-        .popup-top{
-            display: -webkit-box;
-            display: flex;
-            width: 100%;
-        }
-        .popup-body{
-            display: -webkit-box;
-            display: flex;
-            -webkit-box-orient: vertical;
-            -webkit-box-direction: normal;
-                -ms-flex-direction: column;
-                    flex-direction: column;
-            -webkit-box-flex: 1;
-                -ms-flex: 1;
-                    flex: 1;
-            width: 100%;
-            padding: var(--body-padding, 1.5rem);
-            overflow-y: auto;
-        }
-        .hide{
-            display:none;
-        }
-        @media screen and (min-width: 640px){
-            :host{
-                --border-radius: 0.5rem;
-            }
-            .popup{
-                -ms-flex-item-align: center;
-                    -ms-grid-row-align: center;
-                    align-self: center;
-                border-radius: var(--border-radius);
-                height: var(--height);
-                -webkit-box-shadow: 0 3rem 2rem -0.5rem #00000040;
-                        box-shadow: 0 3rem 2rem -0.5rem #00000040;
-            }
-        }
-        @media screen and (max-width: 640px){
-            .popup-top{
-                -webkit-box-orient: vertical;
-                -webkit-box-direction: normal;
-                        flex-direction: column;
-                -webkit-box-align: center;
-                        align-items: center;
-            }
-            .handle{
-                height: 0.3rem;
-                width: 2rem;
-                background: rgba(var(--text-color), .4);
-                border-radius: 1rem;
-                margin: 0.5rem 0;
-            }
-        }
-        @media (any-hover: hover){
-            ::-webkit-scrollbar{
-                width: 0.5rem;
-            }
-            
-            ::-webkit-scrollbar-thumb{
-                background: rgba(var(--text-color), 0.3);
-                border-radius: 1rem;
-                &:hover{
-                    background: rgba(var(--text-color), 0.5);
+                <style>
+                *{
+                    padding: 0;
+                    margin: 0;
+                    -webkit-box-sizing: border-box;
+                            box-sizing: border-box;
+                } 
+                :host{
+                    position: fixed;
+                    display: -ms-grid;
+                    display: grid;
+                    z-index: 10;
+                    --accent-color: #4d2588;
+                    --text-color: 17, 17, 17;
+                    --background-color: 255, 255, 255;
+                    --width: 100%;
+                    --height: auto;
+                    --min-width: auto;
+                    --min-height: auto;
+                    --backdrop-background: rgba(0, 0, 0, 0.6);
+                    --border-radius: 0.8rem 0.8rem 0 0;
                 }
-            }
-        }
-        </style>
-        <div class="popup-container hide" role="dialog">
-            <div part="background" class="background"></div>
-            <div part="popup" class="popup">
-                <div part="popup-header" class="popup-top">
-                    <div class="handle"></div>
-                    <slot name="header"></slot>
+                .popup-container{
+                    display: -ms-grid;
+                    display: grid;
+                    position: fixed;
+                    top: 0;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    place-items: center;
+                    z-index: 10;
+                    touch-action: none;
+                }
+                :host(.stacked) .popup{
+                    -webkit-transform: scale(0.9) translateY(-2rem) !important;
+                            transform: scale(0.9) translateY(-2rem) !important;
+                }
+                .background{
+                    position: absolute;
+                    top: 0;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    pointer-events: none;
+                    background: var(--backdrop-background);
+                    -webkit-transition: opacity 0.3s;
+                    -o-transition: opacity 0.3s;
+                    transition: opacity 0.3s;
+                }
+                .popup{
+                    display: -webkit-box;
+                    display: -ms-flexbox;
+                    display: flex;
+                    -webkit-box-orient: vertical;
+                    -webkit-box-direction: normal;
+                            flex-direction: column;
+                    position: relative;
+                    -ms-flex-item-align: end;
+                        align-self: flex-end;
+                    -webkit-box-align: start;
+                        -ms-flex-align: start;
+                            align-items: flex-start;
+                    width: var(--width);
+                    min-width: var(--min-width);
+                    height: var(--height);
+                    min-height: var(--min-height);
+                    max-height: 90vh;
+                    border-radius: var(--border-radius);
+                    background: rgba(var(--background-color), 1);
+                    -webkit-box-shadow: 0 -1rem 2rem #00000020;
+                            box-shadow: 0 -1rem 2rem #00000020;
+                    transition: transform 0.3s;
+                }
+                .container-header{
+                    display: -webkit-box;
+                    display: flex;
+                    width: 100%;
+                    touch-action: none;
+                    -webkit-box-align: center;
+                        -ms-flex-align: center;
+                            align-items: center;
+                }
+                .popup-top{
+                    display: -webkit-box;
+                    display: flex;
+                    width: 100%;
+                }
+                .popup-body{
+                    display: -webkit-box;
+                    display: flex;
+                    -webkit-box-orient: vertical;
+                    -webkit-box-direction: normal;
+                        -ms-flex-direction: column;
+                            flex-direction: column;
+                    -webkit-box-flex: 1;
+                        -ms-flex: 1;
+                            flex: 1;
+                    width: 100%;
+                    padding: var(--body-padding, 1.5rem);
+                    overflow-y: auto;
+                }
+                .hide{
+                    display:none;
+                }
+                @media screen and (min-width: 640px){
+                    :host{
+                        --border-radius: 0.5rem;
+                    }
+                    .popup{
+                        -ms-flex-item-align: center;
+                            -ms-grid-row-align: center;
+                            align-self: center;
+                        border-radius: var(--border-radius);
+                        height: var(--height);
+                        -webkit-box-shadow: 0 3rem 2rem -0.5rem #00000040;
+                                box-shadow: 0 3rem 2rem -0.5rem #00000040;
+                    }
+                }
+                @media screen and (max-width: 640px){
+                    .popup-top{
+                        -webkit-box-orient: vertical;
+                        -webkit-box-direction: normal;
+                                flex-direction: column;
+                        -webkit-box-align: center;
+                                align-items: center;
+                    }
+                    .handle{
+                        height: 0.3rem;
+                        width: 2rem;
+                        background: rgba(var(--text-color), .4);
+                        border-radius: 1rem;
+                        margin: 0.5rem 0;
+                    }
+                }
+                @media (any-hover: hover){
+                    ::-webkit-scrollbar{
+                        width: 0.5rem;
+                    }
+                    
+                    ::-webkit-scrollbar-thumb{
+                        background: rgba(var(--text-color), 0.3);
+                        border-radius: 1rem;
+                        &:hover{
+                            background: rgba(var(--text-color), 0.5);
+                        }
+                    }
+                }
+                </style>
+                <div class="popup-container hide" role="dialog">
+                    <div part="background" class="background"></div>
+                    <div part="popup" class="popup">
+                        <div part="popup-header" class="popup-top">
+                            <div class="handle"></div>
+                            <slot name="header"></slot>
+                        </div>
+                        <div part="popup-body" class="popup-body">
+                            <slot></slot>
+                        </div>
+                    </div>
                 </div>
-                <div part="popup-body" class="popup-body">
-                    <slot></slot>
-                </div>
-            </div>
-        </div>
-        `;
+                `;
             customElements.define('sm-popup', class extends HTMLElement {
                 constructor() {
                     super();
@@ -13698,79 +13749,79 @@
             });
             const smCopy = document.createElement('template');
             smCopy.innerHTML = `
-        <style>     
-        *{
-            padding: 0;
-            margin: 0;
-            -webkit-box-sizing: border-box;
-                    box-sizing: border-box;
-        }       
-        :host{
-            display: -webkit-box;
-            display: flex;
-            --accent-color: #4d2588;
-            --text-color: 17, 17, 17;
-            --background-color: 255, 255, 255;
-            --padding: 0;
-            --background-color: inherit;
-            --button-background-color: rgba(var(--text-color), 0.2);
-            --button-border-radius: 0.3rem;
-        }
-        .copy{
-            display: grid;
-            width: 100%;
-            gap: 0.5rem;
-            padding: var(--padding);
-            align-items: center;
-            grid-template-columns: minmax(0, 1fr) auto;
-        }
-        :host(:not([clip-text])) .copy-content{
-            overflow-wrap: break-word;
-            word-wrap: break-word;
-        }
-        :host([clip-text]) .copy-content{
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .copy-button{
-            display: inline-flex;
-            justify-content: center;
-            cursor: pointer;
-            border: none;
-            padding: 0.4rem;
-            background-color: inherit;
-            border-radius: var(--button-border-radius);
-        }
-        .copy-button:active{
-            background-color: var(--button-background-color);
-        }
-        .icon{
-            height: 1.2rem;
-            width: 1.2rem;
-            fill: rgba(var(--text-color), 0.8);
-        }
-        @media (any-hover: hover){
-            .copy:hover .copy-button{
-                opacity: 1;
-            }
-            .copy-button{
-                opacity: 0.6;
-            }
-            .copy-button:hover{
-                background-color: var(--button-background-color);
-            }
-        }
-        </style>
-        <section class="copy">
-            <p class="copy-content"></p>
-            <button part="button" class="copy-button" title="copy">
-                <slot name="copy-icon">
-                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M7 6V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-3v3c0 .552-.45 1-1.007 1H4.007A1.001 1.001 0 0 1 3 21l.003-14c0-.552.45-1 1.007-1H7zM5.003 8L5 20h10V8H5.003zM9 6h8v10h2V4H9v2z"/></svg>
-                </slot>
-            </button>
-        </section>
-        `;
+                <style>     
+                *{
+                    padding: 0;
+                    margin: 0;
+                    -webkit-box-sizing: border-box;
+                            box-sizing: border-box;
+                }       
+                :host{
+                    display: -webkit-box;
+                    display: flex;
+                    --accent-color: #4d2588;
+                    --text-color: 17, 17, 17;
+                    --background-color: 255, 255, 255;
+                    --padding: 0;
+                    --background-color: inherit;
+                    --button-background-color: rgba(var(--text-color), 0.2);
+                    --button-border-radius: 0.3rem;
+                }
+                .copy{
+                    display: grid;
+                    width: 100%;
+                    gap: 0.5rem;
+                    padding: var(--padding);
+                    align-items: center;
+                    grid-template-columns: minmax(0, 1fr) auto;
+                }
+                :host(:not([clip-text])) .copy-content{
+                    overflow-wrap: break-word;
+                    word-wrap: break-word;
+                }
+                :host([clip-text]) .copy-content{
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+                .copy-button{
+                    display: inline-flex;
+                    justify-content: center;
+                    cursor: pointer;
+                    border: none;
+                    padding: 0.4rem;
+                    background-color: inherit;
+                    border-radius: var(--button-border-radius);
+                }
+                .copy-button:active{
+                    background-color: var(--button-background-color);
+                }
+                .icon{
+                    height: 1.2rem;
+                    width: 1.2rem;
+                    fill: rgba(var(--text-color), 0.8);
+                }
+                @media (any-hover: hover){
+                    .copy:hover .copy-button{
+                        opacity: 1;
+                    }
+                    .copy-button{
+                        opacity: 0.6;
+                    }
+                    .copy-button:hover{
+                        background-color: var(--button-background-color);
+                    }
+                }
+                </style>
+                <section class="copy">
+                    <p class="copy-content"></p>
+                    <button part="button" class="copy-button" title="copy">
+                        <slot name="copy-icon">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M7 6V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-3v3c0 .552-.45 1-1.007 1H4.007A1.001 1.001 0 0 1 3 21l.003-14c0-.552.45-1 1.007-1H7zM5.003 8L5 20h10V8H5.003zM9 6h8v10h2V4H9v2z"/></svg>
+                        </slot>
+                    </button>
+                </section>
+                `;
             customElements.define('sm-copy',
                 class extends HTMLElement {
                     constructor() {
@@ -13821,26 +13872,26 @@
                 });
             const smForm = document.createElement('template');
             smForm.innerHTML = `
-            <style>
-            *{
-                padding: 0;
-                margin: 0;
-                box-sizing: border-box;
-            }
-            :host{
-                display: flex;
-                width: 100%;
-            }
-            form{
-                display: grid;
-                gap: var(--gap, 1.5rem);
-                width: 100%;
-            }
-            </style>
-            <form part="form" onsubmit="return false">
-                <slot></slot>
-            </form>
-        `;
+                    <style>
+                    *{
+                        padding: 0;
+                        margin: 0;
+                        box-sizing: border-box;
+                    }
+                    :host{
+                        display: flex;
+                        width: 100%;
+                    }
+                    form{
+                        display: grid;
+                        gap: var(--gap, 1.5rem);
+                        width: 100%;
+                    }
+                    </style>
+                    <form part="form" onsubmit="return false">
+                        <slot></slot>
+                    </form>
+                `;
 
             customElements.define('sm-form', class extends HTMLElement {
                 constructor() {
@@ -13922,51 +13973,6 @@
                 }
             })
 
-        </script>
-        <script id="onLoadStartUp">
-            let isSubAdmin = false
-            let isLoggedIn = false
-            let totalVotes = 0
-            function onLoadStartUp() {
-
-                //floDapps.addStartUpFunction('Sample', Promised Function)
-                //floDapps.setAppObjectStores({sampleObs1:{}, sampleObs2:{options{autoIncrement:true, keyPath:'SampleKey'}, Indexes:{sampleIndex:{}}}})
-                floDapps.setMidStartup(() => new Promise(async (resolve, reject) => {
-                    await floCloudAPI.requestObjectData('RMT')
-                    await floCloudAPI.requestGeneralData(`article_${currentArticleID}_votes`)
-                    const allVotes = floGlobals.generalData[`article_${currentArticleID}_votes|${floGlobals.adminID}|${floGlobals.application}`]
-                    for (const vote in allVotes) {
-                        const { message: { articleID } } = allVotes[vote]
-                        if (allVotes[vote].message.articleID === currentArticleID) {
-                            totalVotes++
-                        }
-                    }
-                    getRef('like_count').textContent = totalVotes
-                    resolve(true)
-                }))
-                floDapps.setCustomPrivKeyInput(() => new Promise((resolve, reject) => {
-                    getRef('sign_in_button').onclick = () => {
-                        resolve(getRef('private_key_field').value.trim())
-                        getRef('private_key_field').value = ''
-                        hidePopup()
-                    }
-                    getRef('sign_up_button').onclick = () => {
-                        resolve(getRef('generated_private_key').value.trim())
-                        getRef('generated_private_key').value = ''
-                        hidePopup()
-                    }
-                }))
-
-
-                floDapps.launchStartUp().then(async result => {
-                    isLoggedIn = true
-                    isSubAdmin = floGlobals.subAdmins.includes(myFloID)
-
-                    console.log(result)
-                    // alert(`Welcome FLO_ID: ${ myFloID }`)
-                    //App functions....
-                }).catch(error => console.error(error))
-            }
         </script>
     </template>
 </body>
