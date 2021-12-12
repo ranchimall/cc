@@ -289,7 +289,7 @@ h3:not(:first-of-type) {
   margin: 1rem 0;
   border-radius: 0.2rem;
   border: solid thin rgba(var(--text-color), 0.3);
-  box-shadow: 0.3rem 0.5rem 0 0.1rem rgba(var(--text-color), 0.3);
+  box-shadow: 0.3rem 0.5rem 0 0.1rem rgba(var(--text-color), 0.8);
   overflow: hidden;
   justify-self: center;
   padding-left: 1.3rem;
@@ -317,7 +317,7 @@ h3:not(:first-of-type) {
   &:active {
     transform: none;
     .icon {
-      transform: scale(0.5);
+      transform: scale(0.7);
     }
   }
   &.liked {

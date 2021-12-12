@@ -237,7 +237,7 @@
                         Publish
                     </sm-button>
                     <sm-menu align-options="right">
-                        <menu-option>
+                        <menu-option onclick="exportSelection()">
                             <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg"
                                 enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px"
                                 fill="#000000">
@@ -1300,6 +1300,89 @@
             getRef('preview__body').innerHTML = ''
             getRef('preview__body').append(frag)
             window.location.hash = `#/preview?articleID=${currentArticle.id}`
+        }
+
+        function downloadHTML(string, options = {}) {
+            const { title } = options
+            const element = createElement('a', {
+                attributes: {
+                    'href': 'data:text/html;charset=utf-8,' + encodeURIComponent(string),
+                    'download': `${title ? title : 'article'}.html`,
+                    'style': 'display:none'
+                }
+            });
+
+            document.body.appendChild(element);
+
+            element.click();
+
+            document.body.removeChild(element);
+        }
+
+        function exportSelection() {
+            const bodyTemplate = getRef('body_template').content.cloneNode(true)
+            const composedDocumentStructure = {}
+            floGlobals.appObjects[currentArticle.id].sections.forEach(section => composedDocumentStructure[section.id] = [])
+            selectedContent.forEach(({ content, sectionID }, uid) => {
+                composedDocumentStructure[sectionID].push({ content, uid })
+            })
+            for (const section in composedDocumentStructure) {
+                if (!composedDocumentStructure[section].length)
+                    delete composedDocumentStructure[section]
+            }
+            let frag = document.createDocumentFragment()
+
+            for (const section in composedDocumentStructure) {
+                frag.append(createElement('h3', {
+                    textContent: currentArticle.sections[section].title
+                }))
+                composedDocumentStructure[section].forEach(({ content, uid }) => {
+                    const group = createElement('section', {
+                        className: 'grid gap-1',
+                        innerHTML: content
+                    })
+                    frag.append(group)
+                })
+            }
+            const articleTitle = floGlobals.appObjects.cc.articleList[currentArticle.id].title
+            bodyTemplate.querySelector('#exported_title').textContent = articleTitle
+            bodyTemplate.querySelector('#exported_time').textContent = `Exported on ${getFormattedTime(Date.now())}`
+            bodyTemplate.querySelector('#export_body').innerHTML = ''
+            bodyTemplate.querySelector('#export_body').append(frag)
+            let bodyAttributes = ''
+            let extraScripts = ''
+            if (isSubAdmin) {
+                bodyAttributes = `data-article-id="${currentArticle.id}" onload="onLoadStartUp()"`
+                // copy script already present in this file instead of storing a duplicate
+                extraScripts = `
+                    ${getRef('voting_enabled').innerHTML}
+                    <script>
+                        ${getRef('init_lib').innerHTML}
+                        ${getRef('floCrypto').innerHTML}
+                        ${getRef('floBlockchainAPI').innerHTML}
+                        ${getRef('compactIDB').innerHTML}
+                        ${getRef('floCloudAPI').innerHTML}
+                        ${getRef('floDapps').innerHTML}
+                        <\/script>
+                    `
+            }
+            const bodyHTML = createElement('div')
+            bodyHTML.append(bodyTemplate)
+            const headTemplate = getRef('head_template').content.cloneNode(true)
+            headTemplate.querySelector('title').textContent = articleTitle
+            const headHTML = createElement('div')
+            headHTML.append(headTemplate)
+            const finalMarkup = `
+            <!DOCTYPE html>
+            <html lang="en">
+                <head>${headHTML.innerHTML}<\/head>
+                <body data-theme="light" ${bodyAttributes}>
+                    ${bodyHTML.innerHTML}
+                    ${extraScripts}
+                    <\/body>
+            <\/html>
+            `
+            downloadHTML(finalMarkup, { title: articleTitle })
         }
         function goHome() {
             window.location.hash = `#/home?articleID=${pagesData.params.articleID}`
@@ -11459,6 +11542,2433 @@
             }
         }
     </script>
+    <template id="head_template">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title></title>
+        <style>
+            * {
+                padding: 0;
+                margin: 0;
+                -webkit-box-sizing: border-box;
+                box-sizing: border-box;
+                font-family: "Inter", sans-serif
+            }
+
+            :root {
+                font-size: clamp(1rem, 1.2vmax, 1.2rem)
+            }
+
+            html,
+            body {
+                height: 100%;
+                scroll-behavior: smooth
+            }
+
+            body {
+                color: rgba(var(--text-color), 1);
+                background: var(--foreground-color)
+            }
+
+            body,
+            body * {
+                --accent-color: rgb(0, 156, 78);
+                --text-color: 36, 36, 36;
+                --background-color: 248, 248, 248;
+                --foreground-color: rgb(255, 255, 255);
+                --danger-color: rgb(255, 75, 75);
+                --like-color: #e91e63;
+                scrollbar-width: thin
+            }
+
+            body[data-theme=dark],
+            body[data-theme=dark] * {
+                --accent-color: rgb(14, 230, 122);
+                --text-color: 230, 230, 230;
+                --text-color-light: 170, 170, 170;
+                --background-color: 10, 10, 10;
+                --foreground-color: rgb(24, 24, 24);
+                --danger-color: rgb(255, 106, 106)
+            }
+
+            body[data-theme=dark] sm-popup::part(popup) {
+                background-color: var(--foreground-color)
+            }
+
+            p {
+                font-size: .9rem;
+                max-width: 70ch;
+                color: rgba(var(--text-color), 0.8)
+            }
+
+            p * {
+                font-family: inherit
+            }
+
+            .flex {
+                display: -webkit-box;
+                display: -ms-flexbox;
+                display: flex
+            }
+
+            .direction-column {
+                -webkit-box-orient: vertical;
+                -webkit-box-direction: normal;
+                -ms-flex-direction: column;
+                flex-direction: column
+            }
+
+            .grid {
+                display: grid
+            }
+
+            .flow-column {
+                grid-auto-flow: column
+            }
+
+            .gap-0-5 {
+                gap: .5rem
+            }
+
+            .gap-1 {
+                gap: 1rem
+            }
+
+            .gap-1-5 {
+                gap: 1.5rem
+            }
+
+            .gap-2 {
+                gap: 2rem
+            }
+
+            .gap-3 {
+                gap: 3rem
+            }
+
+            .justify-self-center {
+                justify-self: center
+            }
+
+            .justify-self-start {
+                justify-self: start
+            }
+
+            .justify-self-end {
+                justify-self: end
+            }
+
+            .icon {
+                width: 1.2rem;
+                height: 1.2rem;
+                fill: rgba(var(--text-color), 0.8);
+                -ms-flex-negative: 0;
+                flex-shrink: 0
+            }
+
+            button,
+            .button {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+                position: relative;
+                display: -webkit-inline-box;
+                display: -ms-inline-flexbox;
+                display: inline-flex;
+                border: none;
+                background-color: transparent;
+                overflow: hidden;
+                color: inherit;
+                cursor: pointer;
+                -webkit-transition: -webkit-transform .3s;
+                transition: -webkit-transform .3s;
+                transition: transform .3s;
+                transition: transform .3s, -webkit-transform .3s;
+                -webkit-tap-highlight-color: transparent;
+                -webkit-box-align: center;
+                -ms-flex-align: center;
+                align-items: center;
+                font-size: .9rem;
+                font-weight: 500
+            }
+
+            .button {
+                white-space: nowrap;
+                padding: .6rem 1rem;
+                border-radius: .3rem;
+                background-color: rgba(var(--text-color), 0.06);
+                color: rgba(var(--text-color), 0.8);
+                -webkit-box-pack: center;
+                -ms-flex-pack: center;
+                justify-content: center
+            }
+
+            .button--primary {
+                background-color: var(--accent-color);
+                color: rgba(var(--background-color), 1)
+            }
+
+            button:active,
+            .button:active,
+            sm-button:not([disabled]):active,
+            .interact:active {
+                -webkit-transform: scale(0.9);
+                transform: scale(0.9)
+            }
+
+            .popup__header {
+                display: grid;
+                gap: .5rem;
+                width: 100%;
+                padding: 0 1.5rem 0 .5rem;
+                -webkit-box-align: center;
+                -ms-flex-align: center;
+                align-items: center;
+                grid-template-columns: auto 1fr auto
+            }
+
+            .popup__header__close {
+                padding: .5rem
+            }
+
+            #sign_in,
+            #sign_up {
+                -webkit-box-align: center;
+                -ms-flex-align: center;
+                align-items: center
+            }
+
+            #sign_in sm-form,
+            #sign_up sm-form {
+                margin: 2rem 0;
+                --gap: 1rem
+            }
+
+            #sign_in header,
+            #sign_up header {
+                padding: 1.5rem 0
+            }
+
+            #sign_up sm-copy {
+                font-size: .9rem
+            }
+
+            #sign_up h5 {
+                font-weight: 500;
+                color: rgba(var(--text-color), 0.8)
+            }
+
+            .card {
+                padding: 1rem;
+                border-radius: .5rem;
+                background-color: rgba(var(--text-color), 0.04)
+            }
+
+            .warning {
+                background-color: khaki;
+                color: rgba(0, 0, 0, .7);
+                padding: 1rem;
+                border-radius: .5rem;
+                line-height: 1.5
+            }
+
+            #main_header {
+                display: grid;
+                gap: 1rem;
+                position: sticky;
+                top: 0;
+                padding: 1rem;
+                -webkit-box-align: center;
+                -ms-flex-align: center;
+                align-items: center;
+                grid-template-columns: 1fr auto auto;
+                background-color: var(--foreground-color);
+                z-index: 1
+            }
+
+            .logo {
+                display: grid;
+                -webkit-box-align: center;
+                -ms-flex-align: center;
+                align-items: center;
+                width: 100%;
+                grid-template-columns: auto 1fr;
+                gap: 0 .5rem;
+                margin-right: 1rem
+            }
+
+            .logo h4 {
+                text-transform: capitalize;
+                font-size: .9rem;
+                font-weight: 500
+            }
+
+            .main-logo {
+                height: 1.4rem;
+                width: 1.4rem;
+                fill: rgba(var(--text-color), 1);
+                stroke: none
+            }
+
+            article {
+                position: relative;
+                padding-bottom: 3rem;
+                gap: 1rem
+            }
+
+            article::after {
+                justify-self: center;
+                position: absolute;
+                bottom: 0;
+                content: "";
+                width: 4rem;
+                height: .3rem;
+                border-radius: .5rem;
+                background-color: rgba(var(--text-color), 0.5)
+            }
+
+            article p {
+                font-family: "noto serif", serif;
+                line-height: 1.8;
+                font-size: 1rem
+            }
+
+            .page-layout {
+                display: grid;
+                grid-template-columns: 1rem minmax(0, 1fr) 1rem
+            }
+
+            .page-layout>* {
+                grid-column: 2/3
+            }
+
+            .hero-section {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr);
+                margin-bottom: 1.5rem;
+                padding-top: 1.5rem
+            }
+
+            img {
+                -o-object-fit: cover;
+                object-fit: cover;
+                width: 100%;
+                height: 40vh
+            }
+
+            time {
+                font-size: .8rem
+            }
+
+            h1 {
+                font-size: 1.4rem;
+                margin-bottom: 1rem
+            }
+
+            h3:not(:first-of-type) {
+                margin-top: 2rem
+            }
+
+            .full-bleed {
+                grid-column: 1/-1
+            }
+
+            .quote-template {
+                position: relative;
+                padding: 1rem;
+                margin: 1rem 0;
+                border-radius: .2rem;
+                border: solid thin rgba(var(--text-color), 0.3);
+                -webkit-box-shadow: .3rem .5rem 0 .1rem rgba(var(--text-color), 0.8);
+                box-shadow: .3rem .5rem 0 .1rem rgba(var(--text-color), 0.8);
+                overflow: hidden;
+                justify-self: center;
+                padding-left: 1.3rem
+            }
+
+            .quote-template figcaption {
+                margin-top: .5rem;
+                color: rgba(var(--text-color), 0.8);
+                font-size: .8rem;
+                margin-left: auto
+            }
+
+            .upvote {
+                display: grid;
+                grid-template-columns: auto 1fr;
+                position: relative;
+                padding: .8rem;
+                border-radius: 2rem;
+                background-color: var(--foreground-color);
+                -webkit-box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .1);
+                box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .1);
+                border: solid rgba(var(--text-color), 0.2) thin
+            }
+
+            .upvote>* {
+                pointer-events: none
+            }
+
+            .upvote:active {
+                -webkit-transform: none;
+                transform: none
+            }
+
+            .upvote:active .icon {
+                -webkit-transform: scale(0.7);
+                transform: scale(0.7)
+            }
+
+            .upvote.liked {
+                background-color: var(--like-color);
+                color: #fff
+            }
+
+            .upvote.liked .icon {
+                fill: #fff
+            }
+
+            .expanding-heart,
+            .ring {
+                grid-area: 1/1
+            }
+
+            .ring {
+                border: .1rem solid var(--like-color);
+                border-radius: 50%;
+                height: .5rem;
+                width: .5rem;
+                justify-self: center
+            }
+
+            .upvote .icon {
+                grid-area: 1/1;
+                fill: var(--like-color);
+                height: 1.5rem;
+                width: 1.5rem;
+                -webkit-transition: -webkit-transform .2s;
+                transition: -webkit-transform .2s;
+                transition: transform .2s;
+                transition: transform .2s, -webkit-transform .2s
+            }
+
+            .temp-count,
+            #like_count {
+                grid-area: 1/2
+            }
+
+            .temp-count:not(:empty),
+            #like_count:not(:empty) {
+                margin-left: .4rem
+            }
+
+            footer {
+                padding: 3rem 1.5rem;
+                justify-items: center
+            }
+
+            @media screen and (min-width: 40rem) {
+                sm-popup {
+                    --width: 24rem
+                }
+
+                .popup__header {
+                    padding: 1rem 1.5rem 0 1rem
+                }
+
+                .page-layout {
+                    grid-template-columns: 1fr 60ch 1fr
+                }
+
+                h1 {
+                    font-size: 2rem
+                }
+            }
+
+            @media(any-hover: hover) {
+                ::-webkit-scrollbar {
+                    width: .5rem;
+                    height: .5rem
+                }
+
+                ::-webkit-scrollbar-thumb {
+                    background: rgba(var(--text-color), 0.3);
+                    border-radius: 1rem
+                }
+
+                ::-webkit-scrollbar-thumb:hover {
+                    background: rgba(var(--text-color), 0.5)
+                }
+            }
+
+            .hide-completely {
+                display: none
+            }
+        </style>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+            rel="stylesheet">
+    </template>
+    <template id="body_template">
+        <header id="main_header">
+            <div class="logo">
+                <svg class="main-logo" width="23" height="22" viewBox="0 0 23 22" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M15 0.749881C10.9026 2.35002 8 6.33604 8 11C8 15.664 10.9026 19.65 15 21.2501C13.7603 21.7343 12.4112 22 11 22C4.92487 22 0 17.0751 0 11C0 4.92487 4.92487 0 11 0C12.4112 0 13.7603 0.26573 15 0.749881Z" />
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M14 16.591C16.2349 15.7182 17.8182 13.544 17.8182 11C17.8182 8.45602 16.2349 6.28183 14 5.40903C14.6762 5.14494 15.4121 5 16.1818 5C19.4955 5 22.1818 7.68629 22.1818 11C22.1818 14.3137 19.4955 17 16.1818 17C15.4121 17 14.6762 16.8551 14 16.591Z" />
+                </svg>
+                <h4>RanchiMall Times</h4>
+            </div>
+            <theme-toggle></theme-toggle>
+            <button onclick="showPopup('user_popup')">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" height="24px" viewBox="0 0 24 24" width="24px"
+                    fill="#000000">
+                    <path d="M0 0h24v24H0V0z" fill="none" />
+                    <path
+                        d="M12 5.9c1.16 0 2.1.94 2.1 2.1s-.94 2.1-2.1 2.1S9.9 9.16 9.9 8s.94-2.1 2.1-2.1m0 9c2.97 0 6.1 1.46 6.1 2.1v1.1H5.9V17c0-.64 3.13-2.1 6.1-2.1M12 4C9.79 4 8 5.79 8 8s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 9c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z" />
+                </svg>
+            </button>
+        </header>
+        <article class="page-layout">
+            <!-- <picture class="hero-image full-bleed">
+            <source
+                srcset="https://www.europeanscientist.com/wp-content/uploads/thumbs/111-27-38qkzhwijiszfu016l71fk.jpg"
+                media="(min-width: 800px)">
+            <img loading="lazy" src="https://www.europeanscientist.com/wp-content/uploads/thumbs/111-27-38qkzhwijiszfu016l71fk.jpg"
+                alt="" />
+        </picture> -->
+            <section class="hero-section">
+                <h1 id="exported_title"></h1>
+                <time id="exported_time"></time>
+            </section>
+            <section id="export_body" class="grid gap-1"></section>
+            <section>
+                <h4>Article by -</h4>
+                <div id="article_contributors"></div>
+                <span>created with RanchiMall Content collaboration app</span>
+            </section>
+        </article>
+        <script>
+            const themeToggle = document.createElement('template');
+            themeToggle.innerHTML = `
+            <style>
+            *{
+                padding: 0;
+                margin: 0;
+                box-sizing: border-box;
+            }
+            :host{
+                cursor: pointer;
+                --height: 2.5rem;
+                --width: 2.5rem;
+            }
+            .theme-toggle {
+                display: flex;
+                position: relative;
+                width: 1.4rem;
+                height: 1.4rem;
+                cursor: pointer;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .theme-toggle::after{
+                content: '';
+                position: absolute;
+                height: var(--height);
+                width: var(--width);
+                top: 50%;
+                left: 50%;
+                opacity: 0;
+                border-radius: 50%;
+                pointer-events: none;
+                transition: transform 0.3s, opacity 0.3s;
+                transform: translate(-50%, -50%) scale(1.2);
+                background-color: rgba(var(--text-color), 0.12);
+            }
+            :host(:focus-within) .theme-toggle{
+                outline: none;
+            }
+            :host(:focus-within) .theme-toggle::after{
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            .icon {
+                position: absolute;
+                height: 100%;
+                width: 100%;
+                fill: rgba(var(--text-color), 1);
+                transition: transform 0.3s, opacity 0.1s;
+            }
+            
+            .theme-switcher__checkbox {
+                display: none;
+            }
+            :host([checked]) .moon-icon {
+                transform: translateY(50%);
+                opacity: 0;
+            }
+            :host(:not([checked])) .sun-icon {
+                transform: translateY(50%);
+                opacity: 0;
+            }
+            </style>
+            <label class="theme-toggle" title="Change theme" tabindex="0">
+                <slot name="light-mode-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon moon-icon" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><rect fill="none" height="24" width="24"/><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"/></svg>
+                </slot>
+                <slot name="dark-mode-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon sun-icon" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><rect fill="none" height="24" width="24"/><path d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"/></svg>
+                </slot>
+            </label>
+        `;
+
+            class ThemeToggle extends HTMLElement {
+                constructor() {
+                    super();
+
+                    this.attachShadow({
+                        mode: 'open'
+                    }).append(themeToggle.content.cloneNode(true));
+
+                    this.isChecked = false;
+                    this.hasTheme = 'light';
+
+                    this.toggleState = this.toggleState.bind(this);
+                    this.fireEvent = this.fireEvent.bind(this);
+                    this.handleThemeChange = this.handleThemeChange.bind(this);
+                }
+                static get observedAttributes() {
+                    return ['checked'];
+                }
+
+                daylight() {
+                    this.hasTheme = 'light';
+                    document.body.dataset.theme = 'light';
+                    this.setAttribute('aria-checked', 'false');
+                }
+
+                nightlight() {
+                    this.hasTheme = 'dark';
+                    document.body.dataset.theme = 'dark';
+                    this.setAttribute('aria-checked', 'true');
+                }
+
+                toggleState() {
+                    this.toggleAttribute('checked');
+                    this.fireEvent();
+                }
+                handleKeyDown(e) {
+                    if (e.code === 'Space') {
+                        this.toggleState();
+                    }
+                }
+                handleThemeChange(e) {
+                    if (e.detail.theme !== this.hasTheme) {
+                        if (e.detail.theme === 'dark') {
+                            this.setAttribute('checked', '');
+                        }
+                        else {
+                            this.removeAttribute('checked');
+                        }
+                    }
+                }
+
+                fireEvent() {
+                    this.dispatchEvent(
+                        new CustomEvent('themechange', {
+                            bubbles: true,
+                            composed: true,
+                            detail: {
+                                theme: this.hasTheme
+                            }
+                        })
+                    );
+                }
+
+                connectedCallback() {
+                    this.setAttribute('role', 'switch');
+                    this.setAttribute('aria-label', 'theme toggle');
+                    if (localStorage.getItem(`${window.location.hostname}-theme`) === "dark") {
+                        this.nightlight();
+                        this.setAttribute('checked', '');
+                    } else if (localStorage.getItem(`${window.location.hostname}-theme`) === "light") {
+                        this.daylight();
+                        this.removeAttribute('checked');
+                    }
+                    else {
+                        if (window.matchMedia(`(prefers-color-scheme: dark)`).matches) {
+                            this.nightlight();
+                            this.setAttribute('checked', '');
+                        } else {
+                            this.daylight();
+                            this.removeAttribute('checked');
+                        }
+                    }
+                    this.addEventListener("click", this.toggleState);
+                    this.addEventListener("keydown", this.handleKeyDown);
+                    document.addEventListener('themechange', this.handleThemeChange);
+                }
+
+                disconnectedCallback() {
+                    this.removeEventListener("click", this.toggleState);
+                    this.removeEventListener("keydown", this.handleKeyDown);
+                    document.removeEventListener('themechange', this.handleThemeChange);
+                }
+
+                attributeChangedCallback(name, oldVal, newVal) {
+                    if (name === 'checked') {
+                        if (this.hasAttribute('checked')) {
+                            this.nightlight();
+                            localStorage.setItem(`${window.location.hostname}-theme`, "dark");
+                        } else {
+                            this.daylight();
+                            localStorage.setItem(`${window.location.hostname}-theme`, "light");
+                        }
+                    }
+                }
+            }
+
+            window.customElements.define('theme-toggle', ThemeToggle);
+        </script>
+    </template>
+    <template id="voting_enabled">
+        <footer class="grid gap-1-5">
+            <h4>Loved the article? Don't forget leave a like.</h4>
+            <button id="upvote_button" class="button upvote" onclick="upvote(this)">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                    fill="#000000">
+                    <path d="M0 0h24v24H0z" fill="none" />
+                    <path
+                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+                <div id="like_count"></div>
+            </button>
+        </footer>
+        <sm-popup id="sign_in_popup">
+            <header slot="header" class="popup__header">
+                <button class="popup__header__close" onclick="hidePopup()">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                        fill="#000000">
+                        <path d="M0 0h24v24H0V0z" fill="none" />
+                        <path
+                            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
+                    </svg>
+                </button>
+            </header>
+            <section id="sign_in" class="">
+                <div class="grid gap-0-5">
+                    <h3>Sign in to like this article</h3>
+                    <p>Liking an article supports the creators.</p>
+                </div>
+                <sm-form>
+                    <sm-input id="private_key_field" type="password" placeholder="FLO private key"
+                        error-text="Private key is invalid" data-private-key required></sm-input>
+                    <sm-button id="sign_in_button" variant="primary" disabled>Sign In</sm-button>
+                </sm-form>
+                <div class="grid gap-0-5">
+                    <p>New here? Generate your FLO credentials below to continue</p>
+                    <button class="button" onclick="generateCredentials()">
+                        Get FLO credentials
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                            width="24px" fill="#000000">
+                            <path d="M0 0h24v24H0z" fill="none" />
+                            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+                        </svg>
+                    </button>
+                </div>
+            </section>
+            <section id="sign_up" class="grid gap-1-5 hide-completely">
+                <button class="justify-self-start" onclick="goToSignIn()">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                        fill="#000000">
+                        <path d="M0 0h24v24H0z" fill="none" />
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+                    </svg>
+                </button>
+                <div class="grid gap-0-5">
+                    <h3>FLO credentials</h3>
+                    <p>You can use FLO credentials with RanchiMall Times and all RanchiMall FLO apps. </p>
+                </div>
+                <div class="grid gap-1-5 card">
+                    <div class="grid gap-0-5">
+                        <h5>FLO ID</h5>
+                        <sm-copy id="generated_flo_id"></sm-copy>
+                    </div>
+                    <div class="grid gap-0-5">
+                        <h5>Private key</h5>
+                        <sm-copy id="generated_private_key"></sm-copy>
+                    </div>
+                </div>
+                <sm-button id="sign_up_button" variant="primary">Sign in with these credentials</sm-button>
+                <strong class="warning">
+                    Keep your private key secure and don't share with anyone.
+                    Once lost there is no way to recover private key.
+                </strong>
+            </section>
+        </sm-popup>
+
+        <script id="floGlobals">
+            /* Constants for FLO blockchain operations !!Make sure to add this at begining!! */
+            const floGlobals = {
+
+                //Required for all
+                blockchain: "FLO",
+
+                //Required for blockchain API operators
+                apiURL: {
+                    FLO: ['https://livenet.flocha.in/', 'https://flosight.duckdns.org/'],
+                    FLO_TEST: ['https://testnet-flosight.duckdns.org/', 'https://testnet.flocha.in/']
+                },
+                adminID: "FKAEdnPfjXLHSYwrXQu377ugN4tXU7VGdf",
+                sendAmt: 0.001,
+                fee: 0.0005,
+
+                //Required for Supernode operations
+                SNStorageID: "FNaN9McoBAEFUjkRmNQRYLmBF8SpS7Tgfk",
+                supernodes: {}, //each supnernode must be stored as floID : {uri:<uri>,pubKey:<publicKey>}
+
+                //for cloud apps
+                subAdmins: [],
+                application: "Test_RM_Times",
+                appObjects: {},
+                generalData: {},
+                lastVC: {}
+            }
+        </script>
+        <script>
+            // Global letiables
+            const domRefs = {};
+            let timerId;
+            const currentYear = new Date().getFullYear();
+
+            //Checks for internet connection status
+            if (!navigator.onLine)
+                notify(
+                    "There seems to be a problem connecting to the internet, Please check you internet connection.",
+                    "error",
+                    { sound: true }
+                );
+            window.addEventListener("offline", () => {
+                notify(
+                    "There seems to be a problem connecting to the internet, Please check you internet connection.",
+                    "error",
+                    { pinned: true, sound: true }
+                );
+            });
+            window.addEventListener("online", () => {
+                getRef("notification_drawer").clearAll();
+                notify("We are back online.", "success");
+            });
+
+            // Use instead of document.getElementById
+            function getRef(elementId) {
+                if (!domRefs.hasOwnProperty(elementId)) {
+                    domRefs[elementId] = {
+                        count: 1,
+                        ref: null,
+                    };
+                    return document.getElementById(elementId);
+                } else {
+                    if (domRefs[elementId].count < 3) {
+                        domRefs[elementId].count = domRefs[elementId].count + 1;
+                        return document.getElementById(elementId);
+                    } else {
+                        if (!domRefs[elementId].ref)
+                            domRefs[elementId].ref = document.getElementById(elementId);
+                        return domRefs[elementId].ref;
+                    }
+                }
+            }
+            let zIndex = 10
+            // function required for popups or modals to appear
+            function showPopup(popupId, pinned) {
+                zIndex++
+                getRef(popupId).setAttribute('style', `z-index: ${zIndex}`)
+                getRef(popupId).show({ pinned })
+                return getRef(popupId);
+            }
+
+            // hides the popup or modal 
+            function hidePopup() {
+                if (popupStack.peek() === undefined)
+                    return;
+                popupStack.peek().popup.hide()
+            }
+            document.addEventListener('popupopened', e => {
+                switch (e.target.id) {
+                    case 'sign_in_popup':
+
+                        break
+                }
+            })
+            document.addEventListener('popupclosed', e => {
+                switch (e.target.id) {
+                    case 'sign_in_popup':
+                        getRef('sign_in').classList.remove('hide-completely')
+                        getRef('sign_in').style = ''
+                        getRef('sign_up').classList.add('hide-completely')
+                        break
+                }
+            })
+            let currentArticleID
+            window.addEventListener("load", () => {
+                currentArticleID = document.body.dataset.articleId
+                document.body.classList.remove('hide-completely')
+                document.querySelectorAll('sm-input[data-private-key]').forEach(input => input.customValidation = floCrypto.getPubKeyHex)
+                document.addEventListener('keyup', (e) => {
+                    if (e.code === 'Escape') {
+                        hidePopup()
+                    }
+                })
+                document.addEventListener('copy', () => {
+                    notify('copied', 'success')
+                })
+            });
+            function animateTo(element, keyframes, options) {
+                const anime = element.animate(keyframes, { ...options, fill: 'both' })
+                anime.finished.then(() => {
+                    anime.commitStyles()
+                    anime.cancel()
+                })
+                return anime
+            }
+            getRef('upvote_button').addEventListener('mouseup', function () {
+                if (isLoggedIn) {
+                    const animOptions = {
+                        fill: 'forwards',
+                        duration: 300,
+                        ease: 'easing',
+                    }
+                    const ring = document.createElement('div')
+                    ring.classList.add('ring')
+                    ring.animate([
+                        { transform: 'none' },
+                        { transform: 'scale(6)', opacity: 0 }
+                    ], animOptions).onfinish = e => {
+                        e.target.cancel()
+                        ring.remove()
+                    }
+                    this.append(ring)
+                    this.firstElementChild.animate([
+                        { transform: 'scale(0.5)' },
+                        { transform: 'scale(1.4)', offset: 0.5 },
+                        { transform: 'none' },
+                    ], animOptions).onfinish = e => e.target.cancel()
+                }
+            })
+            function upvote(elem) {
+                if (isLoggedIn) {
+                    const animOptions = {
+                        fill: 'forwards',
+                        duration: 150,
+                        ease: 'easing',
+                    }
+                    totalVotes++
+                    getRef('like_count').animate(slideOutUp, animOptions)
+                        .onfinish = (e) => {
+                            e.target.cancel()
+                        }
+                    const tempCount = document.createElement('div')
+                    tempCount.classList.add('temp-count')
+                    tempCount.textContent = totalVotes
+                    getRef('like_count').after(tempCount)
+                    tempCount.animate(slideInUp, animOptions)
+                        .onfinish = () => {
+                            getRef('like_count').textContent = totalVotes
+                            tempCount.remove()
+                        }
+                    floCloudAPI.sendGeneralData({
+                        articleID: currentArticleID,
+                    }, `article_${currentArticleID}_votes`)
+                        .then(res => {
+                            console.log('upvoted')
+                        })
+                        .catch(err => console.log(err))
+                } else {
+                    showPopup('sign_in_popup')
+                }
+            }
+            const slideInLeft = [
+                {
+                    opacity: 0,
+                    transform: 'translateX(1rem)'
+                },
+                {
+                    opacity: 1,
+                    transform: 'translateX(0)'
+                }
+            ]
+            const slideOutLeft = [
+                {
+                    opacity: 1,
+                    transform: 'translateX(0)'
+                },
+                {
+                    opacity: 0,
+                    transform: 'translateX(-1rem)'
+                },
+            ]
+            const slideInRight = [
+                {
+                    opacity: 0,
+                    transform: 'translateX(-1rem)'
+                },
+                {
+                    opacity: 1,
+                    transform: 'translateX(0)'
+                }
+            ]
+            const slideOutRight = [
+                {
+                    opacity: 1,
+                    transform: 'translateX(0)'
+                },
+                {
+                    opacity: 0,
+                    transform: 'translateX(1rem)'
+                },
+            ]
+            const slideInDown = [
+                {
+                    opacity: 0,
+                    transform: 'translateY(-1rem)'
+                },
+                {
+                    opacity: 1,
+                    transform: 'translateY(0)'
+                },
+            ]
+            const slideInUp = [
+                {
+                    opacity: 0,
+                    transform: 'translateY(1rem)'
+                },
+                {
+                    opacity: 1,
+                    transform: 'translateY(0)'
+                },
+            ]
+            const slideOutUp = [
+                {
+                    opacity: 1,
+                    transform: 'translateY(0)'
+                },
+                {
+                    opacity: 0,
+                    transform: 'translateY(-1rem)'
+                },
+            ]
+            function generateCredentials() {
+                const animOptions = {
+                    fill: 'forwards',
+                    duration: 150,
+                    ease: 'easing',
+                }
+                const { floID, privKey } = floCrypto.generateNewID()
+                getRef('generated_flo_id').value = floID
+                getRef('generated_private_key').value = privKey
+                animateTo(getRef('sign_in'), slideOutLeft, animOptions).onfinish = () => {
+                    getRef('sign_in').classList.add('hide-completely')
+                    getRef('sign_up').classList.remove('hide-completely')
+                    animateTo(getRef('sign_up'), slideInLeft, animOptions)
+                }
+            }
+            function goToSignIn() {
+                const animOptions = {
+                    fill: 'forwards',
+                    duration: 150,
+                    ease: 'easing',
+                }
+                animateTo(getRef('sign_up'), slideOutRight, animOptions).onfinish = () => {
+                    getRef('sign_in').classList.remove('hide-completely')
+                    animateTo(getRef('sign_in'), slideInRight, animOptions)
+                    getRef('sign_up').classList.add('hide-completely')
+                }
+            }
+        </script>
+        <script>
+            const smButton = document.createElement('template')
+            smButton.innerHTML = `
+        <style>     
+        *{
+            padding: 0;
+            margin: 0;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
+        }       
+        :host{
+            display: -webkit-inline-box;
+            display: -ms-inline-flexbox;
+            display: inline-flex;
+            width: auto;
+            --accent-color: #4d2588;
+            --text-color: 17, 17, 17;
+            --background-color: 255, 255, 255;
+            --padding: 0.6rem 1.2rem;
+            --border-radius: 0.3rem;
+            --background: rgba(var(--text-color), 0.1);
+        }
+        :host([variant='primary']) .button{
+            background: var(--accent-color);
+            color: rgba(var(--background-color), 1);
+        }
+        :host([variant='outlined']) .button{
+            -webkit-box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset;
+                    box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset;
+            background: transparent; 
+            color: var(--accent-color);
+        }
+        :host([variant='no-outline']) .button{
+            background: inherit; 
+            color: var(--accent-color);
+        }
+        :host([disabled]){
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+        .button {
+            position: relative;
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            width: 100%;
+            padding: var(--padding);
+            cursor: pointer;
+            -webkit-user-select: none;
+               -moz-user-select: none;
+                -ms-user-select: none;
+                    user-select: none;
+            border-radius: var(--border-radius); 
+            -webkit-box-pack: center; 
+                -ms-flex-pack: center; 
+                    justify-content: center;
+            transition: box-shadow 0.3s, background-color 0.3s;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            background-color: var(--background); 
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+            overflow: hidden;
+            border: none;
+            color: inherit;
+            align-items: center;
+        }
+        :host([disabled]) .button{
+            pointer-events: none;
+            cursor: not-allowed;
+            opacity: 0.6;
+            color: rgba(var(--text-color), 1);
+            background-color: rgba(var(--text-color), 0.3);
+        }
+        @media (hover: hover){
+            :host(:not([disabled])) .button:hover,
+            :host(:focus-within:not([disabled])) .button{
+                -webkit-box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.12);
+                box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.12);
+            }
+            :host([variant='outlined']:not([disabled])) .button:hover,
+            :host(:focus-within[variant='outlined']:not([disabled])) .button:hover{
+                -webkit-box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.12);
+                        box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.12);
+            }
+        }
+        @media (hover: none){
+            :host(:not([disabled])) .button:active{
+                -webkit-box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.2);
+                        box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.2rem 0.8rem rgba(0, 0, 0, 0.2);
+            }
+            :host([variant='outlined']) .button:active{
+                -webkit-box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
+                        box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset, 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1), 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
+            }
+        }
+        </style>
+        <div part="button" class="button">
+            <slot></slot>   
+        </div>`;
+            customElements.define('sm-button',
+                class extends HTMLElement {
+                    constructor() {
+                        super();
+                        this.attachShadow({
+                            mode: 'open'
+                        }).append(smButton.content.cloneNode(true));
+                    }
+                    static get observedAttributes() {
+                        return ['disabled'];
+                    }
+
+                    get disabled() {
+                        return this.hasAttribute('disabled');
+                    }
+
+                    set disabled(value) {
+                        if (value) {
+                            this.setAttribute('disabled', '');
+                        } else {
+                            this.removeAttribute('disabled');
+                        }
+                    }
+                    focusIn() {
+                        this.focus();
+                    }
+
+                    handleKeyDown(e) {
+                        if (!this.hasAttribute('disabled') && (e.key === 'Enter' || e.code === 'Space')) {
+                            e.preventDefault();
+                            this.click();
+                        }
+                    }
+
+                    connectedCallback() {
+                        if (!this.hasAttribute('disabled')) {
+                            this.setAttribute('tabindex', '0');
+                        }
+                        this.setAttribute('role', 'button');
+                        this.addEventListener('keydown', this.handleKeyDown);
+                    }
+                    attributeChangedCallback(name) {
+                        if (name === 'disabled') {
+                            if (this.hasAttribute('disabled')) {
+                                this.removeAttribute('tabindex');
+                            } else {
+                                this.setAttribute('tabindex', '0');
+                            }
+                            this.setAttribute('aria-disabled', this.hasAttribute('disabled'));
+                        }
+                    }
+                })
+            const smInput = document.createElement('template')
+            smInput.innerHTML = `
+        <style>
+        *{
+            padding: 0;
+            margin: 0;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
+        } 
+        input[type="search"]::-webkit-search-decoration,
+        input[type="search"]::-webkit-search-cancel-button,
+        input[type="search"]::-webkit-search-results-button,
+        input[type="search"]::-webkit-search-results-decoration { display: none; }
+        input[type=number] {
+        -moz-appearance:textfield;
+        }
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            margin: 0; 
+        }
+        input::-ms-reveal,
+        input::-ms-clear {
+          display: none;
+        }
+        input:invalid{
+            outline: none;
+            -webkit-box-shadow: none;
+                    box-shadow: none;
+        }
+        ::-moz-focus-inner{
+        border: none;
+        }
+        :host{
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            --accent-color: #4d2588;
+            --text-color: 17, 17, 17;
+            --background-color: 255, 255, 255;
+            --success-color: #00C853;
+            --danger-color: red;
+            --width: 100%;
+            --icon-gap: 0.5rem;
+            --border-radius: 0.3rem;
+            --padding: 0.7rem 1rem;
+            --background: rgba(var(--text-color), 0.06);
+        }
+        .hide{
+           opacity: 0 !important;
+           pointer-events: none !important;
+        }
+        .hide-completely{
+            display: none;
+        }
+        .icon {
+            fill: rgba(var(--text-color), 0.6);
+            height: 1.4rem;
+            width: 1.4rem;
+            border-radius: 1rem;
+            cursor: pointer;
+            min-width: 0;
+        }
+        
+        :host(.round) .input{
+            border-radius: 10rem;
+        }
+        .input {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            cursor: text;
+            min-width: 0;
+            text-align: left;
+            -webkit-box-align: center;
+                -ms-flex-align: center;
+                    align-items: center;
+            position: relative;
+            gap: var(--icon-gap);
+            padding: var(--padding);
+            border-radius: var(--border-radius);
+            -webkit-transition: opacity 0.3s;
+            -o-transition: opacity 0.3s;
+            transition: opacity 0.3s;
+            background: var(--background);
+            width: 100%;
+            outline: none;
+        }
+        .input.readonly .clear{
+            opacity: 0 !important;
+            margin-right: -2rem;
+            pointer-events: none !important;
+        }
+        .readonly{
+            pointer-events: none;
+        }
+        .input:focus-within:not(.readonly){
+            box-shadow: 0 0 0 0.1rem var(--accent-color) inset !important;
+        }
+        .disabled{
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        .label {
+            font-size: inherit;
+            opacity: .7;
+            font-weight: 400;
+            position: absolute;
+            top: 0;
+            -webkit-transition: -webkit-transform 0.3s;
+            transition: -webkit-transform 0.3s;
+            -o-transition: transform 0.3s;
+            transition: transform 0.3s;
+            transition: transform 0.3s, -webkit-transform 0.3s;
+            -webkit-transform-origin: left;
+            -ms-transform-origin: left;
+                transform-origin: left;
+            pointer-events: none;
+            white-space: nowrap;
+            overflow: hidden;
+            -o-text-overflow: ellipsis;
+               text-overflow: ellipsis;
+            width: 100%;
+            user-select: none;
+            will-change: transform;
+        }
+        .outer-container{
+            position: relative;
+            width: var(--width);
+        }
+        .container{
+            width: 100%;
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            position: relative;
+            -webkit-box-align: center;
+                -ms-flex-align: center;
+                    align-items: center;
+            -webkit-box-flex: 1;
+                -ms-flex: 1;
+                    flex: 1;
+        }    
+        input{
+            font-size: inherit;
+            border: none;
+            background: transparent;
+            outline: none;
+            color: rgba(var(--text-color), 1);
+            width: 100%;
+        }
+        :host(:not([variant="outlined"])) .animate-label .container input {
+            -webkit-transform: translateY(0.6rem);
+                    -ms-transform: translateY(0.6rem);
+                transform: translateY(0.6rem);
+            }
+          
+        :host(:not([variant="outlined"])) .animate-label .label {
+            -webkit-transform: translateY(-0.7em) scale(0.8);
+                    -ms-transform: translateY(-0.7em) scale(0.8);
+                transform: translateY(-0.7em) scale(0.8);
+            opacity: 1;
+            color: var(--accent-color)
+        }
+        :host([variant="outlined"]) .input {
+            box-shadow: 0 0 0 0.1rem var(--border-color, rgba(var(--text-color), 0.4)) inset;
+            background: rgba(var(--background-color), 1);
+        }
+        :host([variant="outlined"]) .label {
+            width: max-content;
+            margin-left: -0.5rem;
+            padding: 0 0.5rem;
+        }
+        :host([variant="outlined"]) .animate-label .label {
+            -webkit-transform: translate(0.1rem, -1.5rem) scale(0.8);
+                    -ms-transform: translate(0.1rem, -1.5rem) scale(0.8);
+                transform: translate(0.1rem, -1.5rem) scale(0.8);
+            opacity: 1;
+            background: rgba(var(--background-color), 1);
+        }
+        .animate-label:focus-within:not(.readonly) .label{
+            color: var(--accent-color)
+        }
+        .feedback-text:not(:empty){
+            display: flex;
+            width: 100%;
+            text-align: left;
+            font-size: 0.9rem;
+            align-items: center;
+            padding: 0.8rem 0;
+            color: rgba(var(--text-color), 0.8);
+        }
+        .success{
+            color: var(--success-color);
+        }
+        .error{
+            color: var(--danger-color);
+        }
+        .status-icon{
+            margin-right: 0.2rem;
+        }
+        .status-icon--error{
+            fill: var(--danger-color);
+        }
+        .status-icon--success{
+            fill: var(--success-color);
+        }
+        @media (any-hover: hover){
+            .icon:hover{
+                background: rgba(var(--text-color), 0.1);
+            }
+        }
+        </style>
+        <div class="outer-container">
+            <label part="input" class="input">
+                <slot name="icon"></slot>
+                <div class="container">
+                    <input type="text"/>
+                    <div part="placeholder" class="label"></div>
+                </div>
+                <svg class="icon clear hide" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-11.414L9.172 7.757 7.757 9.172 10.586 12l-2.829 2.828 1.415 1.415L12 13.414l2.828 2.829 1.415-1.415L13.414 12l2.829-2.828-1.415-1.415L12 10.586z"/></svg>
+            </label>
+            <p class="feedback-text"></p>
+        </div>
+        `;
+            customElements.define('sm-input',
+                class extends HTMLElement {
+
+                    constructor() {
+                        super();
+                        this.attachShadow({
+                            mode: 'open'
+                        }).append(smInput.content.cloneNode(true));
+
+                        this.inputParent = this.shadowRoot.querySelector('.input');
+                        this.input = this.shadowRoot.querySelector('input');
+                        this.clearBtn = this.shadowRoot.querySelector('.clear');
+                        this.label = this.shadowRoot.querySelector('.label');
+                        this.feedbackText = this.shadowRoot.querySelector('.feedback-text');
+                        this.outerContainer = this.shadowRoot.querySelector('.outer-container');
+                        this._helperText = '';
+                        this._errorText = '';
+                        this.isRequired = false;
+                        this.hideRequired = false;
+                        this.validationFunction = undefined;
+                        this.reflectedAttributes = ['value', 'required', 'disabled', 'type', 'inputmode', 'readonly', 'min', 'max', 'pattern', 'minlength', 'maxlength', 'step'];
+
+                        this.reset = this.reset.bind(this);
+                        this.focusIn = this.focusIn.bind(this);
+                        this.focusOut = this.focusOut.bind(this);
+                        this.fireEvent = this.fireEvent.bind(this);
+                        this.checkInput = this.checkInput.bind(this);
+                        this.vibrate = this.vibrate.bind(this);
+                    }
+
+                    static get observedAttributes() {
+                        return ['value', 'placeholder', 'required', 'disabled', 'type', 'inputmode', 'readonly', 'min', 'max', 'pattern', 'minlength', 'maxlength', 'step', 'helper-text', 'error-text', 'hiderequired'];
+                    }
+
+                    get value() {
+                        return this.input.value;
+                    }
+
+                    set value(val) {
+                        this.input.value = val;
+                        this.checkInput();
+                        this.fireEvent();
+                    }
+
+                    get placeholder() {
+                        return this.getAttribute('placeholder');
+                    }
+
+                    set placeholder(val) {
+                        this.setAttribute('placeholder', val);
+                    }
+
+                    get type() {
+                        return this.getAttribute('type');
+                    }
+
+                    set type(val) {
+                        this.setAttribute('type', val);
+                    }
+
+                    get validity() {
+                        return this.input.validity;
+                    }
+
+                    get disabled() {
+                        return this.hasAttribute('disabled');
+                    }
+                    set disabled(value) {
+                        if (value)
+                            this.inputParent.classList.add('disabled');
+                        else
+                            this.inputParent.classList.remove('disabled');
+                    }
+                    get readOnly() {
+                        return this.hasAttribute('readonly');
+                    }
+                    set readOnly(value) {
+                        if (value) {
+                            this.setAttribute('readonly', '');
+                        } else {
+                            this.removeAttribute('readonly');
+                        }
+                    }
+                    set customValidation(val) {
+                        this.validationFunction = val;
+                    }
+                    set errorText(val) {
+                        this._errorText = val;
+                    }
+                    set helperText(val) {
+                        this._helperText = val;
+                    }
+                    get isValid() {
+                        if (this.input.value !== '') {
+                            const _isValid = this.input.checkValidity();
+                            let _customValid = true;
+                            if (this.validationFunction) {
+                                _customValid = Boolean(this.validationFunction(this.input.value));
+                            }
+                            if (_isValid && _customValid) {
+                                this.feedbackText.classList.remove('error');
+                                this.feedbackText.classList.add('success');
+                                this.feedbackText.textContent = '';
+                            } else {
+                                if (this._errorText) {
+                                    this.feedbackText.classList.add('error');
+                                    this.feedbackText.classList.remove('success');
+                                    this.feedbackText.innerHTML = `
+                                    <svg class="status-icon status-icon--error" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm0-8v6h2V7h-2z"/></svg>
+                                ${this._errorText}
+                                `;
+                                }
+                            }
+                            return (_isValid && _customValid);
+                        }
+                    }
+                    reset() {
+                        this.value = '';
+                    }
+
+                    focusIn() {
+                        this.input.focus();
+                    }
+
+                    focusOut() {
+                        this.input.blur();
+                    }
+
+                    fireEvent() {
+                        let event = new Event('input', {
+                            bubbles: true,
+                            cancelable: true,
+                            composed: true
+                        });
+                        this.dispatchEvent(event);
+                    }
+
+                    checkInput(e) {
+                        if (!this.hasAttribute('readonly')) {
+                            if (this.input.value.trim() !== '') {
+                                this.clearBtn.classList.remove('hide');
+                            } else {
+                                this.clearBtn.classList.add('hide');
+                                if (this.isRequired && !this.hideRequired) {
+                                    this.feedbackText.textContent = '*required';
+                                }
+                            }
+                        }
+                        if (!this.hasAttribute('placeholder') || this.getAttribute('placeholder').trim() === '') return;
+                        if (this.input.value !== '') {
+                            if (this.animate)
+                                this.inputParent.classList.add('animate-label');
+                            else
+                                this.label.classList.add('hide');
+                        } else {
+                            if (this.animate)
+                                this.inputParent.classList.remove('animate-label');
+                            else
+                                this.label.classList.remove('hide');
+                        }
+                    }
+                    vibrate() {
+                        this.outerContainer.animate([
+                            { transform: 'translateX(-1rem)' },
+                            { transform: 'translateX(1rem)' },
+                            { transform: 'translateX(-0.5rem)' },
+                            { transform: 'translateX(0.5rem)' },
+                            { transform: 'translateX(0)' },
+                        ], {
+                            duration: 300,
+                            easing: 'ease'
+                        });
+                    }
+
+
+                    connectedCallback() {
+                        this.animate = this.hasAttribute('animate');
+                        this.setAttribute('role', 'textbox');
+                        this.input.addEventListener('input', this.checkInput);
+                        this.clearBtn.addEventListener('click', this.reset);
+                    }
+
+                    attributeChangedCallback(name, oldValue, newValue) {
+                        if (oldValue !== newValue) {
+                            if (this.reflectedAttributes.includes(name)) {
+                                if (this.hasAttribute(name)) {
+                                    this.input.setAttribute(name, this.getAttribute(name) ? this.getAttribute(name) : '');
+                                }
+                                else {
+                                    this.input.removeAttribute(name);
+                                }
+                            }
+                            if (name === 'placeholder') {
+                                this.label.textContent = newValue;
+                                this.setAttribute('aria-label', newValue);
+                            }
+                            else if (this.hasAttribute('value')) {
+                                this.checkInput();
+                            }
+                            else if (name === 'type') {
+                                if (this.hasAttribute('type') && this.getAttribute('type') === 'number') {
+                                    this.input.setAttribute('inputmode', 'numeric');
+                                }
+                            }
+                            else if (name === 'helper-text') {
+                                this._helperText = this.getAttribute('helper-text');
+                            }
+                            else if (name === 'error-text') {
+                                this._errorText = this.getAttribute('error-text');
+                            }
+                            else if (name === 'required') {
+                                this.isRequired = this.hasAttribute('required');
+                                if (this.isRequired && !this.hideRequired) {
+                                    this.feedbackText.textContent = '';
+                                } else {
+                                    this.feedbackText.textContent = '*required';
+                                }
+                                if (this.isRequired) {
+                                    this.setAttribute('aria-required', 'true');
+                                }
+                                else {
+                                    this.setAttribute('aria-required', 'false');
+                                }
+                            }
+                            else if (name === 'hiderequired') {
+                                this.hideRequired = this.hasAttribute('hiderequired')
+                            }
+                            else if (name === 'readonly') {
+                                if (this.hasAttribute('readonly')) {
+                                    this.inputParent.classList.add('readonly');
+                                } else {
+                                    this.inputParent.classList.remove('readonly');
+                                }
+                            }
+                            else if (name === 'disabled') {
+                                if (this.hasAttribute('disabled')) {
+                                    this.inputParent.classList.add('disabled');
+                                }
+                                else {
+                                    this.inputParent.classList.remove('disabled');
+                                }
+                            }
+                        }
+                    }
+                    disconnectedCallback() {
+                        this.input.removeEventListener('input', this.checkInput);
+                        this.clearBtn.removeEventListener('click', this.reset);
+                    }
+                })
+
+            class Stack {
+                constructor() {
+                    this.items = [];
+                }
+                push(element) {
+                    this.items.push(element);
+                }
+                pop() {
+                    if (this.items.length == 0)
+                        return "Underflow";
+                    return this.items.pop();
+                }
+                peek() {
+                    return this.items[this.items.length - 1];
+                }
+            }
+            const popupStack = new Stack();
+
+            const smPopup = document.createElement('template');
+            smPopup.innerHTML = `
+        <style>
+        *{
+            padding: 0;
+            margin: 0;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
+        } 
+        :host{
+            position: fixed;
+            display: -ms-grid;
+            display: grid;
+            z-index: 10;
+            --accent-color: #4d2588;
+            --text-color: 17, 17, 17;
+            --background-color: 255, 255, 255;
+            --width: 100%;
+            --height: auto;
+            --min-width: auto;
+            --min-height: auto;
+            --backdrop-background: rgba(0, 0, 0, 0.6);
+            --border-radius: 0.8rem 0.8rem 0 0;
+        }
+        .popup-container{
+            display: -ms-grid;
+            display: grid;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            place-items: center;
+            z-index: 10;
+            touch-action: none;
+        }
+        :host(.stacked) .popup{
+            -webkit-transform: scale(0.9) translateY(-2rem) !important;
+                    transform: scale(0.9) translateY(-2rem) !important;
+        }
+        .background{
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            pointer-events: none;
+            background: var(--backdrop-background);
+            -webkit-transition: opacity 0.3s;
+            -o-transition: opacity 0.3s;
+            transition: opacity 0.3s;
+        }
+        .popup{
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+                    flex-direction: column;
+            position: relative;
+            -ms-flex-item-align: end;
+                align-self: flex-end;
+            -webkit-box-align: start;
+                -ms-flex-align: start;
+                    align-items: flex-start;
+            width: var(--width);
+            min-width: var(--min-width);
+            height: var(--height);
+            min-height: var(--min-height);
+            max-height: 90vh;
+            border-radius: var(--border-radius);
+            background: rgba(var(--background-color), 1);
+            -webkit-box-shadow: 0 -1rem 2rem #00000020;
+                    box-shadow: 0 -1rem 2rem #00000020;
+            transition: transform 0.3s;
+        }
+        .container-header{
+            display: -webkit-box;
+            display: flex;
+            width: 100%;
+            touch-action: none;
+            -webkit-box-align: center;
+                -ms-flex-align: center;
+                    align-items: center;
+        }
+        .popup-top{
+            display: -webkit-box;
+            display: flex;
+            width: 100%;
+        }
+        .popup-body{
+            display: -webkit-box;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+                -ms-flex-direction: column;
+                    flex-direction: column;
+            -webkit-box-flex: 1;
+                -ms-flex: 1;
+                    flex: 1;
+            width: 100%;
+            padding: var(--body-padding, 1.5rem);
+            overflow-y: auto;
+        }
+        .hide{
+            display:none;
+        }
+        @media screen and (min-width: 640px){
+            :host{
+                --border-radius: 0.5rem;
+            }
+            .popup{
+                -ms-flex-item-align: center;
+                    -ms-grid-row-align: center;
+                    align-self: center;
+                border-radius: var(--border-radius);
+                height: var(--height);
+                -webkit-box-shadow: 0 3rem 2rem -0.5rem #00000040;
+                        box-shadow: 0 3rem 2rem -0.5rem #00000040;
+            }
+        }
+        @media screen and (max-width: 640px){
+            .popup-top{
+                -webkit-box-orient: vertical;
+                -webkit-box-direction: normal;
+                        flex-direction: column;
+                -webkit-box-align: center;
+                        align-items: center;
+            }
+            .handle{
+                height: 0.3rem;
+                width: 2rem;
+                background: rgba(var(--text-color), .4);
+                border-radius: 1rem;
+                margin: 0.5rem 0;
+            }
+        }
+        @media (any-hover: hover){
+            ::-webkit-scrollbar{
+                width: 0.5rem;
+            }
+            
+            ::-webkit-scrollbar-thumb{
+                background: rgba(var(--text-color), 0.3);
+                border-radius: 1rem;
+                &:hover{
+                    background: rgba(var(--text-color), 0.5);
+                }
+            }
+        }
+        </style>
+        <div class="popup-container hide" role="dialog">
+            <div part="background" class="background"></div>
+            <div part="popup" class="popup">
+                <div part="popup-header" class="popup-top">
+                    <div class="handle"></div>
+                    <slot name="header"></slot>
+                </div>
+                <div part="popup-body" class="popup-body">
+                    <slot></slot>
+                </div>
+            </div>
+        </div>
+        `;
+            customElements.define('sm-popup', class extends HTMLElement {
+                constructor() {
+                    super();
+                    this.attachShadow({
+                        mode: 'open'
+                    }).append(smPopup.content.cloneNode(true));
+
+                    this.allowClosing = false;
+                    this.isOpen = false;
+                    this.pinned = false;
+                    this.offset = 0;
+                    this.touchStartY = 0;
+                    this.touchEndY = 0;
+                    this.touchStartTime = 0;
+                    this.touchEndTime = 0;
+                    this.touchEndAnimation = undefined;
+                    this.focusable
+                    this.autoFocus
+                    this.mutationObserver
+
+                    this.popupContainer = this.shadowRoot.querySelector('.popup-container');
+                    this.backdrop = this.shadowRoot.querySelector('.background');
+                    this.popup = this.shadowRoot.querySelector('.popup');
+                    this.popupBodySlot = this.shadowRoot.querySelector('.popup-body slot');
+                    this.popupHeader = this.shadowRoot.querySelector('.popup-top');
+
+                    this.resumeScrolling = this.resumeScrolling.bind(this);
+                    this.setStateOpen = this.setStateOpen.bind(this);
+                    this.show = this.show.bind(this);
+                    this.hide = this.hide.bind(this);
+                    this.handleTouchStart = this.handleTouchStart.bind(this);
+                    this.handleTouchMove = this.handleTouchMove.bind(this);
+                    this.handleTouchEnd = this.handleTouchEnd.bind(this);
+                    this.detectFocus = this.detectFocus.bind(this);
+                }
+
+                static get observedAttributes() {
+                    return ['open'];
+                }
+
+                get open() {
+                    return this.isOpen;
+                }
+
+                animateTo(element, keyframes, options) {
+                    const anime = element.animate(keyframes, { ...options, fill: 'both' })
+                    anime.finished.then(() => {
+                        anime.commitStyles()
+                        anime.cancel()
+                    })
+                    return anime
+                }
+
+                resumeScrolling() {
+                    const scrollY = document.body.style.top;
+                    window.scrollTo(0, parseInt(scrollY || '0') * -1);
+                    document.body.style.overflow = 'auto';
+                    document.body.style.top = 'initial';
+                }
+
+                setStateOpen() {
+                    if (!this.isOpen || this.offset) {
+                        const animOptions = {
+                            duration: 300,
+                            easing: 'ease'
+                        }
+                        const initialAnimation = (window.innerWidth > 640) ? 'scale(1.1)' : `translateY(${this.offset ? `${this.offset}px` : '100%'})`
+                        this.animateTo(this.popup, [
+                            {
+                                opacity: this.offset ? 1 : 0,
+                                transform: initialAnimation
+                            },
+                            {
+                                opacity: 1,
+                                transform: 'none'
+                            },
+                        ], animOptions)
+
+                    }
+                }
+
+                show(options = {}) {
+                    const { pinned = false } = options;
+                    if (!this.isOpen) {
+                        const animOptions = {
+                            duration: 300,
+                            easing: 'ease'
+                        }
+                        if (popupStack) {
+                            popupStack.push({
+                                popup: this,
+                                permission: pinned
+                            });
+                            if (popupStack.items.length > 1) {
+                                this.animateTo(popupStack.items[popupStack.items.length - 2].popup.shadowRoot.querySelector('.popup'), [
+                                    { transform: 'none' },
+                                    { transform: 'translateY(-1.5rem) scale(0.9)' },
+                                ], animOptions)
+                            }
+                        }
+                        this.popupContainer.classList.remove('hide');
+                        if (!this.offset)
+                            this.backdrop.animate([
+                                { opacity: 0 },
+                                { opacity: 1 },
+                            ], animOptions)
+                        this.setStateOpen()
+                        this.dispatchEvent(
+                            new CustomEvent("popupopened", {
+                                bubbles: true,
+                                detail: {
+                                    popup: this,
+                                }
+                            })
+                        );
+                        this.pinned = pinned;
+                        this.isOpen = true;
+                        document.body.style.overflow = 'hidden';
+                        document.body.style.top = `-${window.scrollY}px`;
+                        const elementToFocus = this.autoFocus || this.focusable[0];
+                        elementToFocus.tagName.includes('SM-') ? elementToFocus.focusIn() : elementToFocus.focus();
+                        if (!this.hasAttribute('open'))
+                            this.setAttribute('open', '');
+                    }
+                }
+                hide() {
+                    const animOptions = {
+                        duration: 150,
+                        easing: 'ease'
+                    }
+                    this.backdrop.animate([
+                        { opacity: 1 },
+                        { opacity: 0 }
+                    ], animOptions)
+                    this.animateTo(this.popup, [
+                        {
+                            opacity: 1,
+                            transform: (window.innerWidth > 640) ? 'none' : `translateY(${this.offset ? `${this.offset}px` : '0'})`
+                        },
+                        {
+                            opacity: 0,
+                            transform: (window.innerWidth > 640) ? 'scale(1.1)' : 'translateY(100%)'
+                        },
+                    ], animOptions).finished
+                        .finally(() => {
+                            this.popupContainer.classList.add('hide');
+                            this.popup.style = ''
+                            this.removeAttribute('open');
+                            if (typeof popupStack !== 'undefined') {
+                                popupStack.pop();
+                                if (popupStack.items.length) {
+                                    this.animateTo(popupStack.items[popupStack.items.length - 1].popup.shadowRoot.querySelector('.popup'), [
+                                        { transform: 'translateY(-1.5rem) scale(0.9)' },
+                                        { transform: 'none' },
+                                    ], animOptions)
+
+                                } else {
+                                    this.resumeScrolling();
+                                }
+                            } else {
+                                this.resumeScrolling();
+                            }
+
+                            if (this.forms.length) {
+                                this.forms.forEach(form => form.reset());
+                            }
+                            this.dispatchEvent(
+                                new CustomEvent("popupclosed", {
+                                    bubbles: true,
+                                    detail: {
+                                        popup: this,
+                                    }
+                                })
+                            );
+                            this.isOpen = false;
+                        })
+                }
+
+                handleTouchStart(e) {
+                    this.offset = 0
+                    this.popupHeader.addEventListener('touchmove', this.handleTouchMove, { passive: true });
+                    this.popupHeader.addEventListener('touchend', this.handleTouchEnd, { passive: true });
+                    this.touchStartY = e.changedTouches[0].clientY;
+                    this.popup.style.transition = 'transform 0.1s';
+                    this.touchStartTime = e.timeStamp;
+                }
+
+                handleTouchMove(e) {
+                    if (this.touchStartY < e.changedTouches[0].clientY) {
+                        this.offset = e.changedTouches[0].clientY - this.touchStartY;
+                        this.touchEndAnimation = window.requestAnimationFrame(() => {
+                            this.popup.style.transform = `translateY(${this.offset}px)`;
+                        });
+                    }
+                }
+
+                handleTouchEnd(e) {
+                    this.touchEndTime = e.timeStamp;
+                    cancelAnimationFrame(this.touchEndAnimation);
+                    this.touchEndY = e.changedTouches[0].clientY;
+                    this.threshold = this.popup.getBoundingClientRect().height * 0.3;
+                    if (this.touchEndTime - this.touchStartTime > 200) {
+                        if (this.touchEndY - this.touchStartY > this.threshold) {
+                            if (this.pinned) {
+                                this.setStateOpen();
+                                return;
+                            } else
+                                this.hide();
+                        } else {
+                            this.setStateOpen();
+                        }
+                    } else {
+                        if (this.touchEndY > this.touchStartY)
+                            if (this.pinned) {
+                                this.setStateOpen();
+                                return;
+                            }
+                            else
+                                this.hide();
+                    }
+                    this.popupHeader.removeEventListener('touchmove', this.handleTouchMove, { passive: true });
+                    this.popupHeader.removeEventListener('touchend', this.handleTouchEnd, { passive: true });
+                }
+
+
+                detectFocus(e) {
+                    if (e.code === 'Tab') {
+                        const lastElement = this.focusable[this.focusable.length - 1];
+                        const firstElement = this.focusable[0];
+                        if (e.shiftKey && document.activeElement === firstElement) {
+                            e.preventDefault();
+                            lastElement.tagName.includes('SM-') ? lastElement.focusIn() : lastElement.focus();
+                        } else if (!e.shiftKey && document.activeElement === lastElement) {
+                            e.preventDefault();
+                            firstElement.tagName.includes('SM-') ? firstElement.focusIn() : firstElement.focus();
+                        }
+                    }
+                }
+
+                updateFocusableList() {
+                    this.focusable = this.querySelectorAll('sm-button:not([disabled]), button:not([disabled]), [href], sm-input, input, sm-select, select, sm-checkbox, sm-textarea, textarea, [tabindex]:not([tabindex="-1"])')
+                    this.autoFocus = this.querySelector('[autofocus]')
+                }
+
+                connectedCallback() {
+                    this.popupBodySlot.addEventListener('slotchange', () => {
+                        this.forms = this.querySelectorAll('sm-form');
+                        this.updateFocusableList()
+                    });
+                    this.popupContainer.addEventListener('mousedown', e => {
+                        if (e.target === this.popupContainer && !this.pinned) {
+                            if (this.pinned) {
+                                this.setStateOpen();
+                            } else
+                                this.hide();
+                        }
+                    });
+
+                    const resizeObserver = new ResizeObserver(entries => {
+                        for (let entry of entries) {
+                            if (entry.contentBoxSize) {
+                                // Firefox implements `contentBoxSize` as a single content rect, rather than an array
+                                const contentBoxSize = Array.isArray(entry.contentBoxSize) ? entry.contentBoxSize[0] : entry.contentBoxSize;
+                                this.threshold = contentBoxSize.blockSize.height * 0.3;
+                            } else {
+                                this.threshold = entry.contentRect.height * 0.3;
+                            }
+                        }
+                    });
+                    resizeObserver.observe(this);
+
+                    this.mutationObserver = new MutationObserver(entries => {
+                        this.updateFocusableList()
+                    })
+                    this.mutationObserver.observe(this, { attributes: true, childList: true, subtree: true })
+
+                    this.addEventListener('keydown', this.detectFocus);
+                    this.popupHeader.addEventListener('touchstart', this.handleTouchStart, { passive: true });
+                }
+                disconnectedCallback() {
+                    this.removeEventListener('keydown', this.detectFocus);
+                    resizeObserver.unobserve();
+                    this.mutationObserver.disconnect()
+                    this.popupHeader.removeEventListener('touchstart', this.handleTouchStart, { passive: true });
+                }
+                attributeChangedCallback(name) {
+                    if (name === 'open') {
+                        if (this.hasAttribute('open')) {
+                            this.show();
+                        }
+                    }
+                }
+            });
+            const smCopy = document.createElement('template');
+            smCopy.innerHTML = `
+        <style>     
+        *{
+            padding: 0;
+            margin: 0;
+            -webkit-box-sizing: border-box;
+                    box-sizing: border-box;
+        }       
+        :host{
+            display: -webkit-box;
+            display: flex;
+            --accent-color: #4d2588;
+            --text-color: 17, 17, 17;
+            --background-color: 255, 255, 255;
+            --padding: 0;
+            --background-color: inherit;
+            --button-background-color: rgba(var(--text-color), 0.2);
+            --button-border-radius: 0.3rem;
+        }
+        .copy{
+            display: grid;
+            width: 100%;
+            gap: 0.5rem;
+            padding: var(--padding);
+            align-items: center;
+            grid-template-columns: minmax(0, 1fr) auto;
+        }
+        :host(:not([clip-text])) .copy-content{
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+        }
+        :host([clip-text]) .copy-content{
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .copy-button{
+            display: inline-flex;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            padding: 0.4rem;
+            background-color: inherit;
+            border-radius: var(--button-border-radius);
+        }
+        .copy-button:active{
+            background-color: var(--button-background-color);
+        }
+        .icon{
+            height: 1.2rem;
+            width: 1.2rem;
+            fill: rgba(var(--text-color), 0.8);
+        }
+        @media (any-hover: hover){
+            .copy:hover .copy-button{
+                opacity: 1;
+            }
+            .copy-button{
+                opacity: 0.6;
+            }
+            .copy-button:hover{
+                background-color: var(--button-background-color);
+            }
+        }
+        </style>
+        <section class="copy">
+            <p class="copy-content"></p>
+            <button part="button" class="copy-button" title="copy">
+                <slot name="copy-icon">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M7 6V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-3v3c0 .552-.45 1-1.007 1H4.007A1.001 1.001 0 0 1 3 21l.003-14c0-.552.45-1 1.007-1H7zM5.003 8L5 20h10V8H5.003zM9 6h8v10h2V4H9v2z"/></svg>
+                </slot>
+            </button>
+        </section>
+        `;
+            customElements.define('sm-copy',
+                class extends HTMLElement {
+                    constructor() {
+                        super();
+                        this.attachShadow({
+                            mode: 'open'
+                        }).append(smCopy.content.cloneNode(true));
+
+                        this.copyContent = this.shadowRoot.querySelector('.copy-content');
+                        this.copyButton = this.shadowRoot.querySelector('.copy-button');
+
+                        this.copy = this.copy.bind(this);
+                    }
+                    static get observedAttributes() {
+                        return ['value'];
+                    }
+                    set value(val) {
+                        this.setAttribute('value', val);
+                    }
+                    get value() {
+                        return this.getAttribute('value');
+                    }
+                    fireEvent() {
+                        this.dispatchEvent(
+                            new CustomEvent('copy', {
+                                composed: true,
+                                bubbles: true,
+                                cancelable: true,
+                            })
+                        );
+                    }
+                    copy() {
+                        navigator.clipboard.writeText(this.copyContent.textContent)
+                            .then(res => this.fireEvent())
+                            .catch(err => console.error(err));
+                    }
+                    connectedCallback() {
+                        this.copyButton.addEventListener('click', this.copy);
+                    }
+                    attributeChangedCallback(name, oldValue, newValue) {
+                        if (name === 'value') {
+                            this.copyContent.textContent = newValue;
+                        }
+                    }
+                    disconnectedCallback() {
+                        this.copyButton.removeEventListener('click', this.copy);
+                    }
+                });
+            const smForm = document.createElement('template');
+            smForm.innerHTML = `
+            <style>
+            *{
+                padding: 0;
+                margin: 0;
+                box-sizing: border-box;
+            }
+            :host{
+                display: flex;
+                width: 100%;
+            }
+            form{
+                display: grid;
+                gap: var(--gap, 1.5rem);
+                width: 100%;
+            }
+            </style>
+            <form part="form" onsubmit="return false">
+                <slot></slot>
+            </form>
+        `;
+
+            customElements.define('sm-form', class extends HTMLElement {
+                constructor() {
+                    super()
+                    this.attachShadow({
+                        mode: 'open'
+                    }).append(smForm.content.cloneNode(true))
+
+                    this.form = this.shadowRoot.querySelector('form');
+                    this.formElements
+                    this.requiredElements
+                    this.submitButton
+                    this.resetButton
+                    this.allRequiredValid = false;
+
+                    this.debounce = this.debounce.bind(this)
+                    this._checkValidity = this._checkValidity.bind(this)
+                    this.handleKeydown = this.handleKeydown.bind(this)
+                    this.reset = this.reset.bind(this)
+                    this.elementsChanged = this.elementsChanged.bind(this)
+                }
+                debounce(callback, wait) {
+                    let timeoutId = null;
+                    return (...args) => {
+                        window.clearTimeout(timeoutId);
+                        timeoutId = window.setTimeout(() => {
+                            callback.apply(null, args);
+                        }, wait);
+                    };
+                }
+                _checkValidity() {
+                    this.allRequiredValid = this.requiredElements.every(elem => elem.isValid)
+                    if (!this.submitButton) return;
+                    if (this.allRequiredValid) {
+                        this.submitButton.disabled = false;
+                    }
+                    else {
+                        this.submitButton.disabled = true;
+                    }
+                }
+                handleKeydown(e) {
+                    if (e.key === 'Enter' && e.target.tagName !== 'SM-TEXTAREA') {
+                        if (this.allRequiredValid) {
+                            if (this.submitButton && this.submitButton.tagName === 'SM-BUTTON') {
+                                this.submitButton.click()
+                            }
+                            this.dispatchEvent(new CustomEvent('submit', {
+                                bubbles: true,
+                                composed: true,
+                            }))
+                        }
+                        else {
+                            this.requiredElements.find(elem => !elem.isValid).vibrate()
+                        }
+                    }
+                }
+                reset() {
+                    this.formElements.forEach(elem => elem.reset())
+                }
+                elementsChanged() {
+                    this.formElements = [...this.querySelectorAll('sm-input, sm-textarea, sm-checkbox, tags-input, file-input, sm-switch, sm-radio')]
+                    this.requiredElements = this.formElements.filter(elem => elem.hasAttribute('required'));
+                    this.submitButton = this.querySelector('[variant="primary"], [type="submit"]');
+                    this.resetButton = this.querySelector('[type="reset"]');
+                    if (this.resetButton) {
+                        this.resetButton.addEventListener('click', this.reset);
+                    }
+                    this._checkValidity()
+                }
+                connectedCallback() {
+                    const slot = this.shadowRoot.querySelector('slot')
+                    slot.addEventListener('slotchange', this.elementsChanged)
+                    this.addEventListener('input', this.debounce(this._checkValidity, 100));
+                    this.addEventListener('keydown', this.debounce(this.handleKeydown, 100));
+                }
+                disconnectedCallback() {
+                    this.removeEventListener('input', this.debounce(this._checkValidity, 100));
+                    this.removeEventListener('keydown', this.debounce(this.handleKeydown, 100));
+                }
+            })
+
+        </script>
+        <script id="onLoadStartUp">
+            let isSubAdmin = false
+            let isLoggedIn = false
+            let totalVotes = 0
+            function onLoadStartUp() {
+
+                //floDapps.addStartUpFunction('Sample', Promised Function)
+                //floDapps.setAppObjectStores({sampleObs1:{}, sampleObs2:{options{autoIncrement:true, keyPath:'SampleKey'}, Indexes:{sampleIndex:{}}}})
+                floDapps.setMidStartup(() => new Promise(async (resolve, reject) => {
+                    await floCloudAPI.requestObjectData('RMT')
+                    await floCloudAPI.requestGeneralData(`article_${currentArticleID}_votes`)
+                    const allVotes = floGlobals.generalData[`article_${currentArticleID}_votes|${floGlobals.adminID}|${floGlobals.application}`]
+                    for (const vote in allVotes) {
+                        const { message: { articleID } } = allVotes[vote]
+                        if (allVotes[vote].message.articleID === currentArticleID) {
+                            totalVotes++
+                        }
+                    }
+                    getRef('like_count').textContent = totalVotes
+                    resolve(true)
+                }))
+                floDapps.setCustomPrivKeyInput(() => new Promise((resolve, reject) => {
+                    getRef('sign_in_button').onclick = () => {
+                        resolve(getRef('private_key_field').value.trim())
+                        getRef('private_key_field').value = ''
+                        hidePopup()
+                    }
+                    getRef('sign_up_button').onclick = () => {
+                        resolve(getRef('generated_private_key').value.trim())
+                        getRef('generated_private_key').value = ''
+                        hidePopup()
+                    }
+                }))
+
+
+                floDapps.launchStartUp().then(async result => {
+                    isLoggedIn = true
+                    isSubAdmin = floGlobals.subAdmins.includes(myFloID)
+
+                    console.log(result)
+                    // alert(`Welcome FLO_ID: ${ myFloID }`)
+                    //App functions....
+                }).catch(error => console.error(error))
+            }
+        </script>
+    </template>
 </body>
 
 </html>
