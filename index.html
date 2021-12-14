@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CC</title>
+    <title>Content Collaboration</title>
     <script src="components.js" defer></script>
     <link rel="stylesheet" href="css/main.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -70,12 +70,11 @@
                         d="M14 16.591C16.2349 15.7182 17.8182 13.544 17.8182 11C17.8182 8.45602 16.2349 6.28183 14 5.40903C14.6762 5.14494 15.4121 5 16.1818 5C19.4955 5 22.1818 7.68629 22.1818 11C22.1818 14.3137 19.4955 17 16.1818 17C15.4121 17 14.6762 16.8551 14 16.591Z" />
                 </svg>
                 <div class="grid">
-                    <span class="label">RanchiMall</span>
-                    <h4>Content Collaboration</h4>
+                    <h4>RanchiMall CC</h4>
                 </div>
             </div>
             <div id="article_name_wrapper" class="flex gap-0-5 align-center justify-center">
-                <button title="Show all articles list" onclick="showPopup('article_list_popup')">
+                <button class="icon-only" title="Show all articles list" onclick="showPopup('article_list_popup')">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                         fill="#000000">
                         <path d="M0 0h24v24H0V0z" fill="none" />
@@ -84,15 +83,14 @@
                     </svg>
                 </button>
                 <text-field id="current_article_title"></text-field>
-                <button class="button" onclick="toggleFilterPanel()">
-                    <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" height="24px"
-                        viewBox="0 0 24 24" width="24px" fill="#000000">
+                <button class="icon-only" title="Show filters" onclick="toggleFilterPanel()">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                        fill="#000000">
                         <path d="M0 0h24v24H0V0z" fill="none" />
                         <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
                     </svg>
-                    Filters
                 </button>
-                <sm-menu align-options="right">
+                <sm-menu align-options="right" title="Admin options">
                     <menu-option onclick="showPopup('create_article_popup')">
                         <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" height="24px"
                             viewBox="0 0 24 24" width="24px" fill="#000000">
@@ -127,7 +125,16 @@
                     </menu-option>
                 </sm-menu>
             </div>
-            <div id="selected_content_options" class="flex hide-completely">
+            <div id="selected_content_options" class="flex space-between hide-completely">
+                <button onclick="clearSelection()" title="Clear selection">
+                    <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" height="24px"
+                        viewBox="0 0 24 24" width="24px" fill="#000000">
+                        <path d="M0 0h24v24H0V0z" fill="none" />
+                        <path
+                            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
+                    </svg>
+                    <div id="selected_entries_no"></div>
+                </button>
                 <button class="button" onclick="renderPreview()">
                     <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg"
                         enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
@@ -181,14 +188,14 @@
                         d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z" />
                 </svg>
             </button>
-            <button class="formatting-button" title="Add quote" onclick="insertBlockquote()">
+            <!-- <button class="formatting-button" title="Add quote" onclick="insertBlockquote()">
                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                     fill="#000000">
                     <path d="M0 0h24v24H0V0z" fill="none" />
                     <path
                         d="M18.62 18h-5.24l2-4H13V6h8v7.24L18.62 18zm-2-2h.76L19 12.76V8h-4v4h3.62l-2 4zm-8 2H3.38l2-4H3V6h8v7.24L8.62 18zm-2-2h.76L9 12.76V8H5v4h3.62l-2 4z" />
                 </svg>
-            </button>
+            </button> -->
         </div>
         <div id="article_wrapper"></div>
         <aside id="version_history_panel" class="flex direction-column hide-completely">
@@ -227,50 +234,11 @@
                         Preview
                     </button>
                 </div>
-                <div class="flex align-center gap-0-5">
-                    <sm-button variant="primary">
-                        <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" height="24px"
-                            viewBox="0 0 24 24" width="24px" fill="#000000">
-                            <path d="M0 0h24v24H0V0z" fill="none" />
-                            <path d="M5 4h14v2H5zm0 10h4v6h6v-6h4l-7-7-7 7zm8-2v6h-2v-6H9.83L12 9.83 14.17 12H13z" />
-                        </svg>
-                        Publish
-                    </sm-button>
-                    <sm-menu align-options="right">
-                        <menu-option onclick="exportSelection()">
-                            <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg"
-                                enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px"
-                                fill="#000000">
-                                <g>
-                                    <rect fill="none" height="24" width="24" />
-                                </g>
-                                <g>
-                                    <path
-                                        d="M18,15v3H6v-3H4v3c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2v-3H18z M17,11l-1.41-1.41L13,12.17V4h-2v8.17L8.41,9.59L7,11l5,5 L17,11z" />
-                                </g>
-                            </svg>
-                            Download as HTML
-                        </menu-option>
-                        <menu-option onclick="sharePreview()">
-                            <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg"
-                                enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px"
-                                fill="#000000">
-                                <g>
-                                    <rect fill="none" height="24" width="24" />
-                                </g>
-                                <g>
-                                    <path
-                                        d="M16,5l-1.42,1.42l-1.59-1.59V16h-1.98V4.83L9.42,6.42L8,5l4-4L16,5z M20,10v11c0,1.1-0.9,2-2,2H6c-1.11,0-2-0.9-2-2V10 c0-1.11,0.89-2,2-2h3v2H6v11h12V10h-3V8h3C19.1,8,20,8.89,20,10z" />
-                                </g>
-                            </svg>
-                            Share preview
-                        </menu-option>
-                    </sm-menu>
-                </div>
+                <div id="preview_options" class="flex align-center gap-0-5"></div>
             </div>
             <h1 id="preview__title" class="article__title"></h1>
         </header>
-        <div id="preview__body"></div>
+        <main id="preview__body"></main>
     </article>
     <sm-popup id="article_list_popup">
         <header slot="header" class="popup__header">
@@ -608,7 +576,7 @@
             return getRef(popupId);
         }
 
-        // hides the popup or modal 
+        // hides the popup or modal
         function hidePopup() {
             if (popupStack.peek() === undefined)
                 return;
@@ -810,6 +778,7 @@
                 case 'preview':
                 case 'preview_page':
                     if (params.uid) {
+                        getRef('preview__title').textContent = floGlobals.appObjects.cc.articleList[params.articleID].title
                         getRef('preview__body').innerHTML = floGlobals.appObjects[params.articleID].preview.content
                     }
                     targetPage = 'preview_page'
@@ -921,7 +890,7 @@
         getDiff(oldStr, newStr)
         oldStr  - Old String
         newStr  - New String
-        returns diff 
+        returns diff
         updateString(oldStr, diff)
         oldStr  - Same old String
         diff    - returned data from getDiff function
@@ -1234,6 +1203,7 @@
                     easing: 'ease',
                 }
                 const selectedContentSize = selectedContent.size
+                getRef('selected_entries_no').textContent = `${selectedContentSize} selected`
                 if (selectedContentSize === 1 && !isContentSelected) {
                     getRef('article_name_wrapper').classList.remove('hide-completely')
                     getRef('selected_content_options').classList.add('hide-completely')
@@ -1257,6 +1227,7 @@
                 }
             }
         })
+
         function formatSelectedContent() {
             const composedDocumentStructure = {}
             floGlobals.appObjects[currentArticle.id].sections.forEach(section => composedDocumentStructure[section.id] = [])
@@ -1270,6 +1241,13 @@
             return composedDocumentStructure
         }
 
+        function clearSelection() {
+            selectedContent.forEach((v, key) => {
+                getRef('article_wrapper').querySelector(`.content-card[data-uid="${key}"] sm-checkbox`).checked = false
+            })
+            selectedContent.clear()
+        }
+
         function renderPreview() {
             const composedDocumentStructure = formatSelectedContent()
             let frag = document.createDocumentFragment()
@@ -1279,7 +1257,7 @@
                     textContent: currentArticle.sections[section].title
                 }))
                 composedDocumentStructure[section].forEach(({ content, uid }) => {
-                    const group = createElement('div', {
+                    const group = createElement('section', {
                         className: 'preview-group',
                         attributes: { 'data-section-id': section, 'data-uid': uid },
                         innerHTML: content
@@ -1325,28 +1303,21 @@
             document.body.removeChild(element);
         }
 
+        function getCleanExportContent() {
+            const exportContent = getRef('preview__body').cloneNode(true)
+            exportContent.querySelectorAll('.preview-group').forEach(section => {
+                section.lastElementChild.remove()
+                section.replaceWith(...section.childNodes)
+            })
+            return DOMPurify.sanitize(exportContent.innerHTML)
+        }
+
         function exportSelection() {
             const bodyTemplate = getRef('body_template').content.cloneNode(true)
-            const composedDocumentStructure = formatSelectedContent()
-            let frag = document.createDocumentFragment()
-
-            for (const section in composedDocumentStructure) {
-                frag.append(createElement('h3', {
-                    textContent: currentArticle.sections[section].title
-                }))
-                composedDocumentStructure[section].forEach(({ content, uid }) => {
-                    const group = createElement('section', {
-                        className: 'grid gap-1',
-                        innerHTML: content
-                    })
-                    frag.append(group)
-                })
-            }
             const articleTitle = floGlobals.appObjects.cc.articleList[currentArticle.id].title
             bodyTemplate.querySelector('#exported_title').textContent = articleTitle
             bodyTemplate.querySelector('#exported_time').textContent = `Exported on ${getFormattedTime(Date.now())}`
-            bodyTemplate.querySelector('#export_body').innerHTML = ''
-            bodyTemplate.querySelector('#export_body').append(frag)
+            bodyTemplate.querySelector('#export_body').innerHTML = getCleanExportContent()
             let bodyAttributes = ''
             let extraScripts = ''
             if (isSubAdmin) {
@@ -1385,35 +1356,6 @@
         function goHome() {
             window.location.hash = `#/home?articleID=${pagesData.params.articleID}`
         }
-        getRef('preview_page').addEventListener('click', e => {
-            if (e.target.closest('.move-up')) {
-                const currentElement = e.target.closest('.preview-group')
-                const previousSibling = currentElement.previousElementSibling
-                if (previousSibling?.dataset.sectionId === currentElement.dataset.sectionId) {
-                    const clone = currentElement.cloneNode(true)
-                    previousSibling.before(clone)
-                    currentElement.remove()
-                }
-            } else if (e.target.closest('.move-down')) {
-                const currentElement = e.target.closest('.preview-group')
-                const nextSibling = currentElement.nextElementSibling
-                if (nextSibling?.dataset.sectionId === currentElement.dataset.sectionId) {
-                    const clone = currentElement.cloneNode(true)
-                    nextSibling.after(clone)
-                    currentElement.remove()
-                }
-            } else if (e.target.closest('.remove-group')) {
-                const currentElement = e.target.closest('.preview-group')
-                const uid = currentElement.dataset.uid
-                if (currentArticle.id) {
-                    getRef('article_wrapper').querySelector(`.content-card[data-uid="${uid}"] sm-checkbox`).checked = false
-                }
-                if (!currentElement.nextElementSibling && currentElement.previousElementSibling.tagName === 'H3') {
-                    currentElement.previousElementSibling.remove()
-                }
-                currentElement.remove()
-            }
-        })
         function sharePreview() {
             if (isSubAdmin) {
                 if (floGlobals.appObjects[pagesData.params.articleID].preview.uid) {
@@ -1445,6 +1387,63 @@
             }
         }
 
+        function publishArticle() {
+            if (isSubAdmin) {
+                getConfirmation('Request publishing?', {
+                    message: 'Send this article as publishing candidate on RanchiMall TImes',
+                    confirmText: 'Request'
+                })
+                    .then(res => {
+                        if (res) {
+                            floCloudAPI.sendGeneralData({
+                                articleID: pagesData.params.articleID,
+                                title: floGlobals.appObjects.cc.articleList[currentArticle.id].title,
+                                content: getCleanExportContent(),
+                            }, 'publishing_requests', {
+                                application: 'Test_RM_Times',
+                                receiverID: 'FKAEdnPfjXLHSYwrXQu377ugN4tXU7VGdf'
+                            })
+                                .then(res => {
+                                    console.log(res)
+                                    notify('Publication request sent', 'success')
+                                })
+                                .catch(err => notify(err, 'error'))
+                        }
+                    })
+            } else {
+                notify('This action requires sub-admin privileges', 'error')
+            }
+        }
+
+        getRef('preview_page').addEventListener('click', e => {
+            if (e.target.closest('.move-up')) {
+                const currentElement = e.target.closest('.preview-group')
+                const previousSibling = currentElement.previousElementSibling
+                if (previousSibling?.dataset.sectionId === currentElement.dataset.sectionId) {
+                    const clone = currentElement.cloneNode(true)
+                    previousSibling.before(clone)
+                    currentElement.remove()
+                }
+            } else if (e.target.closest('.move-down')) {
+                const currentElement = e.target.closest('.preview-group')
+                const nextSibling = currentElement.nextElementSibling
+                if (nextSibling?.dataset.sectionId === currentElement.dataset.sectionId) {
+                    const clone = currentElement.cloneNode(true)
+                    nextSibling.after(clone)
+                    currentElement.remove()
+                }
+            } else if (e.target.closest('.remove-group')) {
+                const currentElement = e.target.closest('.preview-group')
+                const uid = currentElement.dataset.uid
+                if (currentArticle.id) {
+                    getRef('article_wrapper').querySelector(`.content-card[data-uid="${uid}"] sm-checkbox`).checked = false
+                }
+                if ((!currentElement.nextElementSibling || currentElement.nextElementSibling.tagName === 'H3') && currentElement.previousElementSibling.tagName === 'H3') {
+                    currentElement.previousElementSibling.remove()
+                }
+                currentElement.remove()
+            }
+        })
         getRef('current_article_title').addEventListener("change", e => {
             floGlobals.appObjects.cc.articleList[currentArticle.id].title = e.target.value.trim()
             floCloudAPI.updateObjectData('cc')
@@ -1718,11 +1717,15 @@
                     section.querySelectorAll('.content-card').forEach(card => {
                         allContentCards[card.dataset.uid] = card.cloneNode(true)
                     })
-                    const emptyCard = section.firstElementChild.cloneNode(true)
+                    let emptyCard
+                    if (!isSubAdmin)
+                        emptyCard = section.firstElementChild.cloneNode(true)
                     section.innerHTML = ''
                     const frag = document.createDocumentFragment()
                     currentArticle.sections[sectionID].uniqueEntries.forEach((entry, index) => frag.append(allContentCards[entry]))
-                    section.append(emptyCard, frag)
+                    if (!isSubAdmin)
+                        section.append(emptyCard)
+                    section.append(frag)
                 }
             }
         }
@@ -2081,6 +2084,25 @@
                 await Promise.all([
                     floCloudAPI.requestObjectData('cc'),
                 ])
+                getRef('preview_options').innerHTML = `
+                    ${isSubAdmin ? `
+                        <button class="icon-only" title="Share preview" onclick="sharePreview()">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <g> <rect fill="none" height="24" width="24" /> </g> <g> <path d="M16,5l-1.42,1.42l-1.59-1.59V16h-1.98V4.83L9.42,6.42L8,5l4-4L16,5z M20,10v11c0,1.1-0.9,2-2,2H6c-1.11,0-2-0.9-2-2V10 c0-1.11,0.89-2,2-2h3v2H6v11h12V10h-3V8h3C19.1,8,20,8.89,20,10z" /> </g> </svg>
+                        </button>
+                        <button class="icon-only" title="Export selection" onclick="exportSelection()">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <g> <rect fill="none" height="24" width="24" /> </g> <g> <path d="M18,15v3H6v-3H4v3c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2v-3H18z M17,11l-1.41-1.41L13,12.17V4h-2v8.17L8.41,9.59L7,11l5,5 L17,11z" /> </g> </svg>
+                        </button>
+                    `: ''}
+                    <sm-button variant="primary" onclick="${isSubAdmin ? 'publishArticle()' : 'exportSelection()'}">
+                        ${isSubAdmin ? `
+                            <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0V0z" fill="none" /> <path d="M5 4h14v2H5zm0 10h4v6h6v-6h4l-7-7-7 7zm8-2v6h-2v-6H9.83L12 9.83 14.17 12H13z" /> </svg>
+                            Publish
+                            `: `
+                            <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <g> <rect fill="none" height="24" width="24" /> </g> <g> <path d="M18,15v3H6v-3H4v3c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2v-3H18z M17,11l-1.41-1.41L13,12.17V4h-2v8.17L8.41,9.59L7,11l5,5 L17,11z" /> </g> </svg>
+                            Download
+                        `}
+                    </sm-button>
+                `
                 showPage(window.location.hash, { firstLoad: true })
 
                 console.log(result)
@@ -4882,9 +4904,9 @@
 
                 /**
                 * Electronic Code Book mode.
-                * 
+                *
                 * ECB applies the cipher directly against each block of the input.
-                * 
+                *
                 * ECB does not require an initialization vector.
                 */
                 var ECB = C_mode.ECB = function () {
@@ -4919,7 +4941,7 @@
 
                 /**
                 * Cipher block chaining
-                * 
+                *
                 * The first block is XORed with the IV. Subsequent blocks are XOR with the
                 * previous cipher output.
                 */
@@ -4973,11 +4995,11 @@
 
                 /**
                 * Cipher feed back
-                * 
+                *
                 * The cipher output is XORed with the plain text to produce the cipher output,
                 * which is then fed back into the cipher to produce a bit pattern to XOR the
                 * next block with.
-                * 
+                *
                 * This is a stream cipher mode and does not require padding.
                 */
                 var CFB = C_mode.CFB = function () {
@@ -5025,10 +5047,10 @@
 
                 /**
                 * Output feed back
-                * 
+                *
                 * The cipher repeatedly encrypts its own output. The output is XORed with the
                 * plain text to produce the cipher text.
-                * 
+                *
                 * This is a stream cipher mode and does not require padding.
                 */
                 var OFB = C_mode.OFB = function () {
@@ -5174,17 +5196,17 @@
 
             /*
                   * Copyright (c) 2010-2011 Intalio Pte, All Rights Reserved
-                  * 
+                  *
                   * Permission is hereby granted, free of charge, to any person obtaining a copy
                   * of this software and associated documentation files (the "Software"), to deal
                   * in the Software without restriction, including without limitation the rights
                   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
                   * copies of the Software, and to permit persons to whom the Software is
                   * furnished to do so, subject to the following conditions:
-                  * 
+                  *
                   * The above copyright notice and this permission notice shall be included in
                   * all copies or substantial portions of the Software.
-                  * 
+                  *
                   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
                   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
                   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -5204,7 +5226,7 @@
                 * N = Cpu cost
                 * r = Memory cost
                 * p = parallelization cost
-                * 
+                *
                 */
                 window.Crypto_scrypt = function (passwd, salt, N, r, p, dkLen, callback) {
                     if (N == 0 || (N & (N - 1)) != 0) throw Error("N must be > 0 and a power of 2");
@@ -7125,11 +7147,11 @@
 
         /*
         Copyright (c) 2011 Stefan Thomas
-        
+
         Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-        
+
         The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-        
+
         THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         */
 
@@ -8066,7 +8088,7 @@
 
         (function (ellipticCurveType) {
 
-            //Defining Elliptic Encryption Object  
+            //Defining Elliptic Encryption Object
             var ellipticEncryption = window.ellipticCurveEncryption = function () { };
 
             ellipticEncryption.rng = new SecureRandom();
@@ -8154,7 +8176,7 @@
             }
 
             //In real life ellipticEncryption.receiverPublicString is the public key of the receiver.
-            //you don't have to run receiverRandom and the bottom function 
+            //you don't have to run receiverRandom and the bottom function
             ellipticEncryption.receiverPublicString = function (receiverPublicKey) {
 
                 var receiverKeyECData = {};
@@ -8787,7 +8809,7 @@
         addedDiff(original, updatedObj) returns only the values added to the updated object
         deletedDiff(original, updatedObj) returns only the values deleted in the updated object
         updatedDiff(original, updatedObj) returns only the values that have been changed in the updated object
-        findDiff(original, updatedObj) returns an object with the added, deleted and updated differences  
+        findDiff(original, updatedObj) returns an object with the added, deleted and updated differences
         mergeRecursive(original, diff) returns a new object that will merge difference to old object
         mergeDiff(original, allDiff) returns a new object from original object merged with all differences (allDiff is returned object of findDiff)
         */
@@ -8964,7 +8986,7 @@
                         // Recurse...
                         cleanse(value);
                         // ...and remove if now "empty" (NOTE: insert your definition of "empty" here)
-                        //if (!Object.keys(value).length) 
+                        //if (!Object.keys(value).length)
                         //  delete obj[key];
                     }
                     else if (value === null)
@@ -9238,7 +9260,7 @@
                 }
             },
 
-            //Split the str using shamir's Secret and Returns the shares 
+            //Split the str using shamir's Secret and Returns the shares
             createShamirsSecretShares: function (str, total_shares, threshold_limit) {
                 try {
                     if (str.length > 0) {
@@ -9405,7 +9427,7 @@
                 });
             },
 
-            //Send Tx to blockchain 
+            //Send Tx to blockchain
             sendTx: function (senderAddr, receiverAddr, sendAmt, privKey, floData = '', strict_utxo = true) {
                 return new Promise((resolve, reject) => {
                     if (!floCrypto.validateASCII(floData))
@@ -10040,7 +10062,7 @@
             },
 
             /*searchData: function (obsName, options = {}, dbName = this.defaultDB) {
-                
+
                 return new Promise((resolve, reject) => {
                     this.openDB(dbName).then(db => {
                         var obs = db.transaction(obsName, "readonly").objectStore(obsName);
@@ -12102,7 +12124,7 @@
                 fill: rgba(var(--text-color), 1);
                 transition: transform 0.3s, opacity 0.1s;
             }
-            
+
             .theme-switcher__checkbox {
                 display: none;
             }
@@ -12391,7 +12413,7 @@
                 return getRef(popupId);
             }
 
-            // hides the popup or modal 
+            // hides the popup or modal
             function hidePopup() {
                 if (popupStack.peek() === undefined)
                     return;
@@ -12601,21 +12623,28 @@
 
                 //floDapps.addStartUpFunction('Sample', Promised Function)
                 //floDapps.setAppObjectStores({sampleObs1:{}, sampleObs2:{options{autoIncrement:true, keyPath:'SampleKey'}, Indexes:{sampleIndex:{}}}})
+                let firstLoad = true
                 floDapps.setMidStartup(() => new Promise(async (resolve, reject) => {
                     await floCloudAPI.requestObjectData('RMT')
                     await floCloudAPI.requestGeneralData(`article_${currentArticleID}_votes`, {
                         callback: (d, e) => {
-                            animateLikeCount()
+                            if (firstLoad) {
+                                const allVotes = floGlobals.generalData[`article_${currentArticleID}_votes|${floGlobals.adminID}|${floGlobals.application}`]
+
+                                for (const vote in allVotes) {
+                                    const { message: { articleID } } = allVotes[vote]
+                                    if (allVotes[vote].message.articleID === currentArticleID) {
+                                        totalVotes++
+                                    }
+                                }
+                                getRef('like_count').textContent = totalVotes
+                            } else {
+                                animateLikeCount()
+                            }
+                            firstLoad = false
                         }
                     })
-                    const allVotes = floGlobals.generalData[`article_${currentArticleID}_votes|${floGlobals.adminID}|${floGlobals.application}`]
-                    for (const vote in allVotes) {
-                        const { message: { articleID } } = allVotes[vote]
-                        if (allVotes[vote].message.articleID === currentArticleID) {
-                            totalVotes++
-                        }
-                    }
-                    getRef('like_count').textContent = totalVotes
+
                     resolve(true)
                 }))
                 floDapps.setCustomPrivKeyInput(() => new Promise((resolve, reject) => {
@@ -12645,13 +12674,13 @@
         <script>
             const smButton = document.createElement('template')
             smButton.innerHTML = `
-                <style>     
+                <style>
                 *{
                     padding: 0;
                     margin: 0;
                     -webkit-box-sizing: border-box;
                             box-sizing: border-box;
-                }       
+                }
                 :host{
                     display: -webkit-inline-box;
                     display: -ms-inline-flexbox;
@@ -12671,11 +12700,11 @@
                 :host([variant='outlined']) .button{
                     -webkit-box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset;
                             box-shadow: 0 0 0 1px rgba(var(--text-color), 0.2) inset;
-                    background: transparent; 
+                    background: transparent;
                     color: var(--accent-color);
                 }
                 :host([variant='no-outline']) .button{
-                    background: inherit; 
+                    background: inherit;
                     color: var(--accent-color);
                 }
                 :host([disabled]){
@@ -12694,15 +12723,15 @@
                        -moz-user-select: none;
                         -ms-user-select: none;
                             user-select: none;
-                    border-radius: var(--border-radius); 
-                    -webkit-box-pack: center; 
-                        -ms-flex-pack: center; 
+                    border-radius: var(--border-radius);
+                    -webkit-box-pack: center;
+                        -ms-flex-pack: center;
                             justify-content: center;
                     transition: box-shadow 0.3s, background-color 0.3s;
                     font-family: inherit;
                     font-size: 0.9rem;
                     font-weight: 500;
-                    background-color: var(--background); 
+                    background-color: var(--background);
                     -webkit-tap-highlight-color: transparent;
                     outline: none;
                     overflow: hidden;
@@ -12741,7 +12770,7 @@
                 }
                 </style>
                 <div part="button" class="button">
-                    <slot></slot>   
+                    <slot></slot>
                 </div>`;
             customElements.define('sm-button',
                 class extends HTMLElement {
@@ -12803,7 +12832,7 @@
                     margin: 0;
                     -webkit-box-sizing: border-box;
                             box-sizing: border-box;
-                } 
+                }
                 input[type="search"]::-webkit-search-decoration,
                 input[type="search"]::-webkit-search-cancel-button,
                 input[type="search"]::-webkit-search-results-button,
@@ -12811,12 +12840,12 @@
                 input[type=number] {
                 -moz-appearance:textfield;
                 }
-                input[type=number]::-webkit-inner-spin-button, 
-                input[type=number]::-webkit-outer-spin-button { 
+                input[type=number]::-webkit-inner-spin-button,
+                input[type=number]::-webkit-outer-spin-button {
                     -webkit-appearance: none;
                     -moz-appearance: none;
                     appearance: none;
-                    margin: 0; 
+                    margin: 0;
                 }
                 input::-ms-reveal,
                 input::-ms-clear {
@@ -12860,7 +12889,7 @@
                     cursor: pointer;
                     min-width: 0;
                 }
-                
+
                 :host(.round) .input{
                     border-radius: 10rem;
                 }
@@ -12939,7 +12968,7 @@
                     -webkit-box-flex: 1;
                         -ms-flex: 1;
                             flex: 1;
-                }    
+                }
                 input{
                     font-size: inherit;
                     border: none;
@@ -12953,7 +12982,7 @@
                             -ms-transform: translateY(0.6rem);
                         transform: translateY(0.6rem);
                     }
-                  
+
                 :host(:not([variant="outlined"])) .animate-label .label {
                     -webkit-transform: translateY(-0.7em) scale(0.8);
                             -ms-transform: translateY(-0.7em) scale(0.8);
@@ -13298,7 +13327,7 @@
                     margin: 0;
                     -webkit-box-sizing: border-box;
                             box-sizing: border-box;
-                } 
+                }
                 :host{
                     position: fixed;
                     display: -ms-grid;
@@ -13431,7 +13460,7 @@
                     ::-webkit-scrollbar{
                         width: 0.5rem;
                     }
-                    
+
                     ::-webkit-scrollbar-thumb{
                         background: rgba(var(--text-color), 0.3);
                         border-radius: 1rem;
@@ -13749,13 +13778,13 @@
             });
             const smCopy = document.createElement('template');
             smCopy.innerHTML = `
-                <style>     
+                <style>
                 *{
                     padding: 0;
                     margin: 0;
                     -webkit-box-sizing: border-box;
                             box-sizing: border-box;
-                }       
+                }
                 :host{
                     display: -webkit-box;
                     display: flex;
