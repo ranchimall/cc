@@ -791,7 +791,7 @@
             switch (pageId) {
                 case 'home':
                 case 'main_page':
-                    if (!currentArticle.id || params.articleID !== pagesData.params.articleID) {
+                    if (!floGlobals.currentArticle.id || params.articleID !== pagesData.params.articleID) {
                         hidePopup()
                         render.article(params.articleID)
                     }
@@ -1053,7 +1053,7 @@
             if (isSubAdmin) {
                 getConfirmation('Set as default article?').then(res => {
                     if (res) {
-                        floGlobals.appObjects.cc['defaultArticle'] = currentArticle.id
+                        floGlobals.appObjects.cc['defaultArticle'] = floGlobals.currentArticle.id
                         floCloudAPI.updateObjectData('cc')
                             .then((res) => {
                                 notify('Set current article as default', 'success')
@@ -1126,7 +1126,7 @@
                         data: isUniqueEntry ? clean : getDiff(previousVersion, clean),
                         hash
                     }
-                    floCloudAPI.sendGeneralData(entry, `${currentArticle.id}_gd`)
+                    floCloudAPI.sendGeneralData(entry, `${floGlobals.currentArticle.id}_gd`)
                         .then((res) => {
                             console.log(res)
                             e.target.closest('.submit-entry').classList.add('hide-completely')
@@ -1134,8 +1134,8 @@
                             const iterationData = { ...entry, timestamp, editor: myFloID }
                             if (isUniqueEntry) {
                                 contentArea.innerHTML = ''
-                                currentArticle.sections[sectionID].uniqueEntries.push(entry.origin)
-                                currentArticle.uniqueEntries[entry.origin] = { iterations: [iterationData] }
+                                floGlobals.currentArticle.sections[sectionID].uniqueEntries.push(entry.origin)
+                                floGlobals.currentArticle.uniqueEntries[entry.origin] = { iterations: [iterationData] }
                                 // Insert new content card based on set filter
                                 const newCard = render.contentCard(entry.origin)
                                 if (getRef('sort_content_list').value === 'time') {
@@ -1169,7 +1169,7 @@
                                     parentSection.append(newCard)
                                 }
                             } else {
-                                currentArticle.uniqueEntries[entry.origin].iterations.push(iterationData)
+                                floGlobals.currentArticle.uniqueEntries[entry.origin].iterations.push(iterationData)
                             }
                         })
                 } else {
@@ -1194,6 +1194,25 @@
                 }
                 getRef('contributor_list').append(frag)
                 showPopup('contributors_popup')
+            } else if (e.target.closest('.see-more')) {
+                const target = e.target.closest('.see-more')
+                const sectionID = target.parentNode.dataset.sectionId
+                if (floGlobals.currentArticle.sections[sectionID].expanded) {
+                    target.textContent = `See ${floGlobals.currentArticle.sections[sectionID].uniqueEntries.length - maxCardsPerSection} more`;
+                    [...target.parentNode.nextElementSibling.children].slice(maxCardsPerSection + 1).forEach(card => {
+                        card.querySelector('sm-checkbox').checked = false
+                        card.remove()
+                    })
+                    floGlobals.currentArticle.sections[sectionID].expanded = false
+                } else {
+                    target.textContent = 'See less'
+                    floGlobals.currentArticle.sections[sectionID].uniqueEntries.slice(maxCardsPerSection).forEach(entry => {
+                        const contentCard = render.contentCard(entry)
+                        if (contentCard)
+                            target.parentNode.nextElementSibling.append(contentCard)
+                    })
+                    floGlobals.currentArticle.sections[sectionID].expanded = true
+                }
             }
         })
         getRef('article_wrapper').addEventListener("paste", e => {
@@ -1254,7 +1273,7 @@
 
         function formatSelectedContent() {
             const composedDocumentStructure = {}
-            floGlobals.appObjects[currentArticle.id].sections.forEach(section => composedDocumentStructure[section.id] = [])
+            floGlobals.appObjects[floGlobals.currentArticle.id].sections.forEach(section => composedDocumentStructure[section.id] = [])
             selectedContent.forEach(({ content, sectionID }, uid) => {
                 composedDocumentStructure[sectionID].push({ content, uid })
             })
@@ -1278,7 +1297,7 @@
 
             for (const section in composedDocumentStructure) {
                 frag.append(createElement('h3', {
-                    textContent: currentArticle.sections[section].title
+                    textContent: floGlobals.currentArticle.sections[section].title
                 }))
                 composedDocumentStructure[section].forEach(({ content, uid }) => {
                     const group = createElement('section', {
@@ -1303,10 +1322,10 @@
                     frag.append(group)
                 })
             }
-            getRef('preview__title').textContent = floGlobals.appObjects.cc.articleList[currentArticle.id].title
+            getRef('preview__title').textContent = floGlobals.appObjects.cc.articleList[floGlobals.currentArticle.id].title
             getRef('preview__body').innerHTML = ''
             getRef('preview__body').append(frag)
-            window.location.hash = `#/preview?articleID=${currentArticle.id}`
+            window.location.hash = `#/preview?articleID=${floGlobals.currentArticle.id}`
         }
 
         function getReadingTime(content) {
@@ -1344,7 +1363,7 @@
 
         function exportSelection() {
             const bodyTemplate = getRef('body_template').content.cloneNode(true)
-            const articleTitle = floGlobals.appObjects.cc.articleList[currentArticle.id].title
+            const articleTitle = floGlobals.appObjects.cc.articleList[floGlobals.currentArticle.id].title
             bodyTemplate.querySelector('#exported_title').textContent = articleTitle
             bodyTemplate.querySelector('#exported_time').textContent = `Exported on ${getFormattedTime(Date.now())}`
             bodyTemplate.querySelector('#export_body').innerHTML = getCleanExportContent()
@@ -1353,7 +1372,7 @@
             let bodyAttributes = ''
             let extraScripts = ''
             if (isSubAdmin) {
-                bodyAttributes = `data-article-id="${currentArticle.id}" onload="onLoadStartUp()"`
+                bodyAttributes = `data-article-id="${floGlobals.currentArticle.id}" onload="onLoadStartUp()"`
                 // copy script already present in this file instead of storing a duplicate
                 extraScripts = `
                     ${getRef('voting_enabled').innerHTML}
@@ -1433,7 +1452,7 @@
                         if (res) {
                             floCloudAPI.sendGeneralData({
                                 articleID: pagesData.params.articleID,
-                                title: floGlobals.appObjects.cc.articleList[currentArticle.id].title,
+                                title: floGlobals.appObjects.cc.articleList[floGlobals.currentArticle.id].title,
                                 content: getCleanExportContent(),
                                 category,
                                 tags,
@@ -1473,7 +1492,7 @@
             } else if (e.target.closest('.remove-group')) {
                 const currentElement = e.target.closest('.preview-group')
                 const uid = currentElement.dataset.uid
-                if (currentArticle.id) {
+                if (floGlobals.currentArticle.id) {
                     getRef('article_wrapper').querySelector(`.content-card[data-uid="${uid}"] sm-checkbox`).checked = false
                 }
                 if ((!currentElement.nextElementSibling || currentElement.nextElementSibling.tagName === 'H3') && currentElement.previousElementSibling.tagName === 'H3') {
@@ -1483,7 +1502,7 @@
             }
         })
         getRef('current_article_title').addEventListener("change", e => {
-            floGlobals.appObjects.cc.articleList[currentArticle.id].title = e.target.value.trim()
+            floGlobals.appObjects.cc.articleList[floGlobals.currentArticle.id].title = e.target.value.trim()
             floCloudAPI.updateObjectData('cc')
                 .then((res) => {
                     notify('Renamed article', 'success')
@@ -1492,8 +1511,8 @@
         })
         getRef('article_wrapper').addEventListener("change", e => {
             if (e.target.classList.contains('heading')) {
-                floGlobals.appObjects[currentArticle.id].sections[e.target.dataset.index].title = e.target.value.trim()
-                floCloudAPI.updateObjectData(currentArticle.id)
+                floGlobals.appObjects[floGlobals.currentArticle.id].sections[e.target.dataset.index].title = e.target.value.trim()
+                floCloudAPI.updateObjectData(floGlobals.currentArticle.id)
                     .then((res) => {
                         notify('Updated heading', 'success')
                     })
@@ -1543,14 +1562,49 @@
         }
     </script>
     <script>
-        let currentArticle = {}
+        floGlobals.currentArticle = {}
+        const sectionIntersectionObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const section = entry.target.parentNode
+                    const frag = document.createDocumentFragment();
+                    const arrayOfElements = floGlobals.currentArticle.sections[section.dataset.sectionId].uniqueEntries
+                    const startIndex = isSubAdmin ? section.children.length : section.children.length - 1
+                    arrayOfElements.slice(startIndex, startIndex + 5).forEach(elem => frag.append(render.contentCard(elem)))
+                    entry.target.parentNode.append(frag)
+                }
+            })
+        })
+        const sectionMutationObserver = new MutationObserver(mutationList => {
+            mutationList.forEach(mutation => {
+                if (mutation.type === 'childList' && mutation.addedNodes.length) {
+                    sectionIntersectionObserver.observe(mutation.target.lastElementChild)
+                }
+            })
+        })
+        const mobileQuery = window.matchMedia('(max-width: 40rem)')
+        function handleMobileChange(e) {
+            if (e.matches) {
+                // Mobile view
+                console.log('Media Query Matched!')
+                document.querySelectorAll('.article-section').forEach(section => {
+                    sectionMutationObserver.observe(section, { childList: true })
+                })
 
+            } else {
+                // Desktop view
+                sectionMutationObserver.disconnect()
+                sectionIntersectionObserver.disconnect()
+            }
+        }
+        mobileQuery.addListener(handleMobileChange)
+        // handleMobileChange(mobileQuery)
         const render = {
             article(id) {
-                currentArticle.id = id
+                floGlobals.currentArticle.id = id
                 parseArticleData()
                 const { title } = floGlobals.appObjects.cc.articleList[id]
-                const { writer, sections } = currentArticle
+                const { writer, sections } = floGlobals.currentArticle
                 const frag = document.createDocumentFragment()
                 let index = 0
                 for (const sectionID in sections) {
@@ -1638,6 +1692,7 @@
                 const section = getRef('section_template').content.cloneNode(true)
                 const frag = document.createDocumentFragment()
                 section.children[0].dataset.index = index
+                section.children[0].dataset.sectionId = sectionID
                 section.children[1].dataset.sectionId = sectionID
                 if (isSubAdmin) {
                     section.querySelector('.content-card--empty').remove()
@@ -1645,17 +1700,19 @@
                     section.querySelector('text-field').setAttribute('disabled', '')
                 }
                 section.querySelector('text-field').setAttribute('value', title)
-                currentArticle.sections[sectionID].uniqueEntries.slice(0, maxCardsPerSection).forEach(entry => {
+                floGlobals.currentArticle.sections[sectionID].uniqueEntries.slice(0, maxCardsPerSection).forEach(entry => {
                     const contentCard = render.contentCard(entry)
                     if (contentCard)
                         frag.append(contentCard)
                 })
-                if (currentArticle.sections[sectionID].uniqueEntries.length > maxCardsPerSection) {
+                if (floGlobals.currentArticle.sections[sectionID].uniqueEntries.length > maxCardsPerSection) {
                     section.querySelector('.heading').append(createElement('button', {
-                        className: 'button hide-on-mobile',
-                        textContent: `See ${currentArticle.sections[sectionID].uniqueEntries.length - maxCardsPerSection} more`
+                        className: 'button see-more hide-on-mobile',
+                        textContent: `See ${floGlobals.currentArticle.sections[sectionID].uniqueEntries.length - maxCardsPerSection} more`
                     }))
                 }
+                if (window.innerWidth < 640)
+                    sectionMutationObserver.observe(section.querySelector('.article-section'), { childList: true })
                 section.querySelector('.article-section').append(frag)
                 return section
             },
@@ -1672,25 +1729,27 @@
         }
 
         function parseArticleData() {
-            const { sections, editors, public } = floGlobals.appObjects[currentArticle.id]
-            const generalData = floGlobals.generalData[`${currentArticle.id}_gd|${floGlobals.adminID}|${floGlobals.application}`]
-            currentArticle['sections'] = {}
+            const { sections, editors, public } = floGlobals.appObjects[floGlobals.currentArticle.id]
+            const generalData = floGlobals.generalData[`${floGlobals.currentArticle.id}_gd|${floGlobals.adminID}|${floGlobals.application}`]
+            floGlobals.currentArticle['sections'] = {}
             sections.forEach(({ id, title }) => {
-                currentArticle['sections'][id] = {
+                floGlobals.currentArticle['sections'][id] = {
+                    expanded: false,
+                    lazyLoad: { startIndex: 0, endIndex: 5 },
                     title,
                     uniqueEntries: new Set()
                 }
             })
-            currentArticle['uniqueEntries'] = {}
+            floGlobals.currentArticle['uniqueEntries'] = {}
             for (const key in generalData) {
                 const { message: { section, data, origin, hash }, senderID } = generalData[key]
-                if (!currentArticle.uniqueEntries.hasOwnProperty(origin)) { // check if general data has origin that's already defined
-                    currentArticle.uniqueEntries[origin] = {
+                if (!floGlobals.currentArticle.uniqueEntries.hasOwnProperty(origin)) { // check if general data has origin that's already defined
+                    floGlobals.currentArticle.uniqueEntries[origin] = {
                         iterations: []
                     }
                 }
-                currentArticle.sections[section].uniqueEntries.add(origin)
-                currentArticle.uniqueEntries[origin]['iterations'].push({
+                floGlobals.currentArticle.sections[section].uniqueEntries.add(origin)
+                floGlobals.currentArticle.uniqueEntries[origin]['iterations'].push({
                     timestamp: generalData[key].time,
                     data,
                     editor: senderID,
@@ -1698,11 +1757,11 @@
                     score: floCrypto.randInt(0, 100) // to do: get score from mark feature
                 })
             }
-            for (const sectionID in currentArticle.sections) {
-                currentArticle.sections[sectionID].uniqueEntries = [...currentArticle.sections[sectionID].uniqueEntries].reverse()
+            for (const sectionID in floGlobals.currentArticle.sections) {
+                floGlobals.currentArticle.sections[sectionID].uniqueEntries = [...floGlobals.currentArticle.sections[sectionID].uniqueEntries].reverse()
             }
-            for (const entry in currentArticle.uniqueEntries) {
-                currentArticle.uniqueEntries[entry]['iterations'].sort((a, b) => a.timestamp - b.timestamp)
+            for (const entry in floGlobals.currentArticle.uniqueEntries) {
+                floGlobals.currentArticle.uniqueEntries[entry]['iterations'].sort((a, b) => a.timestamp - b.timestamp)
             }
         }
 
@@ -1746,16 +1805,16 @@
         function sortSectionEntries() {
             const sortByScore = getRef('sort_content_list').value === 'score'
             const originalObj = {}
-            for (const sectionID in currentArticle.sections) {
-                originalObj[sectionID] = [...currentArticle.sections[sectionID].uniqueEntries]
-                currentArticle.sections[sectionID].uniqueEntries.sort((a, b) => {
-                    const arrayA = currentArticle.uniqueEntries[a].iterations
-                    const arrayB = currentArticle.uniqueEntries[b].iterations
+            for (const sectionID in floGlobals.currentArticle.sections) {
+                originalObj[sectionID] = [...floGlobals.currentArticle.sections[sectionID].uniqueEntries]
+                floGlobals.currentArticle.sections[sectionID].uniqueEntries.sort((a, b) => {
+                    const arrayA = floGlobals.currentArticle.uniqueEntries[a].iterations
+                    const arrayB = floGlobals.currentArticle.uniqueEntries[b].iterations
                     return arrayB[arrayB.length - 1][sortByScore ? 'score' : 'timestamp'] - arrayA[arrayA.length - 1][sortByScore ? 'score' : 'timestamp']
                 })
             }
-            for (const sectionID in currentArticle.sections) {
-                if (currentArticle.sections[sectionID].uniqueEntries.some((v, index) => v !== originalObj[sectionID][index])) {
+            for (const sectionID in floGlobals.currentArticle.sections) {
+                if (floGlobals.currentArticle.sections[sectionID].uniqueEntries.some((v, index) => v !== originalObj[sectionID][index])) {
                     const allContentCards = {}
                     const section = getRef('article_wrapper').querySelector(`.article-section[data-section-id="${sectionID}"]`)
                     section.querySelectorAll('.content-card').forEach(card => {
@@ -1766,7 +1825,12 @@
                         emptyCard = section.firstElementChild.cloneNode(true)
                     section.innerHTML = ''
                     const frag = document.createDocumentFragment()
-                    currentArticle.sections[sectionID].uniqueEntries.slice(0, maxCardsPerSection).forEach((entry, index) => {
+                    let toRender
+                    if (floGlobals.currentArticle.sections[sectionID].expanded)
+                        toRender = floGlobals.currentArticle.sections[sectionID].uniqueEntries
+                    else
+                        toRender = floGlobals.currentArticle.sections[sectionID].uniqueEntries.slice(0, maxCardsPerSection)
+                    toRender.forEach((entry, index) => {
                         frag.append(allContentCards[entry] || render.contentCard(entry))
                     })
                     if (!isSubAdmin)
@@ -1779,7 +1843,7 @@
         function renderSectionList() {
             if (!isSubAdmin) return
             const frag = document.createDocumentFragment()
-            floGlobals.appObjects[currentArticle.id].sections.forEach(section => {
+            floGlobals.appObjects[floGlobals.currentArticle.id].sections.forEach(section => {
                 frag.append(render.sectionCard(section))
             })
             getRef('section_list_container').innerHTML = ''
@@ -1821,17 +1885,17 @@
                 })
                 if (newSections.length) {
                     newSections.forEach(elem => {
-                        floGlobals.appObjects[currentArticle.id].sections.push(elem)
+                        floGlobals.appObjects[floGlobals.currentArticle.id].sections.push(elem)
                     })
-                    floCloudAPI.updateObjectData(currentArticle.id)
+                    floCloudAPI.updateObjectData(floGlobals.currentArticle.id)
                         .then((res) => {
                             const frag = document.createDocumentFragment()
                             const currentSectionCount = getRef('section_list_container').querySelectorAll('.section-card:not(.section-card--new)').length
                             let index = currentSectionCount
                             newSections.forEach(elem => {
                                 const { title, id } = elem
-                                currentArticle.sections[id] = { title, uniqueEntries: [] }
-                                frag.append(render.section(id, currentArticle.sections[id], index))
+                                floGlobals.currentArticle.sections[id] = { title, uniqueEntries: [] }
+                                frag.append(render.section(id, floGlobals.currentArticle.sections[id], index))
                                 index += 1
                             })
                             getRef('article_wrapper').append(frag)
@@ -1895,17 +1959,17 @@
         function getIterationDetails(uid, targetIndex) {
             let merged
             const contributors = {}
-            const limit = targetIndex || currentArticle.uniqueEntries[uid].iterations.length - 1
+            const limit = targetIndex || floGlobals.currentArticle.uniqueEntries[uid].iterations.length - 1
             for (let i = 0; i <= limit; i++) {
-                const { data, editor, timestamp } = currentArticle.uniqueEntries[uid].iterations[i]
+                const { data, editor, timestamp } = floGlobals.currentArticle.uniqueEntries[uid].iterations[i]
                 merged = i ? updateString(merged, data) : data
                 contributors[editor] = timestamp
             }
             return {
                 data: merged,
                 contributors,
-                hash: currentArticle.uniqueEntries[uid].iterations[limit].hash,
-                score: currentArticle.uniqueEntries[uid].iterations[limit].score
+                hash: floGlobals.currentArticle.uniqueEntries[uid].iterations[limit].hash,
+                score: floGlobals.currentArticle.uniqueEntries[uid].iterations[limit].score
             }
         }
         const versionHistory = {
@@ -1914,7 +1978,7 @@
         }
         function showVersionHistory(uid) {
             versionHistory.entryUid = uid
-            const { iterations } = currentArticle.uniqueEntries[uid]
+            const { iterations } = floGlobals.currentArticle.uniqueEntries[uid]
             const frag = document.createDocumentFragment()
             let mergedChanges
             iterations.forEach((iter, index) => {

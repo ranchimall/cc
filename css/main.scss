@@ -483,6 +483,9 @@ menu-option {
 }
 
 #main_page {
+  overscroll-behavior: contain;
+  height: 100%;
+  overflow-y: hidden;
   grid-template-columns: minmax(0, 1fr);
 }
 #current_article_title {
@@ -575,6 +578,8 @@ menu-option {
   flex-direction: column;
   padding: 1rem;
   gap: 1rem 0;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .heading {
@@ -909,18 +914,11 @@ menu-option {
   }
   #main_page {
     &.active-sidebar {
-      overscroll-behavior: contain;
-      height: 100%;
-      overflow-y: hidden;
       grid-template-rows: auto 1fr;
       grid-template-columns: minmax(0, 1fr) 24rem;
       #version_history_panel,
       #article_wrapper {
         overscroll-behavior: contain;
-      }
-      #article_wrapper {
-        height: 100%;
-        overflow-y: auto;
       }
     }
   }

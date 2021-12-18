@@ -1085,7 +1085,6 @@ smPopup.innerHTML = `
     background: rgba(var(--background-color), 1);
     -webkit-box-shadow: 0 -1rem 2rem #00000020;
             box-shadow: 0 -1rem 2rem #00000020;
-    transition: transform 0.3s;
 }
 .container-header{
     display: -webkit-box;
@@ -1358,7 +1357,6 @@ customElements.define('sm-popup', class extends HTMLElement {
         this.popupHeader.addEventListener('touchmove', this.handleTouchMove, { passive: true });
         this.popupHeader.addEventListener('touchend', this.handleTouchEnd, { passive: true });
         this.touchStartY = e.changedTouches[0].clientY;
-        this.popup.style.transition = 'transform 0.1s';
         this.touchStartTime = e.timeStamp;
     }
 
