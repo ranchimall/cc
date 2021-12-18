@@ -529,13 +529,50 @@ menu-option {
   z-index: 2;
 }
 
-#filter_panel {
+#options_panel {
   position: sticky;
   top: 6.5rem;
   z-index: 1;
   padding: 0.5rem 1.5rem;
   grid-column: 1/-1;
   background-color: var(--foreground-color);
+  overflow-x: auto;
+}
+
+.outline-button {
+  position: relative;
+  white-space: nowrap;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  padding: 0.5rem 0;
+}
+.outline-button::after {
+  position: absolute;
+  content: "";
+  width: 1rem;
+  border-radius: 0.5rem;
+  height: 0.2rem;
+  -webkit-transition: opacity 0.1s, -webkit-transform 0.3s;
+  transition: opacity 0.1s, -webkit-transform 0.3s;
+  transition: transform 0.3s, opacity 0.1s;
+  transition: transform 0.3s, opacity 0.1s, -webkit-transform 0.3s;
+  bottom: 0;
+  background-color: rgba(var(--text-color), 0.5);
+  opacity: 0;
+}
+.outline-button:hover:not(.outline-button--active)::after {
+  opacity: 1;
+  background-color: rgba(var(--text-color), 0.5);
+}
+.outline-button:active::after {
+  opacity: 1;
+  -webkit-transform: scaleX(2);
+          transform: scaleX(2);
+}
+.outline-button--active::after {
+  opacity: 1;
+  background-color: var(--accent-color);
 }
 
 .label {
@@ -666,6 +703,7 @@ menu-option {
   gap: 1rem 0;
   height: 100%;
   overflow-y: auto;
+  scroll-padding-top: 1.5rem;
 }
 
 .heading {
@@ -969,8 +1007,8 @@ menu-option {
     grid-row: 2/3;
     grid-column: 1/-1;
   }
-  #article_name_wrapper #filter_button,
-#selected_content_options #filter_button {
+  #article_name_wrapper #article_outline_button,
+#selected_content_options #article_outline_button {
     margin-left: auto;
   }
 
@@ -1045,7 +1083,7 @@ menu-option {
     grid-template-columns: auto 1fr auto auto;
   }
 
-  #filter_panel {
+  #options_panel {
     top: 4.2rem;
   }
 
@@ -1053,8 +1091,18 @@ menu-option {
     grid-template-rows: auto 1fr;
     grid-template-columns: minmax(0, 1fr) 24rem;
   }
-  #main_page.active-sidebar #version_history_panel,
-#main_page.active-sidebar #article_wrapper {
+  #main_page.active-outline {
+    grid-template-rows: auto 1fr;
+    grid-template-columns: 20rem minmax(0, 1fr);
+  }
+  #main_page.active-sidebar.active-outline {
+    grid-template-rows: auto 1fr;
+    grid-template-columns: 20rem minmax(0, 1fr) 24rem;
+  }
+
+  #version_history_panel,
+#article_outline_panel,
+#article_wrapper {
     -ms-scroll-chaining: none;
         overscroll-behavior: contain;
   }
