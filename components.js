@@ -2109,7 +2109,7 @@ stripOption.innerHTML = `
         flex-shrink: 0;
         cursor: pointer;
         white-space: nowrap;
-        padding: 0.5rem 0.8rem;
+        padding: var(--padding, 0.4rem 0.6rem);
         transition: background 0.3s;
         border-radius: var(--border-radius);
         -webkit-tap-highlight-color: transparent;

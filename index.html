@@ -158,7 +158,7 @@
                 </button>
             </div>
             <theme-toggle></theme-toggle>
-            <button onclick="showPopup('user_popup')">
+            <button onclick="showPopup('user_popup')" aria-label="User profile">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" height="24px" viewBox="0 0 24 24" width="24px"
                     fill="#000000">
                     <path d="M0 0h24v24H0V0z" fill="none" />
@@ -168,14 +168,15 @@
             </button>
         </header>
         <section id="options_panel" class="flex hide-completely">
-            <div id="filter_panel" class="flex w-100">
-                <sm-select id="sort_content_list" label="Sort by:">
-                    <sm-option value="time">Most recent</sm-option>
-                    <sm-option value="score">Score</sm-option>
-                </sm-select>
+            <div id="filter_panel" class="flex w-100 align-center gap-1 ">
+                <h5>Sort by</h5>
+                <strip-select id="sort_content_list" label="Sort by:">
+                    <strip-option value="time" selected>Most recent</strip-option>
+                    <strip-option value="score">Score</strip-option>
+                </strip-select>
             </div>
             <div id="article_outline_panel" class="flex align-center gap-1 hide-completely">
-                <h4>Outline</h4>
+                <h4>Sections</h4>
                 <ul id="article_outline" class="flex gap-1"></ul>
             </div>
         </section>
@@ -471,7 +472,7 @@
                     </svg>
                     <span class="content__author"></span>
                 </Button>
-                <sm-checkbox class="content__checkbox"></sm-checkbox>
+                <sm-checkbox class="content__checkbox" aria-label="Select content"></sm-checkbox>
             </div>
             <div class="content__area"></div>
             <div class="flex align-center space-between">
@@ -1793,7 +1794,8 @@
             }
         }
 
-        function toggleOptionsPanel() {
+        let currentOptionsPanel = ''
+        function toggleOptionsPanel(type) {
             const animInOptions = {
                 duration: 200,
                 fill: 'forwards',
@@ -1815,7 +1817,7 @@
                         transform: 'translateY(0)'
                     }
                 ], animInOptions)
-            } else {
+            } else if (currentOptionsPanel === type) {
                 getRef('options_panel').animate(slideOutUp, animOutOptions)
                     .onfinish = () => {
                         getRef('options_panel').classList.add('hide-completely')
@@ -1828,17 +1830,18 @@
                     }
                 ], animOutOptions).onfinish = e => e.target.cancel()
             }
+            currentOptionsPanel = type
         }
 
         function toggleFilterPanel() {
             getRef('filter_panel').classList.remove('hide-completely')
             getRef('article_outline_panel').classList.add('hide-completely')
-            toggleOptionsPanel()
+            toggleOptionsPanel('filter')
         }
         function toggleOutlinePanel() {
             getRef('filter_panel').classList.add('hide-completely')
             getRef('article_outline_panel').classList.remove('hide-completely')
-            toggleOptionsPanel()
+            toggleOptionsPanel('outline')
         }
         getRef('article_outline').addEventListener('click', e => {
             if (e.target.closest('.outline-button')) {
@@ -1850,15 +1853,15 @@
                 })
             }
         })
-        function activeHeading(target) {
+        const activeHeading = debounce((target) => {
             [...getRef('article_outline').children].forEach(elem => elem.classList.remove('outline-button--active'))
             target.classList.add('outline-button--active')
             target.scrollIntoView({ behavior: "smooth", block: "end", inline: "center" });
             getRef('options_panel').scrollTo({
                 behavior: 'smooth',
-                left: target.getBoundingClientRect().left - getRef('options_panel').getBoundingClientRect().left + getRef('options_panel').scrollLeft
+                left: target.getBoundingClientRect().left - getRef('options_panel').getBoundingClientRect().left + getRef('options_panel').scrollLeft - ((getRef('options_panel').getBoundingClientRect().width / 2) - target.getBoundingClientRect().width / 2)
             })
-        }
+        }, 150)
 
         const headingIntersectionObserver = new IntersectionObserver(entries => {
             entries.forEach(entry => {

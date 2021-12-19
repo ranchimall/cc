@@ -417,7 +417,8 @@ details {
   }
 }
 sm-select,
-sm-option {
+sm-option,
+strip-option{
   font-size: 0.9rem;
 }
 sm-checkbox {
@@ -653,6 +654,11 @@ menu-option {
       min-height: calc(60vh + 3rem);
       height: 100%;
     }
+  }
+  .submit-entry{
+    border-radius: 0.2rem;
+    padding: 0.4rem 0.8rem;
+    color: var(--accent-color);
   }
 }
 .content__header {
