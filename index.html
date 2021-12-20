@@ -12331,22 +12331,19 @@
                                 i + 1
                               }_thumbs" class="fa fa-thumbs-o-up"
                              onclick="clickProcess(this)"> Upvote 
-                              <!--<i class="fa fa-thumbs-o-up" aria-hidden="true" style="padding-left:1rem;cursor:pointer;"></i>-->
                               <span style="font-weight:bold;padding-left: 5px;" id="num"> </span></span>
-                               <!-- <div><img src="https://cdn-icons-png.flaticon.com/512/25/25423.png" alt="" style="height: 25px;margin-left: 30%;">Upvote</div>-->
                             <br><br>
                             <script>
                                 function clickProcess(element) {
                                   let columnName =\`column\${col}_count\`;
-                                  console.log(element)
-                                  console.log(element.classList)
+
                                   if (myFloID!=undefined) {
                                     if (element.classList.value  == "fa fa-thumbs-o-up")
                                      {
                                       let articlekey =articlekeey
                                       let mainObj = {
                                         floID: myFloID,
-                                        articlekey: articlekey,
+                                        articlename: title.dataset.articlename, 
                                       };
                                       console.log("mainObj")
                                      floCloudAPI.sendGeneralData(JSON.stringify(mainObj), "test")
@@ -12375,7 +12372,7 @@
                                     function onLoadStartUp(){
                                       floDapps.launchStartUp().then(result => {
                                           console.log(result)
-                                          console.log('Welcome FLO_ID: ${myFloID}')
+                                          console.log(\`Welcome FLO_ID: \${myFloID}\`)
                                           //App functions....
                                       }).catch(error => console.error(error))
                                   
