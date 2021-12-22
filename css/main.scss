@@ -428,6 +428,10 @@ sm-menu {
 menu-option {
   font-size: 0.9rem;
 }
+sm-copy {
+  font-size: 0.9rem;
+  --button-border-radius: 0.2rem;
+}
 .warning {
   background-color: khaki;
   color: rgba(0, 0, 0, 0.7);
@@ -435,12 +439,66 @@ menu-option {
   border-radius: 0.5rem;
   line-height: 1.5;
 }
+.page{
+  height: 100%;
+}
 .page-layout,
 #preview_page {
   display: grid;
   grid-template-columns: 1rem minmax(0, 1fr) 1rem;
   & > * {
     grid-column: 2/3;
+  }
+}
+#landing {
+  grid-template-rows: auto 1fr;
+  header {
+    padding: 1.5rem 0;
+  }
+  & > section {
+    align-items: flex-start;
+    margin-top: 6rem;
+    height: 100%;
+    text-align: center;
+  }
+}
+
+#sign_in,
+#sign_up {
+  grid-template-rows: auto 1fr;
+  align-items: center;
+  section{
+    margin-top: -6rem;
+    justify-self: center;
+    width: min(24rem, 100%);
+  }
+  sm-form {
+    margin: 2rem 0;
+  }
+  header {
+    padding: 1.5rem 0;
+  }
+}
+#sign_up {
+  .h2 {
+    margin-bottom: 0.5rem;
+  }
+  .card {
+    margin: 1.5rem 0;
+  }
+  h5 {
+    font-weight: 500;
+    color: rgba(var(--text-color), 0.8);
+  }
+  .warning {
+    margin-top: 2rem;
+  }
+}
+#loading {
+  place-content: center;
+  text-align: center;
+  sm-spinner {
+    margin-bottom: 1.5rem;
   }
 }
 
@@ -712,10 +770,11 @@ menu-option {
 }
 #text_toolbar {
   user-select: none;
-  position: absolute;
-  z-index: 1;
+  position: fixed;
+  z-index: 10;
   left: 0;
-  top: 0;
+  right: 0;
+  bottom: 0;
   transition: transform 0.1s;
   background-color: var(--foreground-color);
   border: solid thin rgba(var(--text-color), 0.2);
@@ -944,7 +1003,7 @@ menu-option {
     --width: 24rem;
   }
   .page-layout {
-    grid-template-columns: 1.5rem minmax(0, 1fr) 1.5rem;
+    grid-template-columns: 1fr 90vw 1fr;
   }
   .hide-on-desktop {
     display: none;
@@ -1001,6 +1060,14 @@ menu-option {
     position: absolute;
     right: 0;
     bottom: 100%;
+  }
+  #text_toolbar {
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    right: auto;
+    bottom: auto;
   }
 }
 @media (any-hover: hover) {

@@ -493,12 +493,21 @@ menu-option {
   font-size: 0.9rem;
 }
 
+sm-copy {
+  font-size: 0.9rem;
+  --button-border-radius: 0.2rem;
+}
+
 .warning {
   background-color: khaki;
   color: rgba(0, 0, 0, 0.7);
   padding: 1rem;
   border-radius: 0.5rem;
   line-height: 1.5;
+}
+
+.page {
+  height: 100%;
 }
 
 .page-layout,
@@ -509,6 +518,65 @@ menu-option {
 .page-layout > *,
 #preview_page > * {
   grid-column: 2/3;
+}
+
+#landing {
+  grid-template-rows: auto 1fr;
+}
+#landing header {
+  padding: 1.5rem 0;
+}
+#landing > section {
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  margin-top: 6rem;
+  height: 100%;
+  text-align: center;
+}
+
+#sign_in,
+#sign_up {
+  grid-template-rows: auto 1fr;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+#sign_in section,
+#sign_up section {
+  margin-top: -6rem;
+  justify-self: center;
+  width: min(24rem, 100%);
+}
+#sign_in sm-form,
+#sign_up sm-form {
+  margin: 2rem 0;
+}
+#sign_in header,
+#sign_up header {
+  padding: 1.5rem 0;
+}
+
+#sign_up .h2 {
+  margin-bottom: 0.5rem;
+}
+#sign_up .card {
+  margin: 1.5rem 0;
+}
+#sign_up h5 {
+  font-weight: 500;
+  color: rgba(var(--text-color), 0.8);
+}
+#sign_up .warning {
+  margin-top: 2rem;
+}
+
+#loading {
+  place-content: center;
+  text-align: center;
+}
+#loading sm-spinner {
+  margin-bottom: 1.5rem;
 }
 
 #main_header {
@@ -823,10 +891,11 @@ menu-option {
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
-  position: absolute;
-  z-index: 1;
+  position: fixed;
+  z-index: 10;
   left: 0;
-  top: 0;
+  right: 0;
+  bottom: 0;
   -webkit-transition: -webkit-transform 0.1s;
   transition: -webkit-transform 0.1s;
   transition: transform 0.1s;
@@ -1084,7 +1153,7 @@ menu-option {
   }
 
   .page-layout {
-    grid-template-columns: 1.5rem minmax(0, 1fr) 1.5rem;
+    grid-template-columns: 1fr 90vw 1fr;
   }
 
   .hide-on-desktop {
@@ -1150,6 +1219,15 @@ menu-option {
     position: absolute;
     right: 0;
     bottom: 100%;
+  }
+
+  #text_toolbar {
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    right: auto;
+    bottom: auto;
   }
 }
 @media (any-hover: hover) {
