@@ -590,6 +590,30 @@
             <sm-button class="danger" onclick="signOut()">Sign out</sm-button>
         </section>
     </sm-popup>
+    <sm-popup id="scoring_popup">
+        <header slot="header" class="popup__header">
+            <button class="popup__header__close" onclick="hidePopup()">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                    fill="#000000">
+                    <path d="M0 0h24v24H0V0z" fill="none" />
+                    <path
+                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
+                </svg>
+            </button>
+            <h3>Update score</h3>
+        </header>
+        <sm-form>
+            <sm-input id="update_score_field" class="outlined" placeholder="Score" type="number" step="0.1" min="1"
+                max="100" error-text="Value must be between 1-100" autofocus animate required hiderequired></sm-input>
+            <div id="inc_section" class="flex">
+                <button class="button" onclick="incScore(0.1)">+ 0.1</button>
+                <button class="button" onclick="incScore(1)">+ 1</button>
+                <button class="button" onclick="incScore(5)">+ 5</button>
+                <sm-button id="get_new_score" variant="primary" class="justify-right" onclick="updateScore()" disabled>
+                    Update</sm-button>
+            </div>
+        </sm-form>
+    </sm-popup>
     <template id="contributor_template">
         <div class="contributor grid">
             <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -622,7 +646,7 @@
                         <path fill-rule="evenodd" clip-rule="evenodd"
                             d="M14.6243 7.99154C13.9395 8.14279 13.4165 8.69672 13.3047 9.38904C13.2248 9.88365 13.3664 10.3773 13.6735 10.7498L9.29125 15.0941C8.93718 15.4451 8.48852 15.6853 8.00011 15.7854L6.12418 16.1699L9.19811 13.1381C9.53438 12.8064 9.53812 12.265 9.20646 11.9287C8.8748 11.5924 8.33333 11.5887 7.99706 11.9203L4.97835 14.8977L5.47976 12.451C5.50451 12.3303 5.55656 12.2168 5.63191 12.1192L6.49083 11.0073C9.58386 7.00317 14.32 4.72705 19.2553 4.71054L16.3569 7.60884L14.6243 7.99154ZM2.79008 17.0559L3.8042 12.1076C3.88132 11.7313 4.0435 11.3776 4.27833 11.0736L5.13724 9.96172C8.89964 5.09105 14.861 2.53305 20.8954 3.07051C21.5971 3.133 22.2997 3.23735 23 3.38478L17.2133 9.1713L14.9932 9.66167L15.4238 9.91837C15.9039 10.2046 15.9849 10.8668 15.588 11.2603L10.4954 16.3088C9.90529 16.8938 9.15752 17.2941 8.34351 17.461L3.88965 18.3738L2.45572 19.788C2.11945 20.1197 1.57798 20.116 1.24632 19.7797C0.91466 19.4434 0.918397 18.9019 1.25467 18.5703L2.79008 17.0559Z" />
                     </svg>
-                    <span class="content__author"></span>
+                    <div class="content__author flex align-center"></div>
                 </Button>
                 <sm-checkbox class="content__checkbox" aria-label="Select content"></sm-checkbox>
             </div>
@@ -637,15 +661,6 @@
                                 d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8z" />
                         </svg>
                     </button>
-                    <button title="Give score">
-                        <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" height="24px"
-                            viewBox="0 0 24 24" width="24px" fill="#000000">
-                            <path d="M0 0h24v24H0V0z" fill="none" />
-                            <path
-                                d="M12 7.13l.97 2.29.47 1.11 1.2.1 2.47.21-1.88 1.63-.91.79.27 1.18.56 2.41-2.12-1.28-1.03-.64-1.03.62-2.12 1.28.56-2.41.27-1.18-.91-.79-1.88-1.63 2.47-.21 1.2-.1.47-1.11.97-2.27M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2z" />
-                        </svg>
-                        <span class="content__score">0</span>
-                    </button>
                 </div>
                 <button class="submit-entry hide-completely">Submit</button>
             </div>
@@ -655,7 +670,6 @@
         <li class="history-entry grid gap-1">
             <div class="flex align-center space-between">
                 <time class="entry__time"></time>
-                <span class="entry__score"></span>
             </div>
             <div class="grid">
                 <div class="label flex align-center">
@@ -1215,7 +1229,8 @@
                     floGlobals.appObjects[uid] = {
                         public: true,
                         editors: [],
-                        sections
+                        sections,
+                        preview: {}
                     }
                     Promise.all([
                         floCloudAPI.updateObjectData('cc'),
@@ -1310,14 +1325,19 @@
                     submitButton.disabled = true
                     floCloudAPI.sendGeneralData(entry, `${floGlobals.currentArticle.id}_gd`)
                         .then((res) => {
-                            console.log(res)
+                            let genDataVC
+                            // Add result to general data
+                            for (genDataVC in res) {
+                                floGlobals.generalData[`${floGlobals.currentArticle.id}_gd|${floGlobals.adminID}|${floGlobals.application}`][genDataVC] = res[genDataVC]
+                            }
+
+                            console.log(genDataVC)
                             submitButton.classList.add('hide-completely')
                             notify('sent data', 'success')
-                            const iterationData = { ...entry, timestamp, editor: myFloID }
                             if (isUniqueEntry) {
                                 contentArea.innerHTML = ''
                                 floGlobals.currentArticle.sections[sectionID].uniqueEntries.push(entry.origin)
-                                floGlobals.currentArticle.uniqueEntries[entry.origin] = { iterations: [iterationData] }
+                                floGlobals.currentArticle.uniqueEntries[entry.origin] = { iterations: [genDataVC] }
                                 // Insert new content card based on set filter
                                 const newCard = render.contentCard(entry.origin)
                                 if (getRef('sort_content_list').value === 'time') {
@@ -1360,7 +1380,7 @@
                                 if (noOfContributors < 2) {
                                     contentCard.querySelector('.content__author').textContent = `2 Contributors`
                                 }
-                                floGlobals.currentArticle.uniqueEntries[entry.origin].iterations.push(iterationData)
+                                floGlobals.currentArticle.uniqueEntries[entry.origin].iterations.push(genDataVC)
                             }
                         })
                         .catch(err => console.log(err))
@@ -1373,7 +1393,7 @@
                 }
             } else if (e.target.closest('.version-history-button')) {
                 const entryUid = e.target.closest('.content-card').dataset.uid
-                if (versionHistory.isOpen && entryUid === versionHistory.entryUid)
+                if (floGlobals.versionHistory.isOpen && entryUid === floGlobals.versionHistory.entryUid)
                     hideVersionHistory()
                 else
                     showVersionHistory(entryUid)
@@ -1409,6 +1429,17 @@
                     })
                     floGlobals.currentArticle.sections[sectionID].expanded = true
                 }
+            } else if (e.target.closest('.score-button') && isSubAdmin) {
+                floGlobals.versionHistory.currentEntry = e.target.closest('.content-card').dataset.vectorClock
+                getRef('update_score_field').value = e.target.closest('.score-button').children[1].textContent
+                showPopup('scoring_popup')
+            }
+        })
+        getRef('version_timeline').addEventListener('click', e => {
+            if (e.target.closest('.score-button') && isSubAdmin) {
+                floGlobals.versionHistory.currentEntry = e.target.closest('.history-entry').dataset.vectorClock
+                getRef('update_score_field').value = e.target.closest('.score-button').children[1].textContent
+                showPopup('scoring_popup')
             }
         })
         getRef('article_wrapper').addEventListener("paste", e => {
@@ -1606,7 +1637,7 @@
         }
         function sharePreview() {
             if (isSubAdmin) {
-                if (floGlobals.appObjects[pagesData.params.articleID].preview) {
+                if (floGlobals.appObjects[pagesData.params.articleID]?.preview?.id) {
                     floGlobals.appObjects[pagesData.params.articleID].preview.content = DOMPurify.sanitize(getRef('preview__body').innerHTML)
                 } else {
                     floGlobals.appObjects[pagesData.params.articleID].preview = {
@@ -1757,6 +1788,31 @@
         function formatDoc(sCmd, sValue) {
             document.execCommand(sCmd, false, sValue);
         }
+        function incScore(value) {
+            let currentScore = parseFloat(getRef('update_score_field').value)
+            if (!currentScore) {
+                currentScore = 0
+            }
+            if (currentScore + value <= 100) {
+                currentScore += value;
+                getRef('update_score_field').value = parseFloat(currentScore.toFixed(1))
+            }
+            else {
+                notify(`You can't give score more than 100.`, 'error')
+            }
+        }
+        function updateScore() {
+            const newScore = parseFloat(getRef('update_score_field').value)
+            const mark = {
+                [floGlobals.versionHistory.currentEntry]: newScore
+            }
+            scores[floGlobals.versionHistory.currentEntry] = newScore
+            document.querySelectorAll(`[data-vector-clock="${floGlobals.versionHistory.currentEntry}"] .content__score`).forEach(scoreElem => scoreElem.textContent = newScore)
+            floCloudAPI.markApplicationData(mark).then(res => {
+                notify('Score updated', 'success')
+                hidePopup()
+            }).catch(err => notify(err, 'error'))
+        }
     </script>
     <script>
         floGlobals.currentArticle = {}
@@ -1797,6 +1853,28 @@
         }
         mobileQuery.addListener(handleMobileChange)
         handleMobileChange(mobileQuery)
+        function getScoreElement(score) {
+            let scoreElement
+            if (isSubAdmin) {
+                scoreElement = createElement('button', {
+                    className: 'score-button',
+                    attributes: { 'title': 'Score this content' }
+                })
+            } else {
+                scoreElement = createElement('div', {
+                    className: 'flex align-center',
+                    attributes: { 'title': 'Score' }
+                })
+            }
+            scoreElement.innerHTML = `
+                    ${score ?
+                    `<svg class="icon filled-star" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><path d="M0,0h24v24H0V0z" fill="none"/><path d="M0,0h24v24H0V0z" fill="none"/></g><g><path d="M12,17.27L18.18,21l-1.64-7.03L22,9.24l-7.19-0.61L12,2L9.19,8.63L2,9.24l5.46,4.73L5.82,21L12,17.27z"/></g></svg> ` :
+                    `<svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0V0z" fill="none" /> <path d="M12 7.13l.97 2.29.47 1.11 1.2.1 2.47.21-1.88 1.63-.91.79.27 1.18.56 2.41-2.12-1.28-1.03-.64-1.03.62-2.12 1.28.56-2.41.27-1.18-.91-.79-1.88-1.63 2.47-.21 1.2-.1.47-1.11.97-2.27M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2z" /> </svg>`
+                }
+                    <div class="content__score">${score}</div>
+                `
+            return scoreElement
+        }
         const render = {
             article(id) {
                 floGlobals.currentArticle.id = id
@@ -1841,32 +1919,30 @@
                 return link
             },
             contentCard(id, version = 0) {
-                const { data, contributors, score = 0 } = getIterationDetails(id)
+                const { data, contributors, score = 0, vectorClock } = getIterationDetails(id)
                 const clone = getRef('content_card_template').content.cloneNode(true).firstElementChild;
                 clone.dataset.uid = id
+                clone.dataset.vectorClock = vectorClock
                 if (!isSubAdmin) {
                     clone.querySelector('.content__area').setAttribute('contentEditable', true)
                 }
                 clone.querySelector('.content__area').innerHTML = DOMPurify.sanitize(data)
                 let noOfContributors = 0
-                let firstContributor
+                let latestContributor
                 for (const contributor in contributors) {
                     noOfContributors++
-                    if (noOfContributors === 1)
-                        firstContributor = contributor
+                    latestContributor = contributor
                 }
-                if (noOfContributors === 1) {
-                    clone.querySelector('.content__author').textContent = firstContributor
-                } else {
-                    clone.querySelector('.content__author').textContent = `${noOfContributors} contributors`
-                }
-                clone.querySelector('.content__score').textContent = score;
+                clone.querySelector('.content__author').innerHTML = `<div>${latestContributor}</div> ${noOfContributors === 1 ? '' : `<div> and ${noOfContributors - 1} more`}</div>`
+                clone.querySelector('.content__options').append(getScoreElement(score));
                 return clone
             },
             historyEntry(details, oldText) {
-                const { editor, timestamp, data } = details
+                const { editor, timestamp, data, score, vectorClock } = details
                 const clone = getRef('history_entry_template').content.cloneNode(true).firstElementChild;
+                clone.dataset.vectorClock = vectorClock
                 clone.querySelector('.entry__time').textContent = getFormattedTime(timestamp)
+                clone.querySelector('.entry__time').after(getScoreElement(score))
                 clone.querySelector('.entry__author').textContent = editor
                 if (Array.isArray(data)) {
                     const [removedAt, addedWords, addedAt] = data
@@ -1892,7 +1968,12 @@
                             }
                         } else return word
                     })
-                    clone.querySelector('.entry__changes').innerHTML = DOMPurify.sanitize(final.join(' '))
+                    clone.querySelector('.entry__changes').innerHTML = DOMPurify.sanitize(final.join(' '));
+                    [...clone.querySelector('.entry__changes').children].forEach(element => {
+                        if (element.tagName === 'P' && !element.querySelector('.added, .removed')) {
+                            element.remove()
+                        }
+                    });
                 } else {
                     clone.querySelector('.entry__changes').innerHTML = DOMPurify.sanitize(data)
                 }
@@ -1952,28 +2033,41 @@
             })
             floGlobals.currentArticle['uniqueEntries'] = {}
             for (const key in generalData) {
-                const { message: { section, data, origin, hash }, senderID } = generalData[key]
+                const { section, origin } = generalData[key].message
                 if (!floGlobals.currentArticle.uniqueEntries.hasOwnProperty(origin)) { // check if general data has origin that's already defined
                     floGlobals.currentArticle.uniqueEntries[origin] = {
                         iterations: []
                     }
                 }
                 floGlobals.currentArticle.sections[section].uniqueEntries.add(origin)
-                floGlobals.currentArticle.uniqueEntries[origin]['iterations'].push({
-                    timestamp: generalData[key].time,
-                    data,
-                    editor: senderID,
-                    hash,
-                    score: floCrypto.randInt(0, 100) // to do: get score from mark feature
-                })
+                floGlobals.currentArticle.uniqueEntries[origin]['iterations'].push(generalData[key].vectorClock)
             }
             for (const sectionID in floGlobals.currentArticle.sections) {
                 floGlobals.currentArticle.sections[sectionID].uniqueEntries = [...floGlobals.currentArticle.sections[sectionID].uniqueEntries].reverse()
             }
             for (const entry in floGlobals.currentArticle.uniqueEntries) {
-                floGlobals.currentArticle.uniqueEntries[entry]['iterations'].sort((a, b) => a.timestamp - b.timestamp)
+                floGlobals.currentArticle.uniqueEntries[entry]['iterations'].sort((a, b) => getGenData(a).timestamp - getGenData(b).timestamp)
             }
         }
+
+        function getGenData(vectorClock) {
+            const { message: { section, origin, data, hash }, senderID, time } = floGlobals.generalData[`${floGlobals.currentArticle.id}_gd|${floGlobals.adminID}|${floGlobals.application}`][vectorClock]
+            return {
+                data,
+                editor: senderID,
+                timestamp: time,
+                vectorClock,
+                score: getScore(vectorClock)
+            }
+        }
+
+        const scores = {}
+        function getScore(vc) {
+            if (!scores[vc])
+                scores[vc] = floCrypto.randInt(0, 100)
+            return scores[vc]
+        }
+
 
         let currentOptionsPanel = ''
         function toggleOptionsPanel(type) {
@@ -2062,7 +2156,7 @@
                 floGlobals.currentArticle.sections[sectionID].uniqueEntries.sort((a, b) => {
                     const arrayA = floGlobals.currentArticle.uniqueEntries[a].iterations
                     const arrayB = floGlobals.currentArticle.uniqueEntries[b].iterations
-                    return arrayB[arrayB.length - 1][sortByScore ? 'score' : 'timestamp'] - arrayA[arrayA.length - 1][sortByScore ? 'score' : 'timestamp']
+                    return getGenData(arrayB[arrayB.length - 1])[sortByScore ? 'score' : 'timestamp'] - getGenData(arrayA[arrayA.length - 1])[sortByScore ? 'score' : 'timestamp']
                 })
             }
             for (const sectionID in floGlobals.currentArticle.sections) {
@@ -2213,45 +2307,48 @@
             const contributors = {}
             const limit = targetIndex || floGlobals.currentArticle.uniqueEntries[uid].iterations.length - 1
             for (let i = 0; i <= limit; i++) {
-                const { data, editor, timestamp } = floGlobals.currentArticle.uniqueEntries[uid].iterations[i]
+                const { data, editor, timestamp } = getGenData(floGlobals.currentArticle.uniqueEntries[uid].iterations[i])
                 merged = i ? updateString(merged, data) : data
                 contributors[editor] = timestamp
             }
+            const { hash, score } = getGenData(floGlobals.currentArticle.uniqueEntries[uid].iterations[limit]);
             return {
                 data: merged,
                 contributors,
-                hash: floGlobals.currentArticle.uniqueEntries[uid].iterations[limit].hash,
-                score: floGlobals.currentArticle.uniqueEntries[uid].iterations[limit].score
+                hash,
+                score,
+                vectorClock: floGlobals.currentArticle.uniqueEntries[uid].iterations[limit]
             }
         }
-        const versionHistory = {
+        floGlobals.versionHistory = {
             isOpen: false,
             entryUid: ''
         }
         function showVersionHistory(uid) {
-            versionHistory.entryUid = uid
+            floGlobals.versionHistory.entryUid = uid
             const { iterations } = floGlobals.currentArticle.uniqueEntries[uid]
             const frag = document.createDocumentFragment()
             let mergedChanges
-            iterations.forEach((iter, index) => {
+            iterations.forEach((vectorClock, index) => {
+                const iter = getGenData(vectorClock)
                 frag.prepend(render.historyEntry(iter, mergedChanges))
                 mergedChanges = index ? updateString(mergedChanges, iter.data) : iter.data
             })
             getRef('version_timeline').innerHTML = ''
             getRef('version_timeline').append(frag)
-            if (!versionHistory.isOpen) {
+            if (!floGlobals.versionHistory.isOpen) {
                 getRef('version_history_panel').classList.remove('hide-completely')
                 getRef('main_page').classList.add('active-sidebar')
-                versionHistory.isOpen = true
+                floGlobals.versionHistory.isOpen = true
             }
         }
 
         function hideVersionHistory() {
-            if (versionHistory.isOpen) {
+            if (floGlobals.versionHistory.isOpen) {
                 getRef('version_history_panel').classList.add('hide-completely')
                 getRef('version_timeline').innerHTML = ''
                 getRef('main_page').classList.remove('active-sidebar')
-                versionHistory.isOpen = false
+                floGlobals.versionHistory.isOpen = false
             }
         }
 

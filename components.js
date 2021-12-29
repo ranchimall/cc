@@ -1835,7 +1835,6 @@ stripSelect.innerHTML = `
         --accent-color: #4d2588;
         --text-color: 17, 17, 17;
         --background-color: 255, 255, 255;
-        --gap: 0.5rem;
         padding: 1rem 0;
     }
     .hide{
@@ -1855,13 +1854,13 @@ stripSelect.innerHTML = `
     :host([multiline]) .strip-select{
         display: flex;
         flex-wrap: wrap;
-        gap: 0.5rem;
+        gap: var(--gap, 0.5rem);
         overflow: auto hidden;
     }
     :host(:not([multiline])) .strip-select{
         display: grid;
         grid-auto-flow: column;
-        gap: var(--gap);
+        gap: var(--gap, 0.5rem);
         max-width: 100%;   
         align-items: center;
         overflow: auto hidden;
@@ -2099,10 +2098,7 @@ stripOption.innerHTML = `
                 box-sizing: border-box;
     }  
     :host{
-        --border-radius: 2rem;
         --background-color: inherit;
-        --active-option-color: inherit;
-        --active-option-background-color: rgba(var(--text-color), .2);
     }
     .strip-option{
         display: flex;
@@ -2111,12 +2107,12 @@ stripOption.innerHTML = `
         white-space: nowrap;
         padding: var(--padding, 0.4rem 0.6rem);
         transition: background 0.3s;
-        border-radius: var(--border-radius);
+        border-radius: var(--border-radius, 2rem);
         -webkit-tap-highlight-color: transparent;
     }
     :host([active]) .strip-option{
-        color: var(--active-option-color);
-        background-color: var(--active-option-background-color);
+        color: var(--active-option-color, inherit);
+        background-color: var(--active-background-color, rgba(var(--text-color), 0.06));
     }
     :host(:focus-within){
         outline: none;
