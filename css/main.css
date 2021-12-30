@@ -1156,6 +1156,10 @@ sm-copy {
     width: min(45ch, calc(100% - 2rem));
   }
 
+  .formatting-button {
+    padding: 0.5rem;
+  }
+
   .hide-on-mobile {
     display: none;
   }

@@ -1467,7 +1467,8 @@
                     const sectionID = contentCard.closest('.article-section').dataset.sectionId
                     const content = DOMPurify.sanitize(contentCard.querySelector('.content__area').innerHTML.split('\n').map(v => v.trim()).filter(v => v).join('\n'), { FORBID_ATTR: ['style'] })
                         .replace(/b>/gi, 'strong>').replace(/i>/gi, 'em>')
-                    selectedContent.set(contentID, { content, sectionID })
+                    const contributors = Object.keys(getIterationDetails(contentID).contributors)
+                    selectedContent.set(contentID, { content, sectionID, contributors })
                 }
                 const animOptions = {
                     duration: 150,
@@ -1496,6 +1497,13 @@
                             animateTo(getRef('article_name_wrapper'), slideInRight, animOptions)
                         }
                 }
+            } else if (e.target.classList.contains('heading')) {
+                floGlobals.appObjects[floGlobals.currentArticle.id].sections[e.target.dataset.index].title = e.target.value.trim()
+                floCloudAPI.updateObjectData(floGlobals.currentArticle.id)
+                    .then((res) => {
+                        notify('Updated heading', 'success')
+                    })
+                    .catch(err => console.error(err))
             }
         })
 
@@ -1595,6 +1603,18 @@
             bodyTemplate.querySelector('#exported_title').textContent = articleTitle
             bodyTemplate.querySelector('#exported_time').textContent = `Exported on ${getFormattedTime(Date.now())}`
             bodyTemplate.querySelector('#export_body').innerHTML = getCleanExportContent()
+            let allContributors = new Set()
+            selectedContent.forEach(({ contributors }) => {
+                contributors.forEach(id => allContributors.add(id))
+            });
+            const frag = document.createDocumentFragment()
+            allContributors.forEach(id => {
+                frag.append(createElement('div', {
+                    textContent: id,
+                    className: 'contributor'
+                }))
+            })
+            bodyTemplate.querySelector('#article_contributors').append(frag)
             const readingTime = getReadingTime(bodyTemplate.querySelector('#export_body').textContent)
             bodyTemplate.querySelector('#reading_time').textContent = `${readingTime} min read`
             let bodyAttributes = ''
@@ -1637,12 +1657,17 @@
         }
         function sharePreview() {
             if (isSubAdmin) {
+                let allContributors = new Set()
+                selectedContent.forEach(({ contributors }) => {
+                    contributors.forEach(id => allContributors.add(id))
+                });
                 if (floGlobals.appObjects[pagesData.params.articleID]?.preview?.id) {
                     floGlobals.appObjects[pagesData.params.articleID].preview.content = DOMPurify.sanitize(getRef('preview__body').innerHTML)
                 } else {
                     floGlobals.appObjects[pagesData.params.articleID].preview = {
                         uid: floCrypto.randString(16, true),
-                        content: DOMPurify.sanitize(getRef('preview__body').innerHTML)
+                        content: DOMPurify.sanitize(getRef('preview__body').innerHTML),
+                        contributors: [...allContributors]
                     }
                 }
                 floCloudAPI.updateObjectData(pagesData.params.articleID)
@@ -1736,16 +1761,6 @@
                     notify('Renamed article', 'success')
                 })
                 .catch(err => console.error(err))
-        })
-        getRef('article_wrapper').addEventListener("change", e => {
-            if (e.target.classList.contains('heading')) {
-                floGlobals.appObjects[floGlobals.currentArticle.id].sections[e.target.dataset.index].title = e.target.value.trim()
-                floCloudAPI.updateObjectData(floGlobals.currentArticle.id)
-                    .then((res) => {
-                        notify('Updated heading', 'success')
-                    })
-                    .catch(err => console.error(err))
-            }
         })
         getRef('article_wrapper').addEventListener("focusin", e => {
             if (e.target.closest('.content__area')) {
@@ -12414,17 +12429,22 @@
             }
 
             article {
-                position: relative;
                 padding-bottom: 3rem;
                 gap: 1rem
             }
 
-            article::after {
+            #export_body {
+                position: relative;
+                margin-bottom: 1rem;
+                padding-bottom: 1.5rem;
+            }
+
+            #export_body::after {
                 justify-self: center;
                 position: absolute;
                 bottom: 0;
                 content: "";
-                width: 4rem;
+                width: 3rem;
                 height: .3rem;
                 border-radius: .5rem;
                 background-color: rgba(var(--text-color), 0.5)
@@ -12495,6 +12515,19 @@
                 color: rgba(var(--text-color), 0.8);
                 font-size: .8rem;
                 margin-left: auto
+            }
+
+            #article_contributors {
+                flex-wrap: wrap;
+                gap: 0.3rem;
+                margin: 0.5rem 0 1rem 0;
+            }
+
+            .contributor {
+                font-size: 0.8rem;
+                background-color: rgba(var(--text-color), 0.06);
+                border-radius: 0.3rem;
+                padding: 0.3rem 0.5rem;
             }
 
             .upvote {
@@ -12647,7 +12680,7 @@
             <section id="export_body" class="grid gap-1"></section>
             <section>
                 <h4>Article by -</h4>
-                <div id="article_contributors"></div>
+                <div id="article_contributors" class="flex"></div>
                 <span>created with RanchiMall Content collaboration app</span>
             </section>
         </article>
@@ -12843,7 +12876,7 @@
                     <path
                         d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
-                <div id="like_count"></div>
+                <div id="like_count">Loading...</div>
             </button>
         </footer>
         <sm-popup id="sign_in_popup">
