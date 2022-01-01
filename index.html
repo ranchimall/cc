@@ -1633,6 +1633,8 @@
                         ${getRef('floDapps').innerHTML}
                      <\/script>
                     `
+            } else {
+                bodyTemplate.querySelector('header button').remove()
             }
             const bodyHTML = createElement('div')
             bodyHTML.append(bodyTemplate)
@@ -12334,6 +12336,33 @@
                 transform: scale(0.9)
             }
 
+            #confirmation_popup,
+            #prompt_popup {
+                -webkit-box-orient: vertical;
+                -webkit-box-direction: normal;
+                -ms-flex-direction: column;
+                flex-direction: column;
+            }
+
+            #confirmation_popup h4 {
+                font-weight: 500;
+                margin-bottom: 0.5rem;
+            }
+
+            #confirmation_popup sm-button {
+                margin: 0;
+            }
+
+            #confirmation_popup .flex {
+                padding: 0;
+                margin-top: 1rem;
+            }
+
+            #confirmation_popup .flex sm-button:first-of-type {
+                margin-right: 0.6rem;
+                margin-left: auto;
+            }
+
             .popup__header {
                 display: grid;
                 gap: .5rem;
@@ -12661,7 +12690,7 @@
                 <h4>RanchiMall Times</h4>
             </div>
             <theme-toggle></theme-toggle>
-            <button onclick="showPopup('user_popup')">
+            <button id="user_button" class="hide-completely" onclick="showPopup('user_popup')">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" height="24px" viewBox="0 0 24 24" width="24px"
                     fill="#000000">
                     <path d="M0 0h24v24H0V0z" fill="none" />
@@ -12879,6 +12908,14 @@
                 <div id="like_count">Loading...</div>
             </button>
         </footer>
+        <sm-popup id="confirmation_popup">
+            <h4 id="confirm_title"></h4>
+            <p id="confirm_message"></p>
+            <div class="flex align-center">
+                <sm-button variant="no-outline" class="cancel-btn">Cancel</sm-button>
+                <sm-button variant="no-outline" class="submit-btn">OK</sm-button>
+            </div>
+        </sm-popup>
         <sm-popup id="sign_in_popup">
             <header slot="header" class="popup__header">
                 <button class="popup__header__close" onclick="hidePopup()">
@@ -12939,6 +12976,27 @@
                     Keep your private key secure and don't share with anyone.
                     Once lost there is no way to recover private key.
                 </strong>
+            </section>
+        </sm-popup>
+        <sm-popup id="user_popup">
+            <header slot="header" class="popup__header">
+                <div class="flex align-center">
+                    <button class="popup__header__close" onclick="hidePopup()">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                            width="24px" fill="#000000">
+                            <path d="M0 0h24v24H0V0z" fill="none" />
+                            <path
+                                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
+                        </svg>
+                    </button>
+                </div>
+            </header>
+            <section class="grid gap-1-5">
+                <div class="grid gap-0-5">
+                    <h5>My FLO ID</h5>
+                    <sm-copy id="user_flo_id"></sm-copy>
+                </div>
+                <sm-button class="danger" onclick="signOut()">Sign out</sm-button>
             </section>
         </sm-popup>
 
@@ -13045,6 +13103,28 @@
                         break
                 }
             })
+
+            // displays a popup for asking permission. Use this instead of JS confirm
+            const getConfirmation = (title, options = {}) => {
+                return new Promise(resolve => {
+                    const { message, cancelText = 'Cancel', confirmText = 'OK' } = options
+                    showPopup('confirmation_popup', true)
+                    getRef('confirm_title').textContent = title;
+                    getRef('confirm_message').textContent = message;
+                    let cancelButton = getRef('confirmation_popup').children[2].children[0],
+                        submitButton = getRef('confirmation_popup').children[2].children[1]
+                    submitButton.textContent = confirmText
+                    cancelButton.textContent = cancelText
+                    submitButton.onclick = () => {
+                        hidePopup()
+                        resolve(true);
+                    }
+                    cancelButton.onclick = () => {
+                        hidePopup()
+                        resolve(false);
+                    }
+                })
+            }
             let currentArticleID
             window.addEventListener("load", () => {
                 currentArticleID = document.body.dataset.articleId
@@ -13223,6 +13303,16 @@
                     getRef('sign_up').classList.add('hide-completely')
                 }
             }
+            function signOut() {
+                getConfirmation('Sign out?', 'You are about to sign out of the app, continue?', 'Stay', 'Leave')
+                    .then(async (res) => {
+                        if (res) {
+                            await floDapps.clearCredentials()
+                            getRef('user_button').classList.add('hide-completely')
+                            location.reload()
+                        }
+                    })
+            }
         </script>
 
         <script id="onLoadStartUp">
@@ -13230,7 +13320,6 @@
             let isLoggedIn = false
             let totalVotes = 0
             function onLoadStartUp() {
-
                 //floDapps.addStartUpFunction('Sample', Promised Function)
                 //floDapps.setAppObjectStores({sampleObs1:{}, sampleObs2:{options{autoIncrement:true, keyPath:'SampleKey'}, Indexes:{sampleIndex:{}}}})
                 let firstLoad = true
@@ -13275,9 +13364,9 @@
                     isLoggedIn = true
                     isSubAdmin = floGlobals.subAdmins.includes(myFloID)
 
+                    getRef('user_flo_id').value = myFloID
+                    getRef('user_button').classList.remove('hide-completely')
                     console.log(result)
-                    // alert(`Welcome FLO_ID: ${ myFloID }`)
-                    //App functions....
                 }).catch(error => console.error(error))
             }
         </script>
