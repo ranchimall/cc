@@ -537,12 +537,17 @@ sm-copy {
   padding: 1.5rem 0;
 }
 #landing > section {
-  -webkit-box-align: start;
-      -ms-flex-align: start;
-          align-items: flex-start;
-  margin-top: 6rem;
-  height: 100%;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
   text-align: center;
+}
+#landing h1 {
+  margin-top: -2ch;
+  font-size: clamp(2rem,5vw,5rem);
+}
+#landing p {
+  max-width: 100%;
 }
 
 #sign_in,
@@ -1164,6 +1169,12 @@ sm-copy {
     display: none;
   }
 }
+@supports (-webkit-text-stroke: 1px black) {
+  #landing h1 {
+    -webkit-text-stroke: 1px rgba(var(--text-color), 1);
+    -webkit-text-fill-color: rgba(var(--background-color), 1);
+  }
+}
 @media screen and (min-width: 40rem) {
   sm-popup {
     --width: 24rem;
@@ -1200,6 +1211,10 @@ sm-copy {
 
   .hide-on-desktop {
     display: none;
+  }
+
+  #landing h1 {
+    -webkit-text-stroke-width: 0.1rem;
   }
 
   #main_header {
