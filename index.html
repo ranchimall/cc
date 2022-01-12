@@ -10,8 +10,8 @@
     <link rel="stylesheet" href="css/main.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap"
         rel="stylesheet">
     <script src="purify.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6" defer></script>
@@ -1493,8 +1493,9 @@
                             animateTo(getRef('article_name_wrapper'), slideInRight, animOptions)
                         }
                 }
-            } else if (e.target.classList.contains('heading')) {
-                floGlobals.appObjects[floGlobals.currentArticle.id].sections[e.target.dataset.index].title = e.target.value.trim()
+            } else if (e.target.closest('text-field')) {
+                const heading = e.target.closest('.heading');
+                floGlobals.appObjects[floGlobals.currentArticle.id].sections[heading.dataset.index].title = e.target.value.trim()
                 floCloudAPI.updateObjectData(floGlobals.currentArticle.id)
                     .then((res) => {
                         notify('Updated heading', 'success')
@@ -1693,20 +1694,27 @@
             if (floGlobals.isSubAdmin) {
                 const category = getRef('published_article_category').value
                 const tags = getRef('article_tags').value
-                console.log(category, tags)
-                return
                 getConfirmation('Request publishing?', {
                     message: 'Send this article as publishing candidate on RanchiMall TImes',
                     confirmText: 'Request'
                 })
                     .then(res => {
                         if (res) {
+                            const content = getCleanExportContent();
+                            const readTime = getReadingTime(createElement('div', { innerHTML: content }).textContent)
+                            let allContributors = new Set()
+                            selectedContent.forEach(({ contributors }) => {
+                                contributors.forEach(id => allContributors.add(id))
+                            });
                             floCloudAPI.sendGeneralData({
                                 articleID: pagesData.params.articleID,
                                 title: floGlobals.appObjects.cc.articleList[floGlobals.currentArticle.id].title,
-                                content: getCleanExportContent(),
+                                content,
+                                readTime,
                                 category,
                                 tags,
+                                contributors: [...allContributors]
+
                             }, 'publishing_requests', {
                                 application: 'Test_RM_Times',
                                 receiverID: 'FKAEdnPfjXLHSYwrXQu377ugN4tXU7VGdf'
@@ -2563,7 +2571,6 @@
         }
     </script>
     <script id="onLoadStartUp">
-        floGlobals.isSubAdmin = false
         let maxCardsPerSection
 
         function onLoadStartUp() {
@@ -12415,13 +12422,6 @@
                 grid-template-columns: minmax(0, 1fr);
                 margin-bottom: 1.5rem;
                 padding-top: 1.5rem
-            }
-
-            img {
-                -o-object-fit: cover;
-                object-fit: cover;
-                width: 100%;
-                height: 40vh
             }
 
             time,

@@ -4399,7 +4399,7 @@ customElements.define('tags-input', class extends HTMLElement {
         return ['placeholder', 'limit']
     }
     get value() {
-        return [...this.tags].join()
+        return [...this.tags]
     }
     get isValid() {
         return this.tags.size
