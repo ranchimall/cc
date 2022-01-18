@@ -758,6 +758,7 @@ sm-copy {
 .content-card--empty .content__area {
   min-height: calc(60vh + 3rem);
   height: 100%;
+  max-height: calc(60vh + 3rem);
 }
 .content-card .submit-entry {
   border-radius: 0.2rem;

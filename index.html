@@ -564,7 +564,7 @@
             </div>
             <div class="grid gap-0-5">
                 <h5>Add tags</h5>
-                <tags-input id="article_tags" limit="10" required></tags-input>
+                <tags-input id="article_tags" limit="10"></tags-input>
             </div>
             <sm-button variant="primary" onclick="publishArticle()">Request publishing</sm-button>
         </sm-form>
@@ -12814,7 +12814,7 @@
     <template id="voting_enabled">
         <footer class="grid gap-1-5">
             <h4>Loved the article? Don't forget leave a like.</h4>
-            <button id="upvote_button" class="button upvote" onclick="upvote(this)">
+            <button id="upvote_button" class="button upvote">
                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                     fill="#000000">
                     <path d="M0 0h24v24H0z" fill="none" />
@@ -13063,8 +13063,21 @@
                 })
                 return anime
             }
+            // Use when a function needs to be executed after user finishes changes
+            const debounce = (callback, wait) => {
+                let timeoutId = null;
+                return (...args) => {
+                    window.clearTimeout(timeoutId);
+                    timeoutId = window.setTimeout(() => {
+                        callback.apply(null, args);
+                    }, wait);
+                };
+            }
+
+            let tempVoteCount = 0
             getRef('upvote_button').addEventListener('mouseup', function () {
                 if (isLoggedIn) {
+                    tempVoteCount++;
                     const animOptions = {
                         fill: 'forwards',
                         duration: 300,
@@ -13087,13 +13100,13 @@
                     ], animOptions).onfinish = e => e.target.cancel()
                 }
             })
-            function animateLikeCount() {
+            function animateLikeCount(voteCount = 1) {
                 const animOptions = {
                     fill: 'forwards',
                     duration: 150,
                     ease: 'easing',
                 }
-                totalVotes++
+                totalVotes += voteCount
                 getRef('like_count').animate(slideOutUp, animOptions)
                     .onfinish = (e) => {
                         e.target.cancel()
@@ -13108,20 +13121,20 @@
                         tempCount.remove()
                     }
             }
-            function upvote(elem) {
+            getRef('upvote_button').addEventListener('click', debounce(() => {
                 if (isLoggedIn) {
-                    // animateLikeCount()
                     floCloudAPI.sendGeneralData({
-                        articleID: currentArticleID,
+                        voteCount: tempVoteCount,
                     }, `article_${currentArticleID}_votes`)
                         .then(res => {
-                            console.log('upvoted')
+                            tempVoteCount = 0
+                            console.log('up voted')
                         })
                         .catch(err => console.log(err))
                 } else {
                     showPopup('sign_in_popup')
                 }
-            }
+            }, 300))
             const slideInLeft = [
                 {
                     opacity: 0,
@@ -13248,26 +13261,29 @@
                 //floDapps.setAppObjectStores({sampleObs1:{}, sampleObs2:{options{autoIncrement:true, keyPath:'SampleKey'}, Indexes:{sampleIndex:{}}}})
                 let firstLoad = true
                 floDapps.setMidStartup(() => new Promise(async (resolve, reject) => {
-                    await floCloudAPI.requestObjectData('RMT')
+                    await floCloudAPI.requestObjectData('articles')
+                    totalVotes = floGlobals.appObjects.articles[currentArticleID].votes
                     await floCloudAPI.requestGeneralData(`article_${currentArticleID}_votes`, {
-                        callback: (d, e) => {
+                        lowerVectorClock: floGlobals.appObjects.articles[currentArticleID].lastCountedVC,
+                        callback: (allVotes, e) => {
                             if (firstLoad) {
-                                const allVotes = floGlobals.generalData[`article_${currentArticleID}_votes|${floGlobals.adminID}|${floGlobals.application}`]
-
+                                let first = true
                                 for (const vote in allVotes) {
-                                    const { message: { articleID } } = allVotes[vote]
-                                    if (allVotes[vote].message.articleID === currentArticleID) {
-                                        totalVotes++
+                                    if (first) {
+                                        first = false
+                                        continue
                                     }
+                                    totalVotes += allVotes[vote].message.voteCount || 1
                                 }
                                 getRef('like_count').textContent = getRelativeCount(totalVotes)
                             } else {
-                                animateLikeCount()
+                                for (const msg in allVotes) {
+                                    animateLikeCount(allVotes[msg].message.voteCount)
+                                }
                             }
                             firstLoad = false
                         }
                     })
-
                     resolve(true)
                 }))
                 floDapps.setCustomPrivKeyInput(() => new Promise((resolve, reject) => {

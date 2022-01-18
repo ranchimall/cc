@@ -4429,7 +4429,7 @@ customElements.define('tags-input', class extends HTMLElement {
             e.preventDefault()
         }
         if (e.target.value.trim() !== '') {
-            if (e.key === 'Enter' || e.key === ',' || e.key === '/' || e.code === 'Space') {
+            if (e.key === 'Enter' || e.key === ',' || e.key === '/') {
                 const tagValue = e.target.value.trim()
                 if (this.tags.has(tagValue)) {
                     this.tagsWrapper.querySelector(`[data-value="${tagValue}"]`).animate([
