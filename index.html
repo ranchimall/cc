@@ -616,7 +616,8 @@
                     </svg>
                     <div class="content__author flex align-center"></div>
                 </Button>
-                <sm-checkbox class="content__checkbox" aria-label="Select content"></sm-checkbox>
+                <sm-checkbox class="content__checkbox" aria-label="Select content"
+                    title="Select this snippet to download as HTML"></sm-checkbox>
             </div>
             <div class="content__area"></div>
             <div class="flex align-center space-between">
@@ -1341,7 +1342,7 @@
                                     if (noOfContributors === 2)
                                         break
                                 }
-                                if (noOfContributors < 2) {
+                                if (noOfContributors < 2 && !contributors.hasOwnProperty(myFloID)) {
                                     contentCard.querySelector('.content__author').textContent = `2 Contributors`
                                 }
                                 floGlobals.currentArticle.uniqueEntries[entry.origin].iterations.push(genDataVC)
@@ -1439,7 +1440,7 @@
                     easing: 'ease',
                 }
                 const selectedContentSize = selectedContent.size
-                getRef('selected_entries_no').textContent = `${selectedContentSize} selected`
+                getRef('selected_entries_no').textContent = `${selectedContentSize} selected for download`
                 if (selectedContentSize === 1 && !isContentSelected) {
                     getRef('article_name_wrapper').classList.remove('hide-completely')
                     getRef('selected_content_options').classList.add('hide-completely')
@@ -13063,24 +13064,24 @@
                     ], animOptions).onfinish = e => e.target.cancel()
                 }
             })
-            function animateLikeCount(voteCount = 1) {
+            function animateLikeCount(voteCount = 1, articleID) {
                 const animOptions = {
                     fill: 'forwards',
                     duration: 150,
                     ease: 'easing',
                 }
-                totalVotes += voteCount
+                floGlobals.appObjects.articles[articleID].votes += voteCount
                 getRef('like_count').animate(slideOutUp, animOptions)
                     .onfinish = (e) => {
                         e.target.cancel()
                     }
                 const tempCount = document.createElement('div')
                 tempCount.classList.add('temp-count')
-                tempCount.textContent = getRelativeCount(totalVotes)
+                tempCount.textContent = floGlobals.appObjects.articles[articleID].votes
                 getRef('like_count').after(tempCount)
                 tempCount.animate(slideInUp, animOptions)
                     .onfinish = () => {
-                        getRef('like_count').textContent = getRelativeCount(totalVotes)
+                        getRef('like_count').textContent = floGlobals.appObjects.articles[articleID].votes
                         tempCount.remove()
                     }
             }
@@ -13183,14 +13184,6 @@
                     animateTo(getRef('sign_up'), slideInLeft, animOptions)
                 }
             }
-            function getRelativeCount(count) {
-                if (count < 1000)
-                    return count
-                else if (count < 1000000)
-                    return parseFloat((count / 1000).toFixed(1)) + 'K'
-                else if (count < 1000000000)
-                    return parseFloat((count / 1000000).toFixed(1)) + 'M'
-            }
             function goToSignIn() {
                 const animOptions = {
                     fill: 'forwards',
@@ -13218,30 +13211,23 @@
         <script id="onLoadStartUp">
             floGlobals.isSubAdmin = false
             let isLoggedIn = false
-            let totalVotes = 0
             function onLoadStartUp() {
                 //floDapps.addStartUpFunction('Sample', Promised Function)
                 //floDapps.setAppObjectStores({sampleObs1:{}, sampleObs2:{options{autoIncrement:true, keyPath:'SampleKey'}, Indexes:{sampleIndex:{}}}})
                 let firstLoad = true
                 floDapps.setMidStartup(() => new Promise(async (resolve, reject) => {
                     await floCloudAPI.requestObjectData('articles')
-                    totalVotes = floGlobals.appObjects.articles[currentArticleID].votes
                     await floCloudAPI.requestGeneralData(`article_${currentArticleID}_votes`, {
-                        lowerVectorClock: floGlobals.appObjects.articles[currentArticleID].lastCountedVC,
+                        lowerVectorClock: floGlobals.appObjects.articles[currentArticleID].lastCountedVC + 1,
                         callback: (allVotes, e) => {
                             if (firstLoad) {
-                                let first = true
                                 for (const vote in allVotes) {
-                                    if (first) {
-                                        first = false
-                                        continue
-                                    }
-                                    totalVotes += allVotes[vote].message.voteCount || 1
+                                    floGlobals.appObjects.articles[currentArticleID].votes += allVotes[vote].message.voteCount || 1
                                 }
-                                getRef('like_count').textContent = getRelativeCount(totalVotes)
+                                getRef('like_count').textContent = floGlobals.appObjects.articles[currentArticleID].votes
                             } else {
                                 for (const msg in allVotes) {
-                                    animateLikeCount(allVotes[msg].message.voteCount)
+                                    animateLikeCount(allVotes[msg].message.voteCount, currentArticleID)
                                 }
                             }
                             firstLoad = false
