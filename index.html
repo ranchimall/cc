@@ -167,7 +167,7 @@
                             d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z" />
                     </svg>
                 </button>
-                <text-field id="current_article_title"></text-field>
+                <h4 id="current_article_title"></h4>
                 <button id="article_outline_button" class="icon-only" title="View article outline"
                     onclick="toggleOutlinePanel()">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px"
@@ -204,7 +204,7 @@
                                 d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z">
                             </path>
                         </svg>
-                        Edit sections
+                        Edit title & sections
                     </menu-option>
                     <menu-option onclick="setDefaultArticle()">
                         <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg"
@@ -473,36 +473,44 @@
                         d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
                 </svg>
             </button>
-            <h3>Edit sections</h3>
+            <h3>Edit title & sections</h3>
         </header>
-        <h5 class="label">Existing sections</h5>
-        <div id="section_list_container" class="observe-empty-state"></div>
-        <p class="empty-state">
-            There are no sections so far, you can add section with button below.
-        </p>
-        <div class="flex space-between align-center">
-            <sm-button id="insert_section_button" onclick="insertEmptySection()">
-                <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg"
-                    enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
-                    <g>
-                        <rect fill="none" height="24" width="24" />
-                    </g>
-                    <g>
-                        <g />
+        <section class="grid gap-1-5">
+            <div class="grid gap-0-5">
+                <h5 class="label">Title</h5>
+                <sm-input id="edit_article_title"></sm-input>
+            </div>
+            <div class="grid gap-0-5">
+                <h5 class="label">Sections</h5>
+                <div id="section_list_container" class="observe-empty-state grid"></div>
+                <p class="empty-state">
+                    There are no sections so far, you can add section with button below.
+                </p>
+            </div>
+            <div class="flex space-between align-center">
+                <sm-button id="insert_section_button" onclick="insertEmptySection()">
+                    <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg"
+                        enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
                         <g>
-                            <path
-                                d="M17,19.22H5V7h7V5H5C3.9,5,3,5.9,3,7v12c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2v-7h-2V19.22z" />
-                            <path d="M19,2h-2v3h-3c0.01,0.01,0,2,0,2h3v2.99c0.01,0.01,2,0,2,0V7h3V5h-3V2z" />
-                            <rect height="2" width="8" x="7" y="9" />
-                            <polygon points="7,12 7,14 15,14 15,12 12,12" />
-                            <rect height="2" width="8" x="7" y="15" />
+                            <rect fill="none" height="24" width="24" />
                         </g>
-                    </g>
-                </svg>
-                Insert section
-            </sm-button>
-            <sm-button variant="primary" onclick="saveSectionEdit()">Save</sm-button>
-        </div>
+                        <g>
+                            <g />
+                            <g>
+                                <path
+                                    d="M17,19.22H5V7h7V5H5C3.9,5,3,5.9,3,7v12c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2v-7h-2V19.22z" />
+                                <path d="M19,2h-2v3h-3c0.01,0.01,0,2,0,2h3v2.99c0.01,0.01,2,0,2,0V7h3V5h-3V2z" />
+                                <rect height="2" width="8" x="7" y="9" />
+                                <polygon points="7,12 7,14 15,14 15,12 12,12" />
+                                <rect height="2" width="8" x="7" y="15" />
+                            </g>
+                        </g>
+                    </svg>
+                    Insert section
+                </sm-button>
+                <sm-button variant="primary" onclick="saveSectionEdit()">Save</sm-button>
+            </div>
+        </section>
     </sm-popup>
     <sm-popup id="contributors_popup">
         <header slot="header" class="popup__header">
@@ -594,7 +602,7 @@
     </template>
     <template id="section_template">
         <div class="heading flex align-center">
-            <text-field></text-field>
+            <h4 class="section-title"></h4>
         </div>
         <section class="article-section">
             <div class="content-card content-card--empty">
@@ -1343,7 +1351,7 @@
                                         break
                                 }
                                 if (noOfContributors < 2 && !contributors.hasOwnProperty(myFloID)) {
-                                    contentCard.querySelector('.content__author').textContent = `2 Contributors`
+                                    contentCard.querySelector('.content__author').textContent = `${myFloID} and 1 more`
                                 }
                                 floGlobals.currentArticle.uniqueEntries[entry.origin].iterations.push(genDataVC)
                             }
@@ -1462,14 +1470,6 @@
                             animateTo(getRef('article_name_wrapper'), slideInRight, animOptions)
                         }
                 }
-            } else if (e.target.closest('text-field')) {
-                const heading = e.target.closest('.heading');
-                floGlobals.appObjects[floGlobals.currentArticle.id].sections[heading.dataset.index].title = e.target.value.trim()
-                floCloudAPI.updateObjectData(floGlobals.currentArticle.id)
-                    .then((res) => {
-                        notify('Updated heading', 'success')
-                    })
-                    .catch(err => console.error(err))
             }
         })
 
@@ -1724,14 +1724,6 @@
                 currentElement.remove()
             }
         })
-        getRef('current_article_title').addEventListener("change", e => {
-            floGlobals.appObjects.cc.articleList[floGlobals.currentArticle.id].title = e.target.value.trim()
-            floCloudAPI.updateObjectData('cc')
-                .then((res) => {
-                    notify('Renamed article', 'success')
-                })
-                .catch(err => console.error(err))
-        })
         getRef('article_wrapper').addEventListener("focusin", e => {
             if (e.target.closest('.content__area')) {
                 const target = e.target.closest('.content__area')
@@ -1872,24 +1864,10 @@
                     frag.append(render.section(sectionID, sections[sectionID], index))
                     index += 1
                 }
-                if (!floGlobals.isSubAdmin) {
-                    getRef('current_article_title').setAttribute('disabled', '')
-                }
-                getRef('current_article_title').value = title
+                getRef('current_article_title').textContent = title
                 getRef('article_wrapper').innerHTML = ''
                 getRef('article_wrapper').append(frag)
-
-                getRef('article_outline').innerHTML = ''
-                floGlobals.appObjects[floGlobals.currentArticle.id].sections.forEach(section => {
-                    frag.append(createElement('button', {
-                        attributes: { 'data-section-id': section.id },
-                        className: 'outline-button',
-                        textContent: section.title,
-                    }))
-                })
-                getRef('article_outline').append(frag)
-
-
+                render.sectionOutline()
             },
             articleLink(details, isDefaultArticle) {
                 const { uid, timestamp, title } = details
@@ -1964,18 +1942,15 @@
                 }
                 return clone
             },
-            section(sectionID, { title, uniqueEntries }, index) {
+            section(sectionID, { title, uniqueEntries }) {
                 const section = getRef('section_template').content.cloneNode(true)
                 const frag = document.createDocumentFragment()
-                section.children[0].dataset.index = index
                 section.children[0].dataset.sectionId = sectionID
                 section.children[1].dataset.sectionId = sectionID
                 if (floGlobals.isSubAdmin) {
                     section.querySelector('.content-card--empty').remove()
-                } else {
-                    section.querySelector('text-field').setAttribute('disabled', '')
                 }
-                section.querySelector('text-field').setAttribute('value', title)
+                section.querySelector('.section-title').textContent = title
                 floGlobals.currentArticle.sections[sectionID].uniqueEntries.slice(0, maxCardsPerSection).forEach(entry => {
                     const contentCard = render.contentCard(entry)
                     if (contentCard)
@@ -1994,14 +1969,27 @@
                 return section
             },
             sectionCard(details) {
-                const { title } = details
+                const { title, id } = details
                 return createElement('div', {
                     className: 'section-card flex align-center',
+                    attributes: { 'data-section-id': id },
                     innerHTML: `
                         <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><path d="M9,18h12v-2H9V18z M3,6v2h18V6H3z M9,13h12v-2H9V13z"/></g></svg>
-                        ${title}
+                        <input placeholder="Section title" value="${title}"/>
                     `
                 })
+            },
+            sectionOutline() {
+                const frag = document.createDocumentFragment()
+                getRef('article_outline').innerHTML = ''
+                floGlobals.appObjects[floGlobals.currentArticle.id].sections.forEach(section => {
+                    frag.append(createElement('button', {
+                        attributes: { 'data-section-id': section.id },
+                        className: 'outline-button',
+                        textContent: section.title,
+                    }))
+                })
+                getRef('article_outline').append(frag)
             }
         }
 
@@ -2174,6 +2162,7 @@
         getRef('sort_content_list').addEventListener('change', sortSectionEntries)
         function renderSectionList() {
             if (!floGlobals.isSubAdmin) return
+            getRef('edit_article_title').value = floGlobals.appObjects.cc.articleList[floGlobals.currentArticle.id].title
             const frag = document.createDocumentFragment()
             floGlobals.appObjects[floGlobals.currentArticle.id].sections.forEach(section => {
                 frag.append(render.sectionCard(section))
@@ -2183,7 +2172,7 @@
         }
         function insertEmptySection() {
             const emptySection = createElement('div', {
-                className: 'section-card section-card--new flex align-center',
+                className: 'section-card flex align-center',
                 innerHTML: `
                         <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><path d="M9,18h12v-2H9V18z M3,6v2h18V6H3z M9,13h12v-2H9V13z"/></g></svg>
                         <input placeholder="New section title"/>
@@ -2206,29 +2195,58 @@
 
         function saveSectionEdit() {
             if (floGlobals.isSubAdmin) {
-                const newSections = []
-                getRef('section_list_container').querySelectorAll('.section-card--new').forEach(section => {
+                const newArticleTitle = getRef('edit_article_title').value.trim()
+                if (newArticleTitle !== '') {
+                    if (floGlobals.appObjects.cc.articleList[floGlobals.currentArticle.id].title !== newArticleTitle) {
+                        floGlobals.appObjects.cc.articleList[floGlobals.currentArticle.id].title = newArticleTitle
+                        floCloudAPI.updateObjectData('cc')
+                            .then((res) => {
+                                getRef('current_article_title').textContent = newArticleTitle
+                                notify('Renamed article', 'success')
+                            }).catch(err => {
+                                notify(err, 'error')
+                            })
+
+                    }
+                } else {
+                    getRef('edit_article_title').value = floGlobals.appObjects.cc.articleList[floGlobals.currentArticle.id].title
+                }
+                const changedSections = [];
+                [...getRef('section_list_container').children].forEach(section => {
                     const title = section.querySelector('input').value.trim()
+                    const sectionID = section.dataset.sectionId
                     if (title !== '')
-                        newSections.push({
-                            id: floCrypto.randString(16, true),
+                        changedSections.push({
+                            id: sectionID || floCrypto.randString(16, true),
                             title
                         })
                 })
-                if (newSections.length) {
-                    newSections.forEach(elem => {
-                        floGlobals.appObjects[floGlobals.currentArticle.id].sections.push(elem)
-                    })
+                const didAddSection = changedSections.length > floGlobals.appObjects[floGlobals.currentArticle.id].sections.length
+                let didTitlesChange = false
+                if (!didAddSection) {
+                    didTitlesChange = floGlobals.appObjects[floGlobals.currentArticle.id].sections.some(({ title }, index) => title !== changedSections[index].title)
+                }
+                if (didAddSection || didTitlesChange) {
+                    floGlobals.appObjects[floGlobals.currentArticle.id].sections = changedSections
                     floCloudAPI.updateObjectData(floGlobals.currentArticle.id)
                         .then((res) => {
-                            const frag = document.createDocumentFragment()
-                            const currentSectionCount = getRef('section_list_container').querySelectorAll('.section-card:not(.section-card--new)').length
-                            let index = currentSectionCount
-                            newSections.forEach(elem => {
+                            render.sectionOutline()
+                            const frag = document.createDocumentFragment();
+                            const currentSections = {}
+                            getRef('article_wrapper').querySelectorAll('.heading').forEach(heading => {
+                                currentSections[heading.dataset.sectionId] = {
+                                    title: heading.textContent,
+                                    ref: heading
+                                }
+                            })
+                            changedSections.forEach(elem => {
                                 const { title, id } = elem
-                                floGlobals.currentArticle.sections[id] = { title, uniqueEntries: [] }
-                                frag.append(render.section(id, floGlobals.currentArticle.sections[id], index))
-                                index += 1
+                                if (currentSections.hasOwnProperty(id)) {
+                                    currentSections[id].ref.textContent = title
+                                } else {
+                                    floGlobals.currentArticle.sections[id] = { title, uniqueEntries: [] }
+                                    frag.append(render.section(id, floGlobals.currentArticle.sections[id]))
+                                }
                             })
                             getRef('article_wrapper').append(frag)
                             notify('Sections updated', 'success')
