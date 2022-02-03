@@ -1097,6 +1097,12 @@ sm-copy {
     right: auto;
     bottom: auto;
   }
+  #create_article_popup {
+    --width: 28rem;
+  }
+  #user_popup {
+    --width: 25rem;
+  }
 }
 @media (any-hover: hover) {
   ::-webkit-scrollbar {

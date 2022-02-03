@@ -3882,7 +3882,6 @@ smTextarea.innerHTML = `
     --border-radius: 0.3rem;
     --background: rgba(var(--text-color), 0.06);
     --padding: initial;
-    --max-height: 8rem;
 }
 :host([variant="outlined"]) .textarea {
     box-shadow: 0 0 0 0.1rem rgba(var(--text-color), 0.4) inset;
@@ -3897,7 +3896,7 @@ smTextarea.innerHTML = `
     overflow: hidden auto;
     grid-template-columns: 1fr;
     align-items: stretch;
-    max-height: var(--max-height);
+    max-height: var(--max-height, auto);
     background: var(--background);
     border-radius: var(--border-radius);
     padding: var(--padding);
@@ -3909,6 +3908,7 @@ textarea{
     min-width: 1em;
     font: inherit;
     color: inherit;
+    font-size: inherit;
     resize: none;
     grid-area: 2/1;
     justify-self: stretch;

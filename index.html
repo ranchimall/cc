@@ -443,10 +443,13 @@
             </sm-checkbox>
             <div class="grid gap-1">
                 <div class="grid gap-0-5">
-                    <h4>Define sections (optional)</h4>
-                    <p>Create and name sections by writing title of each section separated by a comma (,)</p>
+                    <h4>Define plot (optional)</h4>
+                    <p>Create and name sections by writing section title encapsulated in '()' and each separated by a
+                        '->'.
+                    </p>
                 </div>
-                <sm-textarea id="get_section_titles" rows="4" placeholder="section title 1, section title 2, ...">
+                <sm-textarea id="get_section_titles" rows="8"
+                    placeholder="(Name, place, time, context) -> (Name, place, time, context) ...">
                 </sm-textarea>
             </div>
             <!-- <div class="grid gap-1">
@@ -732,23 +735,6 @@
                     callback.apply(null, args);
                 }, wait);
             };
-        }
-
-        // Limits the rate of function execution
-        function throttle(func, delay) {
-            // If setTimeout is already scheduled, no need to do anything
-            if (timerId) {
-                return;
-            }
-
-            // Schedule a setTimeout after delay seconds
-            timerId = setTimeout(function () {
-                func();
-
-                // Once setTimeout function execution is finished, timerId = undefined so that in
-                // the next scroll event function execution can be scheduled by the setTimeout
-                timerId = undefined;
-            }, delay);
         }
 
         let zIndex = 10
@@ -1189,10 +1175,10 @@
                 if (floGlobals.isSubAdmin) {
                     const title = getRef('get_article_title').value.trim()
                     const setDefault = getRef('set_default_checkbox').checked
-                    const sectionTitles = getRef('get_section_titles').value.trim()
+                    const sectionTitles = parsePlot(getRef('get_section_titles').value.trim())
                     let sections = []
-                    if (sectionTitles !== '') {
-                        sections = sectionTitles.split(',').map(title => {
+                    if (sectionTitles) {
+                        sections = sectionTitles.map(title => {
                             return {
                                 id: floCrypto.randString(16, true),
                                 title: title.trim(),
@@ -1226,6 +1212,36 @@
                     notify('This action requires sub-admin privileges', 'error')
                 }
             }
+        }
+
+        function parsePlot(plottext) {
+            let tstring = plottext.trim().replace(/\s+/g, " ") // collapse all whitespace to single whitespace
+            tstring = tstring.replace(/\)\s*\->\s*\(/g, ")->(");
+
+            tstring = tstring.split(")->("); // split string based on the delimiter
+
+            if (tstring.length > 0) {
+                if (tstring[0].trim()[0] == "(") {
+                    tstring[0] = tstring[0].trim().slice(1)
+                }
+                else {
+                    return false;
+                }
+
+                let lastobj = tstring[tstring.length - 1];
+                let lastobjlen = lastobj.length;
+
+                if (lastobj.trim()[lastobjlen - 1] == ")") {
+                    tstring[tstring.length - 1] = lastobj.trim().slice(0, lastobjlen - 1)
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                return false;
+            }
+            return tstring;
         }
 
         function setDefaultArticle() {
@@ -1585,21 +1601,22 @@
             bodyTemplate.querySelector('#reading_time').textContent = `${readingTime} min read`
             let bodyAttributes = ''
             let extraScripts = ''
-            if (floGlobals.isSubAdmin) {
-                bodyAttributes = `data-article-id="${floGlobals.currentArticle.id}" onload="onLoadStartUp()"`
-                // copy script already present in this file instead of storing a duplicate
-                extraScripts = `
-                    ${getRef('voting_enabled').innerHTML}
-                    <script>
-                        ${getRef('init_lib').innerHTML}
-                        ${getRef('floCrypto').innerHTML}
-                        ${getRef('floBlockchainAPI').innerHTML}
-                        ${getRef('compactIDB').innerHTML}
-                        ${getRef('floCloudAPI').innerHTML}
-                        ${getRef('floDapps').innerHTML}
-                     <\/script>
-                    `
-            } else {
+            // if (floGlobals.isSubAdmin) {
+            //     bodyAttributes = `data-article-id="${floGlobals.currentArticle.id}" onload="onLoadStartUp()"`
+            //     // copy script already present in this file instead of storing a duplicate
+            //     extraScripts = `
+            //         ${getRef('voting_enabled').innerHTML}
+            //         <script>
+            //             ${getRef('init_lib').innerHTML}
+            //             ${getRef('floCrypto').innerHTML}
+            //             ${getRef('floBlockchainAPI').innerHTML}
+            //             ${getRef('compactIDB').innerHTML}
+            //             ${getRef('floCloudAPI').innerHTML}
+            //             ${getRef('floDapps').innerHTML}
+            //          <\/script>
+            //         `
+            // }
+            if (!isSubAdmin) {
                 bodyTemplate.querySelector('header button').remove()
             }
             const bodyHTML = createElement('div')
@@ -1680,8 +1697,8 @@
                                 readTime,
                                 contributors: [...allContributors],
                             }, 'publishing_requests', {
-                                application: 'Test_RM_Times',
-                                receiverID: 'FKAEdnPfjXLHSYwrXQu377ugN4tXU7VGdf'
+                                application: 'RM_Times',
+                                receiverID: 'FF5pewfsJxyrCvg8a2C8VXefeyVvKvQxmF'
                             })
                                 .then(res => {
                                     console.log(res)
@@ -12910,7 +12927,7 @@
                     FLO: ['https://livenet.flocha.in/', 'https://flosight.duckdns.org/'],
                     FLO_TEST: ['https://testnet-flosight.duckdns.org/', 'https://testnet.flocha.in/']
                 },
-                adminID: "FKAEdnPfjXLHSYwrXQu377ugN4tXU7VGdf",
+                adminID: "FF5pewfsJxyrCvg8a2C8VXefeyVvKvQxmF",
                 sendAmt: 0.001,
                 fee: 0.0005,
 
@@ -12920,7 +12937,7 @@
 
                 //for cloud apps
                 subAdmins: [],
-                application: "Test_RM_Times",
+                application: "RM_Times",
                 appObjects: {},
                 generalData: {},
                 lastVC: {}
@@ -13088,18 +13105,18 @@
                     duration: 150,
                     ease: 'easing',
                 }
-                floGlobals.appObjects.articles[articleID].votes += voteCount
+                floGlobals.appObjects.rmTimes.articles[articleID].votes += voteCount
                 getRef('like_count').animate(slideOutUp, animOptions)
                     .onfinish = (e) => {
                         e.target.cancel()
                     }
                 const tempCount = document.createElement('div')
                 tempCount.classList.add('temp-count')
-                tempCount.textContent = floGlobals.appObjects.articles[articleID].votes
+                tempCount.textContent = floGlobals.appObjects.rmTimes.articles[articleID].votes
                 getRef('like_count').after(tempCount)
                 tempCount.animate(slideInUp, animOptions)
                     .onfinish = () => {
-                        getRef('like_count').textContent = floGlobals.appObjects.articles[articleID].votes
+                        getRef('like_count').textContent = floGlobals.appObjects.rmTimes.articles[articleID].votes
                         tempCount.remove()
                     }
             }
@@ -13234,15 +13251,15 @@
                 //floDapps.setAppObjectStores({sampleObs1:{}, sampleObs2:{options{autoIncrement:true, keyPath:'SampleKey'}, Indexes:{sampleIndex:{}}}})
                 let firstLoad = true
                 floDapps.setMidStartup(() => new Promise(async (resolve, reject) => {
-                    await floCloudAPI.requestObjectData('articles')
+                    await floCloudAPI.requestObjectData('rmTimes')
                     await floCloudAPI.requestGeneralData(`article_${currentArticleID}_votes`, {
-                        lowerVectorClock: floGlobals.appObjects.articles[currentArticleID].lastCountedVC + 1,
+                        lowerVectorClock: floGlobals.appObjects.rmTimes.articles[currentArticleID].lastCountedVC + 1,
                         callback: (allVotes, e) => {
                             if (firstLoad) {
                                 for (const vote in allVotes) {
-                                    floGlobals.appObjects.articles[currentArticleID].votes += allVotes[vote].message.voteCount || 1
+                                    floGlobals.appObjects.rmTimes.articles[currentArticleID].votes += allVotes[vote].message.voteCount || 1
                                 }
-                                getRef('like_count').textContent = floGlobals.appObjects.articles[currentArticleID].votes
+                                getRef('like_count').textContent = floGlobals.appObjects.rmTimes.articles[currentArticleID].votes
                             } else {
                                 for (const msg in allVotes) {
                                     animateLikeCount(allVotes[msg].message.voteCount, currentArticleID)
