@@ -1616,7 +1616,7 @@
             //          <\/script>
             //         `
             // }
-            if (!isSubAdmin) {
+            if (!floGlobals.isSubAdmin) {
                 bodyTemplate.querySelector('header button').remove()
             }
             const bodyHTML = createElement('div')
@@ -1799,11 +1799,11 @@
         }
         function updateScore() {
             const newScore = parseFloat(getRef('update_score_field').value)
+            scores[floGlobals.versionHistory.currentEntry] = newScore
+            document.querySelectorAll(`[data-vector-clock="${floGlobals.versionHistory.currentEntry}"] .content__score`).forEach(scoreElem => scoreElem.textContent = newScore)
             const mark = {
                 [floGlobals.versionHistory.currentEntry]: newScore
             }
-            scores[floGlobals.versionHistory.currentEntry] = newScore
-            document.querySelectorAll(`[data-vector-clock="${floGlobals.versionHistory.currentEntry}"] .content__score`).forEach(scoreElem => scoreElem.textContent = newScore)
             floCloudAPI.markApplicationData(mark).then(res => {
                 notify('Score updated', 'success')
                 hidePopup()
