@@ -880,7 +880,7 @@
             document.body.classList.remove('hide-completely')
             document.querySelectorAll('sm-input[data-private-key]').forEach(input => input.customValidation = floCrypto.getPubKeyHex)
             document.addEventListener('keyup', (e) => {
-                if (e.code === 'Escape') {
+                if (e.key === 'Escape') {
                     hidePopup()
                 }
             })
@@ -1302,6 +1302,7 @@
                 } else {
                     previousHash = ''
                 }
+                console.log(previousVersion, clean)
                 if (previousHash !== hash) {
                     const timestamp = Date.now()
                     const entry = {
@@ -1320,7 +1321,6 @@
                                 floGlobals.generalData[`${floGlobals.currentArticle.id}_gd|${floGlobals.adminID}|${floGlobals.application}`][genDataVC] = res[genDataVC]
                             }
 
-                            console.log(genDataVC)
                             submitButton.classList.add('hide-completely')
                             notify('sent data', 'success')
                             if (isUniqueEntry) {
@@ -2429,7 +2429,7 @@
                     }
                 })
             }
-        }, 100)
+        }, 300)
 
         function saveSelection() {
             if (window.getSelection) {
@@ -12737,7 +12737,7 @@
                     this.fireEvent();
                 }
                 handleKeyDown(e) {
-                    if (e.code === 'Space') {
+                    if (e.key === ' ') {
                         this.toggleState();
                     }
                 }
@@ -13046,7 +13046,7 @@
                 document.body.classList.remove('hide-completely')
                 document.querySelectorAll('sm-input[data-private-key]').forEach(input => input.customValidation = floCrypto.getPubKeyHex)
                 document.addEventListener('keyup', (e) => {
-                    if (e.code === 'Escape') {
+                    if (e.key === 'Escape') {
                         hidePopup()
                     }
                 })
@@ -13423,7 +13423,7 @@
                     }
 
                     handleKeyDown(e) {
-                        if (!this.hasAttribute('disabled') && (e.key === 'Enter' || e.code === 'Space')) {
+                        if (!this.hasAttribute('disabled') && (e.key === 'Enter' || e.key === ' ')) {
                             e.preventDefault();
                             this.click();
                         }
@@ -14332,7 +14332,7 @@
 
 
                 detectFocus(e) {
-                    if (e.code === 'Tab') {
+                    if (e.key === 'Tab') {
                         const lastElement = this.focusable[this.focusable.length - 1];
                         const firstElement = this.focusable[0];
                         if (e.shiftKey && document.activeElement === firstElement) {
