@@ -85,6 +85,7 @@ button,
   align-items: center;
   font-size: 0.9rem;
   font-weight: 500;
+  overflow: hidden;
 }
 .button {
   white-space: nowrap;
@@ -284,10 +285,23 @@ ul {
   width: 100%;
 }
 
+.ripple {
+  height: 8rem;
+  width: 8rem;
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  background: radial-gradient(
+    circle,
+    rgba(var(--text-color), 0.3) 0%,
+    rgba(0, 0, 0, 0) 50%
+  );
+  pointer-events: none;
+}
 .interact {
   position: relative;
+  overflow: hidden;
   cursor: pointer;
-  transition: transform 0.3s;
   -webkit-tap-highlight-color: transparent;
 }
 .empty-state {
@@ -354,13 +368,6 @@ ul {
 }
 #prompt_message {
   margin-bottom: 1.5rem;
-}
-
-button:active,
-.button:active,
-sm-button:not([disabled]):active,
-.interact:active {
-  transform: scale(0.96);
 }
 
 .popup__header {
@@ -597,10 +604,6 @@ sm-copy {
 #article_list_popup {
   --width: min(64rem, 100%);
   --min-height: 70vh;
-  &::part(popup-header),
-  &::part(popup-body) {
-    padding: 0.5rem;
-  }
   .popup__header {
     padding: 1rem;
     gap: 1rem;
@@ -623,14 +626,16 @@ sm-copy {
   }
 }
 .default-article {
-  &::after {
+  &::before {
     content: "";
     font-size: 0.7rem;
     background-color: var(--accent-color);
-    padding: 0.3rem;
+    height: 2em;
+    width: 0.3em;
     border-radius: 0.5rem;
     font-weight: 500;
-    margin: auto 0 auto auto;
+    margin-right: 0.5rem;
+    align-self: center;
     color: var(--foreground-color);
   }
 }
@@ -885,6 +890,7 @@ sm-copy {
   line-height: 1.7;
   color: rgba(var(--text-color), 0.8);
   overflow-wrap: break-word;
+  white-space: pre-line;
   .added > *,
   .removed > * {
     background-color: transparent;
@@ -1119,10 +1125,16 @@ sm-copy {
     }
   }
   .interact,
-  button {
-    transition: background-color 0.3s, transform 0.3s;
+  button:not(.button--primary) {
+    transition: background-color 0.3s;
     &:hover {
-      background-color: rgba(var(--text-color), 0.1);
+      background-color: rgba(var(--text-color), 0.06);
+    }
+  }
+  .button--primary {
+    transition: filter 0.3s;
+    &:hover {
+      filter: brightness(120%);
     }
   }
   .content-card {
