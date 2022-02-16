@@ -64,7 +64,7 @@ strong {
 a {
   color: var(--accent-color);
   text-decoration: none;
-
+  overflow: hidden;
   &:focus-visible {
     box-shadow: 0 0 0 0.1rem rgba(var(--text-color), 1) inset;
   }
@@ -121,6 +121,7 @@ tags-input {
 sm-button {
   --padding: 0.5rem 0.8rem;
   transition: transform 0.3s;
+  overflow: hidden;
   &[variant="primary"] {
     .icon {
       fill: rgba(var(--background-color), 1);
