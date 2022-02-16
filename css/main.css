@@ -1000,7 +1000,8 @@ sm-copy {
   font-family: "noto serif", serif;
   font-size: 1rem;
 }
-#preview_page p > * {
+#preview_page p * {
+  font-size: inherit;
   font-family: inherit;
 }
 

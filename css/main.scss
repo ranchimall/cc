@@ -946,7 +946,8 @@ sm-copy {
   p {
     font-family: "noto serif", serif;
     font-size: 1rem;
-    & > * {
+    & * {
+      font-size: inherit;
       font-family: inherit;
     }
   }
