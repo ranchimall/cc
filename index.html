@@ -2473,7 +2473,11 @@
                 (startA || endA).setAttribute('href', url)
             } else {
                 replaceSelectedText(createElement('a', {
-                    attributes: { href: url }
+                    attributes: {
+                        href: url,
+                        target: "_blank",
+                        rel: "noopener noreferrer"
+                    }
                 }))
             }
         }
