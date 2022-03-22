@@ -787,8 +787,10 @@ sm-copy {
   margin-left: 0.2rem;
   line-height: 100%;
 }
-.filled-star {
-  fill: var(--yellow);
+.score-button--filled {
+  .icon {
+    fill: var(--yellow);
+  }
 }
 
 .actionable-button {

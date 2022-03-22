@@ -1544,6 +1544,7 @@
             const newScore = parseFloat(getRef('update_score_field').value)
             updateGenData(floGlobals.versionHistory.currentEntry, { score: newScore })
             document.querySelectorAll(`[data-vector-clock="${floGlobals.versionHistory.currentEntry}"] .content__score`).forEach(scoreElem => scoreElem.textContent = newScore)
+            document.querySelectorAll(`[data-vector-clock="${floGlobals.versionHistory.currentEntry}"] .content__score`).forEach(scoreElem => newScore > 0 ? scoreElem.parentNode.classList.add('score-button--filled') : scoreElem.parentNode.classList.remove('score-button--filled'))
             floCloudAPI.tagApplicationData(floGlobals.versionHistory.currentEntry, newScore).then(res => {
                 notify('Score updated', 'success')
                 hidePopup()
@@ -1600,13 +1601,13 @@
                     attributes: { 'title': 'Score' }
                 })
             }
+            if (score > 0) {
+                scoreElement.classList.add('score-button--filled')
+            }
             scoreElement.innerHTML = `
-                    ${score ?
-                    `<svg class="icon filled-star" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><path d="M0,0h24v24H0V0z" fill="none"/><path d="M0,0h24v24H0V0z" fill="none"/></g><g><path d="M12,17.27L18.18,21l-1.64-7.03L22,9.24l-7.19-0.61L12,2L9.19,8.63L2,9.24l5.46,4.73L5.82,21L12,17.27z"/></g></svg> ` :
-                    `<svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0V0z" fill="none" /> <path d="M12 7.13l.97 2.29.47 1.11 1.2.1 2.47.21-1.88 1.63-.91.79.27 1.18.56 2.41-2.12-1.28-1.03-.64-1.03.62-2.12 1.28.56-2.41.27-1.18-.91-.79-1.88-1.63 2.47-.21 1.2-.1.47-1.11.97-2.27M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2z" /> </svg>`
-                }
-                    <div class="content__score">${score}</div>
-                `
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><path d="M0,0h24v24H0V0z" fill="none"/><path d="M0,0h24v24H0V0z" fill="none"/></g><g><g><polygon opacity=".3" points="12,15.4 8.24,17.67 9.24,13.39 5.92,10.51 10.3,10.13 12,6.1 13.71,10.14 18.09,10.52 14.77,13.4 15.77,17.68"/><path d="M22,9.24l-7.19-0.62L12,2L9.19,8.63L2,9.24l5.46,4.73L5.82,21L12,17.27L18.18,21l-1.63-7.03L22,9.24z M12,15.4l-3.76,2.27 l1-4.28l-3.32-2.88l4.38-0.38L12,6.1l1.71,4.04l4.38,0.38l-3.32,2.88l1,4.28L12,15.4z"/></g></g></svg>
+                <div class="content__score">${score}</div>
+            `
             return scoreElement
         }
         const render = {
@@ -1765,14 +1766,16 @@
         }
 
         function getGenData(vectorClock) {
-            const { message: { section, origin, html, hash }, senderID, time, tag } = floGlobals.generalData[`${floGlobals.currentArticle.id}_gd|${floGlobals.adminID}|${floGlobals.application}`][vectorClock]
-            // convert html to innerText
-            const tempDiv = createElement('div', {
-                innerHTML: html
-            })
-            console.log(tempDiv.innerText)
+            const { message: { section, origin, plainText, html, hash }, senderID, time, tag } = floGlobals.generalData[`${floGlobals.currentArticle.id}_gd|${floGlobals.adminID}|${floGlobals.application}`][vectorClock]
+            let tempDiv
+            if (!plainText) {
+                // convert html to innerText
+                tempDiv = createElement('div', {
+                    innerHTML: html
+                })
+            }
             return {
-                plainText: tempDiv.innerText,
+                plainText: plainText ? plainText : tempDiv.innerText,
                 html,
                 editor: senderID,
                 hash,
@@ -1832,6 +1835,7 @@
                     const entry = {
                         section: sectionID,
                         origin: isUniqueEntry ? floCrypto.randString(16, true) : uid,
+                        plainText,
                         html: cleanHTML,
                         hash
                     }
@@ -1889,6 +1893,8 @@
                                 if (noOfContributors < 2 && !contributors.hasOwnProperty(myFloID)) {
                                     contentCard.querySelector('.content__author').textContent = `${myFloID} and 1 more`
                                 }
+                                contentCard.querySelector('.content__score').textContent = 0
+                                contentCard.querySelector('.content__score').parentNode.classList.remove('score-button--filled')
                                 floGlobals.currentArticle.uniqueEntries[entry.origin].iterations.push(res.vectorClock)
                             }
                         })

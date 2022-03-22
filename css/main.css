@@ -830,7 +830,7 @@ sm-copy {
   line-height: 100%;
 }
 
-.filled-star {
+.score-button--filled .icon {
   fill: var(--yellow);
 }
 
