@@ -2,7 +2,7 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: "Inter", sans-serif;
+  font-family: "Roboto", sans-serif;
 }
 
 :root {
@@ -123,6 +123,7 @@ sm-button {
   transition: transform 0.3s;
   overflow: hidden;
   &[variant="primary"] {
+    --padding: 0.8rem;
     .icon {
       fill: rgba(var(--background-color), 1);
     }
@@ -389,15 +390,11 @@ ul {
   align-items: center;
   width: 100%;
   grid-template-columns: auto 1fr;
-  gap: 0 0.5rem;
-  margin-right: 1rem;
-
+  gap: 0 0.3rem;
   h4 {
     text-transform: capitalize;
     font-size: 0.9rem;
-    font-weight: 600;
   }
-
   .main-logo {
     height: 1.4rem;
     width: 1.4rem;
@@ -597,9 +594,6 @@ sm-copy {
   overflow-y: hidden;
   grid-template-columns: minmax(0, 1fr);
   align-content: flex-start;
-}
-#current_article_title {
-  font-weight: 700;
 }
 
 #article_list_popup {
@@ -946,7 +940,6 @@ sm-copy {
     }
   }
   p {
-    font-family: "noto serif", serif;
     font-size: 1rem;
     & * {
       font-size: inherit;

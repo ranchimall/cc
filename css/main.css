@@ -2,7 +2,7 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: "Inter", sans-serif;
+  font-family: "Roboto", sans-serif;
 }
 
 :root {
@@ -133,6 +133,9 @@ sm-button {
   --padding: 0.5rem 0.8rem;
   transition: transform 0.3s;
   overflow: hidden;
+}
+sm-button[variant=primary] {
+  --padding: 0.8rem;
 }
 sm-button[variant=primary] .icon {
   fill: rgba(var(--background-color), 1);
@@ -401,13 +404,11 @@ ul {
   align-items: center;
   width: 100%;
   grid-template-columns: auto 1fr;
-  gap: 0 0.5rem;
-  margin-right: 1rem;
+  gap: 0 0.3rem;
 }
 .logo h4 {
   text-transform: capitalize;
   font-size: 0.9rem;
-  font-weight: 600;
 }
 .logo .main-logo {
   height: 1.4rem;
@@ -627,10 +628,6 @@ sm-copy {
   overflow-y: hidden;
   grid-template-columns: minmax(0, 1fr);
   align-content: flex-start;
-}
-
-#current_article_title {
-  font-weight: 700;
 }
 
 #article_list_popup {
@@ -997,7 +994,6 @@ sm-copy {
   margin-top: 3rem;
 }
 #preview_page p {
-  font-family: "noto serif", serif;
   font-size: 1rem;
 }
 #preview_page p * {
