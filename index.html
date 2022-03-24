@@ -1823,6 +1823,13 @@
                 const sectionID = parentSection.dataset.sectionId
                 const plainText = contentArea.innerText.trim()
                 if (plainText === '') return
+                if (contentArea.firstChild.nodeType === Node.TEXT_NODE) {
+                    const clone = contentArea.firstChild.cloneNode(true)
+                    const p = createElement('p')
+                    p.append(clone)
+                    contentArea.firstChild.remove()
+                    contentArea.prepend(p)
+                }
                 const cleanHTML = DOMPurify.sanitize(contentArea.innerHTML.split('\n').map(v => v.trim()).filter(v => v).join('\n'), { FORBID_ATTR: ['style'] })
                 const hash = Crypto.SHA256(cleanHTML)
                 let previousVersion, previousHash
