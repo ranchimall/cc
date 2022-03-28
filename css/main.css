@@ -1011,7 +1011,7 @@ sm-copy {
 }
 
 #preview__body {
-  padding-bottom: 1.5rem;
+  padding: 1.5rem 0;
 }
 
 .preview-group:not(:last-of-type) {
