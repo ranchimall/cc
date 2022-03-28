@@ -1669,15 +1669,21 @@
                 clone.querySelector('.entry__author').textContent = editor
                 if (oldText !== '') {
                     const frag = document.createDocumentFragment()
-                    Diff.diffChars(oldText, plainText).forEach((part) => {
-                        const type = part.added ? 'added' :
-                            part.removed ? 'removed' : '';
-                        frag.append(
-                            createElement('span', {
-                                textContent: part.value,
-                                className: type
-                            })
-                        );
+                    Diff.diffWords(oldText, plainText).forEach((part) => {
+                        if (part.hasOwnProperty('added') || part.hasOwnProperty('removed')) {
+                            const type = part.added ? 'added' :
+                                part.removed ? 'removed' : '';
+                            frag.append(
+                                createElement('span', {
+                                    textContent: part.value,
+                                    className: type
+                                })
+                            );
+                        } else {
+                            frag.append(
+                                document.createTextNode(part.value)
+                            )
+                        }
                     });
                     clone.querySelector('.entry__changes').append(frag)
                 } else {
