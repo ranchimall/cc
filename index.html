@@ -1004,6 +1004,7 @@
                         hidePopup()
                         render.article(params.articleID)
                     }
+                    hideVersionHistory()
                     window.history.replaceState('', '', `#/home?articleID=${params.articleID}`)
                     getRef('preview__body').innerHTML = ''
                     targetPage = 'main_page'
@@ -1335,7 +1336,7 @@
                 section.lastElementChild.remove()
                 section.replaceWith(...section.childNodes)
             })
-            return DOMPurify.sanitize(exportContent.innerHTML)
+            return DOMPurify.sanitize(exportContent.innerHTML, { FORBID_ATTR: ['style'], ADD_ATTR: ['target'] })
         }
 
         function exportSelection() {
@@ -1389,11 +1390,11 @@
                     contributors.forEach(id => allContributors.add(id))
                 });
                 if (floGlobals.appObjects[pagesData.params.articleID]?.preview?.id) {
-                    floGlobals.appObjects[pagesData.params.articleID].preview.content = DOMPurify.sanitize(getRef('preview__body').innerHTML)
+                    floGlobals.appObjects[pagesData.params.articleID].preview.content = DOMPurify.sanitize(getRef('preview__body').innerHTML, { FORBID_ATTR: ['style'], ADD_ATTR: ['target'] })
                 } else {
                     floGlobals.appObjects[pagesData.params.articleID].preview = {
                         uid: floCrypto.randString(16, true),
-                        content: DOMPurify.sanitize(getRef('preview__body').innerHTML),
+                        content: DOMPurify.sanitize(getRef('preview__body').innerHTML, { FORBID_ATTR: ['style'], ADD_ATTR: ['target'] }),
                         contributors: [...allContributors]
                     }
                 }
@@ -1654,7 +1655,7 @@
                 if (!floGlobals.isSubAdmin) {
                     clone.querySelector('.content__area').setAttribute('contentEditable', true)
                 }
-                clone.querySelector('.content__area').innerHTML = DOMPurify.sanitize(html)
+                clone.querySelector('.content__area').innerHTML = DOMPurify.sanitize(html, { FORBID_ATTR: ['style'], ADD_ATTR: ['target'] })
                 let noOfContributors = 0
                 let latestContributor
                 for (const contributor in contributors) {
