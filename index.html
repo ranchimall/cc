@@ -1767,7 +1767,9 @@
                         iterations: []
                     }
                 }
-                floGlobals.currentArticle.sections[section].uniqueEntries.add(origin)
+                if (floGlobals.currentArticle.sections[section]) {
+                    floGlobals.currentArticle.sections[section].uniqueEntries.add(origin)
+                }
                 floGlobals.currentArticle.uniqueEntries[origin]['iterations'].push(generalData[key].vectorClock)
             }
             for (const sectionID in floGlobals.currentArticle.sections) {
