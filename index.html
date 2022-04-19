@@ -1549,7 +1549,7 @@
         }
         function updateScore() {
             const newScore = parseFloat(getRef('update_score_field').value)
-            updateGenData(floGlobals.versionHistory.currentEntry, { score: newScore })
+            updateGenData(floGlobals.versionHistory.currentEntry, { tag: newScore })
             document.querySelectorAll(`[data-vector-clock="${floGlobals.versionHistory.currentEntry}"] .content__score`).forEach(scoreElem => scoreElem.textContent = newScore)
             document.querySelectorAll(`[data-vector-clock="${floGlobals.versionHistory.currentEntry}"] .content__score`).forEach(scoreElem => newScore > 0 ? scoreElem.parentNode.classList.add('score-button--filled') : scoreElem.parentNode.classList.remove('score-button--filled'))
             floCloudAPI.tagApplicationData(floGlobals.versionHistory.currentEntry, newScore).then(res => {
