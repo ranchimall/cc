@@ -327,17 +327,30 @@ ul {
   flex-shrink: 0;
 }
 
-.button__icon {
-  height: 1.2rem;
-  width: 1.2rem;
+.margin-right-0-5 {
+  margin-right: 0.5rem;
+}
 
-  &--left {
-    margin-right: 0.5rem;
-  }
-
-  &--right {
-    margin-left: 0.5rem;
-  }
+.margin-left-0-5 {
+  margin-left: 0.5rem;
+}
+.margin-left-auto {
+  margin-left: auto;
+}
+.margin-bottom-0-5 {
+  margin-bottom: 0.5rem;
+}
+.margin-block-1 {
+  margin-block: 1rem;
+}
+.margin-block-1-5 {
+  margin-block: 1.5rem;
+}
+.margin-inline-1 {
+  margin-inline: 1rem;
+}
+.margin-inline-1-5 {
+  margin-inline: 1.5rem;
 }
 
 .icon-button {
@@ -527,7 +540,7 @@ sm-copy {
   gap: 1rem;
   padding: 1rem;
   align-items: center;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto;
   grid-column: 1/-1;
   background-color: var(--foreground-color);
   z-index: 2;
@@ -1050,7 +1063,7 @@ sm-copy {
   }
   #main_header {
     padding: 1rem 1.5rem;
-    grid-template-columns: auto 1fr auto auto;
+    grid-template-columns: 1fr auto auto;
   }
   #options_panel {
     top: 4.2rem;

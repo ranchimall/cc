@@ -14,9 +14,10 @@
         href="https://fonts.googleapis.com/css2?family=Calistoga&family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap"
         rel="stylesheet">
     <script src="purify.min.js" defer></script>
+    <script src="https://unpkg.com/uhtml@3.0.1/es.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6" defer></script>
     <script id="floGlobals">
-        /* Constants for FLO blockchain operations !!Make sure to add this at begining!! */
+        /* Constants for FLO blockchain operations !!Make sure to add this at beginning!! */
         const floGlobals = {
 
             //Required for all
@@ -33,7 +34,7 @@
 
             //Required for Supernode operations
             SNStorageID: "FNaN9McoBAEFUjkRmNQRYLmBF8SpS7Tgfk",
-            supernodes: {}, //each supnernode must be stored as floID : {uri:<uri>,pubKey:<publicKey>}
+            supernodes: {}, //each supernode must be stored as floID : {uri:<uri>,pubKey:<publicKey>}
 
             //for cloud apps
             subAdmins: [],
@@ -47,10 +48,6 @@
 
 <body class="hide" onload="onLoadStartUp()">
     <sm-notifications id="notification_drawer"></sm-notifications>
-    <audio id="notification_sound">
-        <source src="https://rmservices.duckdns.org/files/notification-sound.mp3" type="audio/mpeg">
-        <source src="https://rmservices.duckdns.org/files/notification-sound.ogg" type="audio/ogg">
-    </audio>
     <sm-popup id="confirmation_popup">
         <h4 id="confirm_title"></h4>
         <p id="confirm_message"></p>
@@ -148,18 +145,8 @@
     </article>
     <article id="main_page" class="grid page hide-completely">
         <header id="main_header">
-            <div class="logo">
-                <svg class="main-logo" viewBox="0 0 27.25 32">
-                    <title>RanchiMall</title>
-                    <path
-                        d="M27.14,30.86c-.74-2.48-3-4.36-8.25-6.94a20,20,0,0,1-4.2-2.49,6,6,0,0,1-1.25-1.67,4,4,0,0,1,0-2.26c.37-1.08.79-1.57,3.89-4.55a11.66,11.66,0,0,0,3.34-4.67,6.54,6.54,0,0,0,.05-2.82C20,3.6,18.58,2,16.16.49c-.89-.56-1.29-.64-1.3-.24a3,3,0,0,1-.3.72l-.3.55L13.42.94C13,.62,12.4.26,12.19.15c-.4-.2-.73-.18-.72.05a9.39,9.39,0,0,1-.61,1.33s-.14,0-.27-.13C8.76.09,8-.27,8,.23A11.73,11.73,0,0,1,6.76,2.6C4.81,5.87,2.83,7.49.77,7.49c-.89,0-.88,0-.61,1,.22.85.33.92,1.09.69A5.29,5.29,0,0,0,3,8.33c.23-.17.45-.29.49-.26a2,2,0,0,1,.22.63A1.31,1.31,0,0,0,4,9.34a5.62,5.62,0,0,0,2.27-.87L7,8l.13.55c.19.74.32.82,1,.65a7.06,7.06,0,0,0,3.46-2.47l.6-.71-.06.64c-.17,1.63-1.3,3.42-3.39,5.42L6.73,14c-3.21,3.06-3,5.59.6,8a46.77,46.77,0,0,0,4.6,2.41c.28.13,1,.52,1.59.87,3.31,2,4.95,3.92,4.95,5.93a2.49,2.49,0,0,0,.07.77h0c.09.09,0,.1.9-.14a2.61,2.61,0,0,0,.83-.32,3.69,3.69,0,0,0-.55-1.83A11.14,11.14,0,0,0,17,26.81a35.7,35.7,0,0,0-5.1-2.91C9.37,22.64,8.38,22,7.52,21.17a3.53,3.53,0,0,1-1.18-2.48c0-1.38.71-2.58,2.5-4.23,2.84-2.6,3.92-3.91,4.67-5.65a3.64,3.64,0,0,0,.42-2A3.37,3.37,0,0,0,13.61,5l-.32-.74.29-.48c.17-.27.37-.63.46-.8l.15-.3.44.64a5.92,5.92,0,0,1,1,2.81,5.86,5.86,0,0,1-.42,1.94c0,.12-.12.3-.15.4a9.49,9.49,0,0,1-.67,1.1,28,28,0,0,1-4,4.29C8.62,15.49,8.05,16.44,8,17.78a3.28,3.28,0,0,0,1.11,2.76c.95,1,2.07,1.74,5.25,3.32,3.64,1.82,5.22,2.9,6.41,4.38A4.78,4.78,0,0,1,21.94,31a3.21,3.21,0,0,0,.14.92,1.06,1.06,0,0,0,.43-.05l.83-.22.46-.12-.06-.46c-.21-1.53-1.62-3.25-3.94-4.8a37.57,37.57,0,0,0-5.22-2.82A13.36,13.36,0,0,1,11,21.19a3.36,3.36,0,0,1-.8-4.19c.41-.85.83-1.31,3.77-4.15,2.39-2.31,3.43-4.13,3.43-6a5.85,5.85,0,0,0-2.08-4.29c-.23-.21-.44-.43-.65-.65A2.5,2.5,0,0,1,15.27.69a10.6,10.6,0,0,1,2.91,2.78A4.16,4.16,0,0,1,19,6.16a4.91,4.91,0,0,1-.87,3c-.71,1.22-1.26,1.82-4.27,4.67a9.47,9.47,0,0,0-2.07,2.6,2.76,2.76,0,0,0-.33,1.54,2.76,2.76,0,0,0,.29,1.47c.57,1.21,2.23,2.55,4.65,3.73a32.41,32.41,0,0,1,5.82,3.24c2.16,1.6,3.2,3.16,3.2,4.8a1.94,1.94,0,0,0,.09.76,4.54,4.54,0,0,0,1.66-.4C27.29,31.42,27.29,31.37,27.14,30.86ZM6.1,7h0a3.77,3.77,0,0,1-1.46.45L4,7.51l.68-.83a25.09,25.09,0,0,0,3-4.82A12,12,0,0,1,8.28.76c.11-.12.77.32,1.53,1l.63.58-.57.84A10.34,10.34,0,0,1,6.1,7Zm5.71-1.78A9.77,9.77,0,0,1,9.24,7.18h0a5.25,5.25,0,0,1-1.17.28l-.58,0,.65-.78a21.29,21.29,0,0,0,2.1-3.12c.22-.41.42-.76.44-.79s.5.43.9,1.24L12,5ZM13.41,3a2.84,2.84,0,0,1-.45.64,11,11,0,0,1-.9-.91l-.84-.9.19-.45c.34-.79.39-.8,1-.31A9.4,9.4,0,0,1,13.8,2.33q-.18.34-.39.69Z" />
-                </svg>
-                <div class="grid">
-                    <h4>RanchiMall CC</h4>
-                </div>
-            </div>
-            <div id="article_name_wrapper" class="flex gap-0-5 align-center justify-center">
-                <button class="icon-only" title="Show all articles list" onclick="showPopup('article_list_popup')">
+            <div id="article_name_wrapper" class="flex gap-0-5 align-center">
+                <button class="icon-only" title="Show all articles list" onclick="openPopup('article_list_popup')">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                         fill="#000000">
                         <path d="M0 0h24v24H0V0z" fill="none" />
@@ -188,16 +175,16 @@
                     </svg>
                 </button>
                 <sm-menu align-options="right" title="Admin options" class="admin-option">
-                    <menu-option onclick="showPopup('create_article_popup')">
-                        <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" height="24px"
+                    <menu-option onclick="openPopup('create_article_popup')">
+                        <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
                             viewBox="0 0 24 24" width="24px" fill="#000000">
                             <path d="M0 0h24v24H0V0z" fill="none" />
                             <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                         </svg>
                         Create new article
                     </menu-option>
-                    <menu-option onclick="showPopup('edit_sections_popup')">
-                        <svg class="icon button__icon--left" title="edit" xmlns="http://www.w3.org/2000/svg"
+                    <menu-option onclick="openPopup('edit_sections_popup')">
+                        <svg class="icon margin-right-0-5" title="edit" xmlns="http://www.w3.org/2000/svg"
                             height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
                             <path d="M0 0h24v24H0z" fill="none"></path>
                             <path
@@ -207,7 +194,7 @@
                         Edit title & sections
                     </menu-option>
                     <menu-option onclick="setDefaultArticle()">
-                        <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg"
+                        <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg"
                             enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px"
                             fill="#000000">
                             <g>
@@ -224,7 +211,7 @@
             </div>
             <div id="selected_content_options" class="flex space-between hide-completely">
                 <button onclick="clearSelection()" title="Clear selection">
-                    <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" height="24px"
+                    <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
                         viewBox="0 0 24 24" width="24px" fill="#000000">
                         <path d="M0 0h24v24H0V0z" fill="none" />
                         <path
@@ -234,7 +221,7 @@
                 </button>
                 <div class="flex gap-0-5">
                     <button class="button icon-only" title="Select all" onclick="selectAll()">
-                        <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" height="24px"
+                        <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
                             viewBox="0 0 24 24" width="24px" fill="#000000">
                             <path d="M0 0h24v24H0V0z" fill="none" />
                             <path
@@ -243,7 +230,7 @@
                         Select all
                     </button>
                     <button class="button" onclick="renderPreview()">
-                        <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg"
+                        <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg"
                             enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px"
                             fill="#000000">
                             <g>
@@ -256,22 +243,23 @@
                     </button>
                 </div>
             </div>
-            <theme-toggle></theme-toggle>
-            <button onclick="showPopup('user_popup')" aria-label="User profile">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" height="24px" viewBox="0 0 24 24" width="24px"
-                    fill="#000000">
+            <button onclick="openPopup('user_popup')" aria-label="User profile">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon margin-right-0-5" height="24px" viewBox="0 0 24 24"
+                    width="24px" fill="#000000">
                     <path d="M0 0h24v24H0V0z" fill="none" />
                     <path
                         d="M12 5.9c1.16 0 2.1.94 2.1 2.1s-.94 2.1-2.1 2.1S9.9 9.16 9.9 8s.94-2.1 2.1-2.1m0 9c2.97 0 6.1 1.46 6.1 2.1v1.1H5.9V17c0-.64 3.13-2.1 6.1-2.1M12 4C9.79 4 8 5.79 8 8s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 9c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z" />
                 </svg>
+                <div class="user-id"></div>
             </button>
+            <theme-toggle></theme-toggle>
         </header>
         <section id="options_panel" class="flex hide-completely">
             <div id="filter_panel" class="flex w-100 align-center gap-1 ">
                 <h5>Sort by</h5>
                 <strip-select id="sort_content_list" label="Sort by:">
-                    <strip-option value="time" selected>Most recent</strip-option>
-                    <strip-option value="score">Score</strip-option>
+                    <strip-option value="score" selected>Score</strip-option>
+                    <strip-option value="time">Most recent</strip-option>
                 </strip-select>
             </div>
             <div id="article_outline_panel" class="flex align-center gap-1 hide-completely">
@@ -334,14 +322,6 @@
                             d="M17 7h-4v2h4c1.65 0 3 1.35 3 3s-1.35 3-3 3h-4v2h4c2.76 0 5-2.24 5-5s-2.24-5-5-5zm-6 8H7c-1.65 0-3-1.35-3-3s1.35-3 3-3h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-2zm-3-4h8v2H8z" />
                     </svg>
                 </button>
-                <!--             <button class="formatting-button" title="Add quote" onclick="insertBlockquote()">
-                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
-                        fill="#000000">
-                        <path d="M0 0h24v24H0V0z" fill="none" />
-                        <path
-                            d="M18.62 18h-5.24l2-4H13V6h8v7.24L18.62 18zm-2-2h.76L19 12.76V8h-4v4h3.62l-2 4zm-8 2H3.38l2-4H3V6h8v7.24L8.62 18zm-2-2h.76L9 12.76V8H5v4h3.62l-2 4z" />
-                    </svg>
-                </button> -->
             </div>
             <div id="link_panel" class="hide-completely">
                 <sm-form style="--gap: 0.5rem">
@@ -361,7 +341,7 @@
         <aside id="version_history_panel" class="flex direction-column hide-completely">
             <div class="flex align-center space-between">
                 <div class="flex align-center">
-                    <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" height="24px"
+                    <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
                         viewBox="0 0 24 24" width="24px" fill="#000000">
                         <path d="M0 0h24v24H0V0z" fill="none" />
                         <path
@@ -386,7 +366,7 @@
             <div class="flex align-center space-between">
                 <div class="flex gap-0-5">
                     <button onclick="goHome()">
-                        <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" height="24px"
+                        <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
                             viewBox="0 0 24 24" width="24px" fill="#000000">
                             <path d="M0 0h24v24H0V0z" fill="none" />
                             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
@@ -403,7 +383,7 @@
     <sm-popup id="article_list_popup">
         <header slot="header" class="popup__header">
             <div class="flex align-center">
-                <button class="popup__header__close" onclick="hidePopup()">
+                <button class="popup__header__close" onclick="closePopup()">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                         fill="#000000">
                         <path d="M0 0h24v24H0V0z" fill="none" />
@@ -433,7 +413,7 @@
     </sm-popup>
     <sm-popup id="create_article_popup">
         <header slot="header" class="popup__header">
-            <button class="popup__header__close" onclick="hidePopup()">
+            <button class="popup__header__close" onclick="closePopup()">
                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                     fill="#000000">
                     <path d="M0 0h24v24H0V0z" fill="none" />
@@ -446,7 +426,7 @@
         <sm-form>
             <sm-input id="get_article_title" placeholder="Article title" required autofocus></sm-input>
             <sm-checkbox id="set_default_checkbox" checked>
-                <div class="grid button__icon--right gap-0-5">
+                <div class="grid margin-left-0-5 gap-0-5">
                     Set as default
                     <p style="font-size: 0.8rem;">
                         This article will be opened by default for everyone when CC is first loaded.
@@ -460,7 +440,7 @@
                         '->'.
                     </p>
                 </div>
-                <sm-textarea id="get_section_titles" rows="8"
+                <sm-textarea id="get_plot" rows="8"
                     placeholder="(Name, place, time, context) -> (Name, place, time, context) ...">
                 </sm-textarea>
             </div>
@@ -473,14 +453,14 @@
                     </sm-switch>
                     <p>Define the FLO IDs separated by a comma (,), which are allowed to contribute.</p>
                 </div>
-                <sm-textarea id="get_section_titles" rows="4"></sm-textarea>
+                <sm-textarea id="get_plot" rows="4"></sm-textarea>
             </div> -->
             <sm-button variant="primary" onclick="cc.createNewArticle()">Create</sm-button>
         </sm-form>
     </sm-popup>
     <sm-popup id="edit_sections_popup">
         <header slot="header" class="popup__header">
-            <button class="popup__header__close" onclick="hidePopup()">
+            <button class="popup__header__close" onclick="closePopup()">
                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                     fill="#000000">
                     <path d="M0 0h24v24H0V0z" fill="none" />
@@ -504,7 +484,7 @@
             </div>
             <div class="flex space-between align-center">
                 <sm-button id="insert_section_button" onclick="insertEmptySection()">
-                    <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg"
+                    <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg"
                         enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
                         <g>
                             <rect fill="none" height="24" width="24" />
@@ -530,7 +510,7 @@
     <sm-popup id="contributors_popup">
         <header slot="header" class="popup__header">
             <div class="flex align-center">
-                <button class="popup__header__close" onclick="hidePopup()">
+                <button class="popup__header__close" onclick="closePopup()">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                         fill="#000000">
                         <path d="M0 0h24v24H0V0z" fill="none" />
@@ -546,7 +526,7 @@
     <sm-popup id="share_popup">
         <header slot="header" class="popup__header">
             <div class="flex align-center">
-                <button class="popup__header__close" onclick="hidePopup()">
+                <button class="popup__header__close" onclick="closePopup()">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                         fill="#000000">
                         <path d="M0 0h24v24H0V0z" fill="none" />
@@ -563,7 +543,7 @@
     <sm-popup id="user_popup">
         <header slot="header" class="popup__header">
             <div class="flex align-center">
-                <button class="popup__header__close" onclick="hidePopup()">
+                <button class="popup__header__close" onclick="closePopup()">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                         fill="#000000">
                         <path d="M0 0h24v24H0V0z" fill="none" />
@@ -583,7 +563,7 @@
     </sm-popup>
     <sm-popup id="scoring_popup">
         <header slot="header" class="popup__header">
-            <button class="popup__header__close" onclick="hidePopup()">
+            <button class="popup__header__close" onclick="closePopup()">
                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                     fill="#000000">
                     <path d="M0 0h24v24H0V0z" fill="none" />
@@ -678,29 +658,18 @@
         </li>
     </template>
     <script id="ui_utils">
-        // Global letiables
-        const domRefs = {};
-        let timerId;
-        const currentYear = new Date().getFullYear();
-
+        const { html, render: renderElem } = uhtml;
+        const domRefs = {}
         //Checks for internet connection status
         if (!navigator.onLine)
-            notify(
-                "There seems to be a problem connecting to the internet, Please check you internet connection.",
-                "error",
-                { sound: true }
-            );
-        window.addEventListener("offline", () => {
-            notify(
-                "There seems to be a problem connecting to the internet, Please check you internet connection.",
-                "error",
-                { pinned: true, sound: true }
-            );
-        });
-        window.addEventListener("online", () => {
-            getRef("notification_drawer").clearAll();
-            notify("We are back online.", "success");
-        });
+            notify('There seems to be a problem connecting to the internet, Please check you internet connection.', 'error', '', true)
+        window.addEventListener('offline', () => {
+            notify('There seems to be a problem connecting to the internet, Please check you internet connection.', 'error', true, true)
+        })
+        window.addEventListener('online', () => {
+            getRef('notification_drawer').clearAll()
+            notify('We are back online.', 'success')
+        })
 
         // Use instead of document.getElementById
         function getRef(elementId) {
@@ -748,10 +717,26 @@
                 }, wait);
             };
         }
+        // adds a class to all elements in an array
+        function addClass(elements, className) {
+            elements.forEach((element) => {
+                document.querySelector(element).classList.add(className);
+            });
+        }
+        // removes a class from all elements in an array
+        function removeClass(elements, className) {
+            elements.forEach((element) => {
+                document.querySelector(element).classList.remove(className);
+            });
+        }
+        // return querySelectorAll elements as an array
+        function getAllElements(selector) {
+            return Array.from(document.querySelectorAll(selector));
+        }
 
-        let zIndex = 10
+        let zIndex = 50
         // function required for popups or modals to appear
-        function showPopup(popupId, pinned) {
+        function openPopup(popupId, pinned) {
             zIndex++
             getRef(popupId).setAttribute('style', `z-index: ${zIndex}`)
             getRef(popupId).show({ pinned })
@@ -759,7 +744,7 @@
         }
 
         // hides the popup or modal
-        function hidePopup() {
+        function closePopup() {
             if (popupStack.peek() === undefined)
                 return;
             popupStack.peek().popup.hide()
@@ -793,20 +778,20 @@
         // displays a popup for asking permission. Use this instead of JS confirm
         const getConfirmation = (title, options = {}) => {
             return new Promise(resolve => {
-                const { message, cancelText = 'Cancel', confirmText = 'OK' } = options
-                showPopup('confirmation_popup', true)
-                getRef('confirm_title').textContent = title;
-                getRef('confirm_message').textContent = message;
+                const { message = '', cancelText = 'Cancel', confirmText = 'OK' } = options
+                openPopup('confirmation_popup', true)
+                getRef('confirm_title').innerText = title;
+                getRef('confirm_message').innerText = message;
                 let cancelButton = getRef('confirmation_popup').children[2].children[0],
                     submitButton = getRef('confirmation_popup').children[2].children[1]
                 submitButton.textContent = confirmText
                 cancelButton.textContent = cancelText
                 submitButton.onclick = () => {
-                    hidePopup()
+                    closePopup()
                     resolve(true);
                 }
                 cancelButton.onclick = () => {
-                    hidePopup()
+                    closePopup()
                     resolve(false);
                 }
             })
@@ -814,7 +799,6 @@
 
         //Function for displaying toast notifications. pass in error for mode param if you want to show an error.
         function notify(message, mode, options = {}) {
-            const { pinned = false, sound = false } = options
             let icon
             switch (mode) {
                 case 'success':
@@ -824,30 +808,19 @@
                     icon = `<svg class="icon icon--error" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm0-8v6h2V7h-2z"/></svg>`
                     break;
             }
-            getRef("notification_drawer").push(message, { pinned, icon });
-            if (navigator.onLine && sound) {
-                getRef("notification_sound").currentTime = 0;
-                getRef("notification_sound").play();
-            }
+            getRef("notification_drawer").push(message, { icon, ...options });
             if (mode === 'error') {
                 console.error(message)
             }
         }
 
-        function getFormattedTime(time, relative) {
+        function getFormattedTime(timestamp, format) {
             try {
-                if (String(time).indexOf('_'))
-                    time = String(time).split('_')[0]
-                const intTime = parseInt(time)
-                if (String(intTime).length < 13)
-                    time *= 1000
-                let timeFrag = new Date(intTime).toString().split(' '),
-                    day = timeFrag[0],
-                    month = timeFrag[1],
-                    date = timeFrag[2],
-                    year = timeFrag[3],
-                    minutes = new Date(intTime).getMinutes(),
-                    hours = new Date(intTime).getHours(),
+                if (String(timestamp).length < 13)
+                    timestamp *= 1000
+                let [day, month, date, year] = new Date(timestamp).toString().split(' '),
+                    minutes = new Date(timestamp).getMinutes(),
+                    hours = new Date(timestamp).getHours(),
                     currentTime = new Date().toString().split(' ')
 
                 minutes = minutes < 10 ? `0${minutes}` : minutes
@@ -860,30 +833,24 @@
                     finalHours = `${hours}:${minutes}`
 
                 finalHours = hours >= 12 ? `${finalHours} PM` : `${finalHours} AM`
-                if (relative) {
-                    if (year == currentYear) {
-                        if (currentTime[1] === month) {
-                            const dateDiff = (parseInt(currentTime[2]) - parseInt(date))
-                            if (dateDiff === 0)
-                                return `${finalHours}`;
-                            else if (dateDiff === 1)
-                                return `Yesterday`;
-                            else if (dateDiff > 1 && dateDiff < 8)
-                                return currentTime[0];
-                            else
-                                return ` ${date} ${month}`;
-                        }
+                switch (format) {
+                    case 'date-only':
+                        return `${month} ${date}, ${year}`;
+                        break;
+                    case 'time-only':
+                        return finalHours;
+                    case 'relative':
+                        // check if timestamp is older than a day
+                        if (Date.now() - new Date(timestamp) < 60 * 60 * 24 * 1000)
+                            return `${finalHours}`;
                         else
-                            return ` ${date} ${month}`;
-                    }
-                    else
-                        return `${month} ${year}`;
+                            return relativeTime.from(timestamp)
+                    default:
+                        return `${month} ${date}, ${year} at ${finalHours}`;
                 }
-                else
-                    return `${month} ${date} ${year}, ${finalHours}`;
             } catch (e) {
                 console.error(e);
-                return time;
+                return timestamp;
             }
         }
 
@@ -893,7 +860,7 @@
             document.querySelectorAll('sm-input[data-private-key]').forEach(input => input.customValidation = floCrypto.getPubKeyHex)
             document.addEventListener('keyup', (e) => {
                 if (e.key === 'Escape') {
-                    hidePopup()
+                    closePopup()
                 }
             })
             document.addEventListener('copy', () => {
@@ -1001,12 +968,12 @@
                 case 'home':
                 case 'main_page':
                     if (!floGlobals.currentArticle.id || params.articleID !== pagesData.params.articleID) {
-                        hidePopup()
+                        closePopup()
                         render.article(params.articleID)
                     }
                     hideVersionHistory()
                     window.history.replaceState('', '', `#/home?articleID=${params.articleID}`)
-                    getRef('preview__body').innerHTML = ''
+                    renderElem(getRef('preview__body'), html``)
                     targetPage = 'main_page'
                     break;
                 case 'preview':
@@ -1032,7 +999,7 @@
         // class based lazy loading
         class LazyLoader {
             constructor(container, elementsToRender, renderFn, options = {}) {
-                const { batchSize = 10 } = options
+                const { batchSize = 10, freshRender, bottomFirst = false, domUpdated } = options
 
                 this.elementsToRender = elementsToRender
                 this.arrayOfElements = (typeof elementsToRender === 'function') ? this.elementsToRender() : elementsToRender || []
@@ -1040,6 +1007,13 @@
                 this.intersectionObserver
 
                 this.batchSize = batchSize
+                this.freshRender = freshRender
+                this.domUpdated = domUpdated
+                this.bottomFirst = bottomFirst
+
+                this.shouldLazyLoad = false
+                this.lastScrollTop = 0
+                this.lastScrollHeight = 0
 
                 this.lazyContainer = document.querySelector(container)
 
@@ -1047,6 +1021,9 @@
                 this.render = this.render.bind(this)
                 this.init = this.init.bind(this)
                 this.clear = this.clear.bind(this)
+            }
+            get elements() {
+                return this.arrayOfElements
             }
             init() {
                 this.intersectionObserver = new IntersectionObserver((entries, observer) => {
@@ -1057,13 +1034,19 @@
                         }
                     })
                 }, {
-                    threshold: 0.3
+                    root: this.lazyContainer
                 })
                 this.mutationObserver = new MutationObserver(mutationList => {
                     mutationList.forEach(mutation => {
                         if (mutation.type === 'childList') {
                             if (mutation.addedNodes.length) {
-                                this.intersectionObserver.observe(this.lazyContainer.lastElementChild)
+                                if (this.bottomFirst) {
+                                    if (this.lazyContainer.firstElementChild)
+                                        this.intersectionObserver.observe(this.lazyContainer.firstElementChild)
+                                } else {
+                                    if (this.lazyContainer.lastElementChild)
+                                        this.intersectionObserver.observe(this.lazyContainer.lastElementChild)
+                                }
                             }
                         }
                     })
@@ -1075,24 +1058,50 @@
             }
             update(elementsToRender) {
                 this.arrayOfElements = (typeof elementsToRender === 'function') ? this.elementsToRender() : elementsToRender || []
-                this.render()
             }
             render(options = {}) {
                 let { lazyLoad = false } = options
+                this.shouldLazyLoad = lazyLoad
                 const frag = document.createDocumentFragment();
                 if (lazyLoad) {
-                    this.updateStartIndex = this.updateEndIndex
-                    this.updateEndIndex = this.arrayOfElements.length > this.updateEndIndex + this.batchSize ? this.updateEndIndex + this.batchSize : this.arrayOfElements.length
+                    if (this.bottomFirst) {
+                        this.updateEndIndex = this.updateStartIndex
+                        this.updateStartIndex = this.updateEndIndex - this.batchSize
+                    } else {
+                        this.updateStartIndex = this.updateEndIndex
+                        this.updateEndIndex = this.updateEndIndex + this.batchSize
+                    }
                 } else {
                     this.intersectionObserver.disconnect()
+                    if (this.bottomFirst) {
+                        this.updateEndIndex = this.arrayOfElements.length
+                        this.updateStartIndex = this.updateEndIndex - this.batchSize - 1
+                    } else {
+                        this.updateStartIndex = 0
+                        this.updateEndIndex = this.batchSize
+                    }
                     this.lazyContainer.innerHTML = ``;
-                    this.updateStartIndex = 0
-                    this.updateEndIndex = this.arrayOfElements.length > this.batchSize ? this.batchSize : this.arrayOfElements.length
                 }
-                for (let index = this.updateStartIndex; index < this.updateEndIndex; index++) {
-                    frag.append(this.renderFn(this.arrayOfElements[index]))
+                this.lastScrollHeight = this.lazyContainer.scrollHeight
+                this.lastScrollTop = this.lazyContainer.scrollTop
+                this.arrayOfElements.slice(this.updateStartIndex, this.updateEndIndex).forEach((element, index) => {
+                    frag.append(this.renderFn(element))
+                })
+                if (this.bottomFirst) {
+                    this.lazyContainer.prepend(frag)
+                    // scroll anchoring for reverse scrolling
+                    this.lastScrollTop += this.lazyContainer.scrollHeight - this.lastScrollHeight
+                    this.lazyContainer.scrollTo({ top: this.lastScrollTop })
+                    this.lastScrollHeight = this.lazyContainer.scrollHeight
+                } else {
+                    this.lazyContainer.append(frag)
                 }
-                this.lazyContainer.append(frag)
+                if (!lazyLoad && this.bottomFirst) {
+                    this.lazyContainer.scrollTop = this.lazyContainer.scrollHeight
+                }
+                // Callback to be called if elements are updated or rendered for first time
+                if (!lazyLoad && this.freshRender)
+                    this.freshRender()
             }
             clear() {
                 this.intersectionObserver.disconnect()
@@ -1183,7 +1192,8 @@
                 if (floGlobals.isSubAdmin) {
                     const title = getRef('get_article_title').value.trim()
                     const setDefault = getRef('set_default_checkbox').checked
-                    const sectionTitles = parsePlot(getRef('get_section_titles').value.trim())
+                    const plot = getRef('get_plot').value.trim()
+                    const sectionTitles = parsePlot(plot)
                     let sections = []
                     if (sectionTitles) {
                         sections = sectionTitles.map(title => {
@@ -1198,20 +1208,21 @@
                         floGlobals.appObjects.cc['defaultArticle'] = uid
                     floGlobals.appObjects.cc['articleList'][uid] = {
                         title,
-                        timestamp: Date.now()
+                        timestamp: Date.now(),
                     }
                     floGlobals.appObjects[uid] = {
                         public: true,
                         editors: [],
                         sections,
-                        preview: {}
+                        preview: {},
+                        plot
                     }
                     Promise.all([
                         floCloudAPI.updateObjectData('cc'),
                         floCloudAPI.resetObjectData(uid)
                     ])
                         .then((res) => {
-                            hidePopup()
+                            closePopup()
                             notify('created article', 'success')
                             window.location.hash = `#/home?articleID=${uid}`
                         })
@@ -1222,8 +1233,8 @@
             }
         }
 
-        function parsePlot(plottext) {
-            let tstring = plottext.trim().replace(/\s+/g, " ") // collapse all whitespace to single whitespace
+        function parsePlot(plotText) {
+            let tstring = plotText.trim().replace(/\s+/g, " ") // collapse all whitespace to single whitespace
             tstring = tstring.replace(/\)\s*\->\s*\(/g, ")->(");
 
             tstring = tstring.split(")->("); // split string based on the delimiter
@@ -1286,15 +1297,12 @@
                     group.append(createElement('div', {
                         className: 'preview-group__buttons flex align-center',
                         innerHTML: `
-                    <button class="formatting-button move-up" title="Move up">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>
-                        </button>
-                    <button class="formatting-button move-down" title="Move down">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></svg>
-                        </button>
-                    <button class="formatting-button remove-group" title="Remove from exporting">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M7 11v2h10v-2H7zm5-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
-                        </button>
+                                <button class="formatting-button move-up" title="Move up">
+                                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>
+                                </button>
+                                <button class="formatting-button remove-group" title="Remove from exporting">
+                                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M7 11v2h10v-2H7zm5-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                                </button>    
                     `
                     }))
                     frag.append(group)
@@ -1315,18 +1323,9 @@
 
         function downloadHTML(string, options = {}) {
             const { title } = options
-            const element = createElement('a', {
-                attributes: {
-                    'href': 'data:text/html;charset=utf-8,' + encodeURIComponent(string),
-                    'download': `${title ? title : 'article'}.html`,
-                    'style': 'display:none'
-                }
-            });
-
+            const element = html.node`<a href="${`${`data:text/html;charset=utf-8, ${encodeURIComponent(string)}`}`}" download="${`${title ? title : 'article'}.html`}" class="hide"></a>`
             document.body.appendChild(element);
-
             element.click();
-
             document.body.removeChild(element);
         }
 
@@ -1351,10 +1350,7 @@
             });
             const frag = document.createDocumentFragment()
             allContributors.forEach(id => {
-                frag.append(createElement('div', {
-                    textContent: id,
-                    className: 'contributor'
-                }))
+                frag.append(html.node`<div class="contributor">${id}</div>`)
             })
             bodyTemplate.querySelector('#article_contributors').append(frag)
             const readingTime = getReadingTime(bodyTemplate.querySelector('#export_body').textContent)
@@ -1410,7 +1406,7 @@
                             })
                         } else {
                             getRef('shared_url').value = window.location.href
-                            showPopup('share_popup')
+                            openPopup('share_popup')
                         }
                     })
                     .catch(err => notify(err, 'error'))
@@ -1554,7 +1550,7 @@
             document.querySelectorAll(`[data-vector-clock="${floGlobals.versionHistory.currentEntry}"] .content__score`).forEach(scoreElem => newScore > 0 ? scoreElem.parentNode.classList.add('score-button--filled') : scoreElem.parentNode.classList.remove('score-button--filled'))
             floCloudAPI.tagApplicationData(floGlobals.versionHistory.currentEntry, newScore).then(res => {
                 notify('Score updated', 'success')
-                hidePopup()
+                closePopup()
             }).catch(err => notify(err, 'error'))
         }
         floGlobals.currentArticle = {}
@@ -1598,15 +1594,9 @@
         function getScoreElement(score) {
             let scoreElement
             if (floGlobals.isSubAdmin) {
-                scoreElement = createElement('button', {
-                    className: 'score-button',
-                    attributes: { 'title': 'Score this content' }
-                })
+                scoreElement = html.node`<button class="score-button" title="Score this content"></button>`
             } else {
-                scoreElement = createElement('div', {
-                    className: 'flex align-center',
-                    attributes: { 'title': 'Score' }
-                })
+                scoreElement = html.node`<div class="flex align-center" title="Score"></div>`
             }
             if (score > 0) {
                 scoreElement.classList.add('score-button--filled')
@@ -1636,11 +1626,7 @@
             },
             articleLink(details, isDefaultArticle) {
                 const { uid, timestamp, title } = details
-                const link = createElement('a', {
-                    textContent: title,
-                    attributes: { href: `#/home?articleID=${uid}` },
-                    className: 'article-link flex interact'
-                })
+                const link = html.node`<a class="article-link flex interact" href="#/home?articleID=${uid}">${title}</a>`
                 if (isDefaultArticle) {
                     link.classList.add('default-article')
                     link.title = 'Actively written article'
@@ -1698,6 +1684,7 @@
                 return clone
             },
             section(sectionID, { title, uniqueEntries }) {
+                const sortByScore = getRef('sort_content_list').value === 'score'
                 const section = getRef('section_template').content.cloneNode(true)
                 const frag = document.createDocumentFragment()
                 section.children[0].dataset.sectionId = sectionID
@@ -1706,7 +1693,11 @@
                     section.querySelector('.content-card--empty').remove()
                 }
                 section.querySelector('.section-title').textContent = title
-                floGlobals.currentArticle.sections[sectionID].uniqueEntries.slice(0, maxCardsPerSection).forEach(entry => {
+                floGlobals.currentArticle.sections[sectionID].uniqueEntries.sort((a, b) => {
+                    const arrayA = floGlobals.currentArticle.uniqueEntries[a].iterations
+                    const arrayB = floGlobals.currentArticle.uniqueEntries[b].iterations
+                    return getGenData(arrayB[arrayB.length - 1])[sortByScore ? 'score' : 'timestamp'] - getGenData(arrayA[arrayA.length - 1])[sortByScore ? 'score' : 'timestamp']
+                }).slice(0, maxCardsPerSection).forEach(entry => {
                     const contentCard = render.contentCard(entry)
                     if (contentCard)
                         frag.append(contentCard)
@@ -1725,14 +1716,11 @@
             },
             sectionCard(details) {
                 const { title, id } = details
-                return createElement('div', {
-                    className: 'section-card flex align-center',
-                    attributes: { 'data-section-id': id },
-                    innerHTML: `
-                        <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><path d="M9,18h12v-2H9V18z M3,6v2h18V6H3z M9,13h12v-2H9V13z"/></g></svg>
+                return html.node`
+                    <div class="section-card flex align-center" data-section-id="${id}">
+                        <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><path d="M9,18h12v-2H9V18z M3,6v2h18V6H3z M9,13h12v-2H9V13z"/></g></svg>
                         <input placeholder="Section title" value="${title}"/>
-                    `
-                })
+                    </div>`
             },
             sectionOutline() {
                 const frag = document.createDocumentFragment()
@@ -1946,7 +1934,7 @@
                     frag.prepend(contributor)
                 }
                 getRef('contributor_list').append(frag)
-                showPopup('contributors_popup')
+                openPopup('contributors_popup')
             } else if (e.target.closest('.see-more')) {
                 const target = e.target.closest('.see-more')
                 const sectionID = target.parentNode.dataset.sectionId
@@ -1969,14 +1957,14 @@
             } else if (e.target.closest('.score-button') && floGlobals.isSubAdmin) {
                 floGlobals.versionHistory.currentEntry = e.target.closest('.content-card').dataset.vectorClock
                 getRef('update_score_field').value = e.target.closest('.score-button').children[1].textContent
-                showPopup('scoring_popup')
+                openPopup('scoring_popup')
             }
         })
         getRef('version_timeline').addEventListener('click', e => {
             if (e.target.closest('.score-button') && floGlobals.isSubAdmin) {
                 floGlobals.versionHistory.currentEntry = e.target.closest('.history-entry').dataset.vectorClock
                 getRef('update_score_field').value = e.target.closest('.score-button').children[1].textContent
-                showPopup('scoring_popup')
+                openPopup('scoring_popup')
             }
         })
         getRef('article_wrapper').addEventListener("paste", e => {
@@ -2121,6 +2109,17 @@
                 })
             }
         })
+        function transformScroll(event) {
+            if (!event.deltaY) {
+                return;
+            }
+
+            // event.currentTarget.scrollLeft += event.deltaY + event.deltaX;
+            event.currentTarget.scrollBy({ left: event.deltaY * 5, behavior: 'smooth' });
+            event.preventDefault();
+        }
+
+        getRef('options_panel').addEventListener('wheel', transformScroll);
         const activeHeading = debounce((target) => {
             [...getRef('article_outline').children].forEach(elem => elem.classList.remove('outline-button--active'))
             target.classList.add('outline-button--active')
@@ -2190,19 +2189,18 @@
             getRef('section_list_container').append(frag)
         }
         function insertEmptySection() {
-            const emptySection = createElement('div', {
-                className: 'section-card flex align-center',
-                innerHTML: `
-                        <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><path d="M9,18h12v-2H9V18z M3,6v2h18V6H3z M9,13h12v-2H9V13z"/></g></svg>
-                        <input placeholder="New section title"/>
-                        <button class="remove">
-                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
-                                <path d="M0 0h24v24H0V0z" fill="none"></path>
-                                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path>
-                            </svg>
-                        </button>
-                    `
-            })
+            const emptySection = html.node`
+                <div class="section-card flex align-center">
+                    <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><path d="M9,18h12v-2H9V18z M3,6v2h18V6H3z M9,13h12v-2H9V13z"/></g></svg>
+                    <input placeholder="New section title"/>
+                    <button class="remove">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
+                            <path d="M0 0h24v24H0V0z" fill="none"></path>
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path>
+                        </svg>
+                    </button>
+                </div>
+            `
             getRef('section_list_container').append(emptySection)
             emptySection.querySelector('input').focus()
         }
@@ -2269,14 +2267,14 @@
                             })
                             getRef('article_wrapper').append(frag)
                             notify('Sections updated', 'success')
-                            hidePopup()
+                            closePopup()
                         })
                         .catch(err => {
                             notify(err, 'error')
                         })
                 }
             } else {
-                hidePopup()
+                closePopup()
                 notify('This action requires sub-admin privileges', 'error')
             }
         }
@@ -2522,25 +2520,6 @@
                 range.insertNode(node)
             }
         }
-        function createQuote() {
-            return createElement('figure', {
-                className: 'quote-template grid gap-0-5',
-                attributes: { 'contenteditable': "false" },
-                innerHTML: `<blockquote class="flex"> <p class="quote" contenteditable="true">Words can be like X-rays, if you use them properly—they’ll go through anything. You read and you’re pierced.</p> </blockquote> <figcaption class="flex"><span class="by" contenteditable="true">Aldous Huxley</span>, <cite class="citation" contenteditable="true">Brave New World</cite></figcaption>`
-            })
-        }
-        function insertBlockquote() {
-            insertNode(createQuote())
-        }
-
-        function getRelativeCount(count) {
-            if (count < 1000)
-                return count
-            else if (count < 1000000)
-                return parseFloat((count / 1000).toFixed(1)) + 'K'
-            else if (count < 1000000000)
-                return parseFloat((count / 1000000).toFixed(1)) + 'M'
-        }
 
         function getSignedIn() {
             return new Promise((resolve, reject) => {
@@ -2582,6 +2561,9 @@
 
             floDapps.launchStartUp().then(async result => {
                 getRef('user_flo_id').value = myFloID
+                document.querySelectorAll('.user-id').forEach(elem => {
+                    elem.textContent = myFloID
+                })
                 floGlobals.isSubAdmin = floGlobals.subAdmins.includes(myFloID)
                 maxCardsPerSection = floGlobals.isSubAdmin ? 3 : 2
                 if (floGlobals.isSubAdmin) {
@@ -2603,10 +2585,10 @@
                     `: ''}
                     <sm-button variant="primary" onclick="${floGlobals.isSubAdmin ? 'publishArticle()' : 'exportSelection()'}">
                         ${floGlobals.isSubAdmin ? `
-                            <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0V0z" fill="none" /> <path d="M5 4h14v2H5zm0 10h4v6h6v-6h4l-7-7-7 7zm8-2v6h-2v-6H9.83L12 9.83 14.17 12H13z" /> </svg>
+                            <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0V0z" fill="none" /> <path d="M5 4h14v2H5zm0 10h4v6h6v-6h4l-7-7-7 7zm8-2v6h-2v-6H9.83L12 9.83 14.17 12H13z" /> </svg>
                             Publish
                             `: `
-                            <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <g> <rect fill="none" height="24" width="24" /> </g> <g> <path d="M18,15v3H6v-3H4v3c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2v-3H18z M17,11l-1.41-1.41L13,12.17V4h-2v8.17L8.41,9.59L7,11l5,5 L17,11z" /> </g> </svg>
+                            <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <g> <rect fill="none" height="24" width="24" /> </g> <g> <path d="M18,15v3H6v-3H4v3c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2v-3H18z M17,11l-1.41-1.41L13,12.17V4h-2v8.17L8.41,9.59L7,11l5,5 L17,11z" /> </g> </svg>
                             Download
                         `}
                     </sm-button>
@@ -12616,7 +12598,7 @@
                 <h4>RanchiMall Times</h4>
             </a>
             <theme-toggle></theme-toggle>
-            <button id="user_button" class="hide-completely" onclick="showPopup('user_popup')">
+            <button id="user_button" class="hide-completely" onclick="openPopup('user_popup')">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" height="24px" viewBox="0 0 24 24" width="24px"
                     fill="#000000">
                     <path d="M0 0h24v24H0V0z" fill="none" />
@@ -12844,7 +12826,7 @@
         </sm-popup>
         <sm-popup id="sign_in_popup">
             <header slot="header" class="popup__header">
-                <button class="popup__header__close" onclick="hidePopup()">
+                <button class="popup__header__close" onclick="closePopup()">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                         fill="#000000">
                         <path d="M0 0h24v24H0V0z" fill="none" />
@@ -12907,7 +12889,7 @@
         <sm-popup id="user_popup">
             <header slot="header" class="popup__header">
                 <div class="flex align-center">
-                    <button class="popup__header__close" onclick="hidePopup()">
+                    <button class="popup__header__close" onclick="closePopup()">
                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
                             width="24px" fill="#000000">
                             <path d="M0 0h24v24H0V0z" fill="none" />
@@ -12955,7 +12937,67 @@
             }
         </script>
         <script>
-            // Global letiables
+            const slideInLeft = [
+                {
+                    opacity: 0,
+                    transform: 'translateX(1rem)'
+                },
+                {
+                    opacity: 1,
+                    transform: 'translateX(0)'
+                }
+            ]
+            const slideOutLeft = [
+                {
+                    opacity: 1,
+                    transform: 'translateX(0)'
+                },
+                {
+                    opacity: 0,
+                    transform: 'translateX(-1rem)'
+                },
+            ]
+            const slideInRight = [
+                {
+                    opacity: 0,
+                    transform: 'translateX(-1rem)'
+                },
+                {
+                    opacity: 1,
+                    transform: 'translateX(0)'
+                }
+            ]
+            const slideOutRight = [
+                {
+                    opacity: 1,
+                    transform: 'translateX(0)'
+                },
+                {
+                    opacity: 0,
+                    transform: 'translateX(1rem)'
+                },
+            ]
+            const slideInDown = [
+                {
+                    opacity: 0,
+                    transform: 'translateY(-1rem)'
+                },
+                {
+                    opacity: 1,
+                    transform: 'translateY(0)'
+                },
+            ]
+            const slideOutUp = [
+                {
+                    opacity: 1,
+                    transform: 'translateY(0)'
+                },
+                {
+                    opacity: 0,
+                    transform: 'translateY(-1rem)'
+                },
+            ]
+            // Global variables
             const domRefs = {};
             let timerId;
             const currentYear = new Date().getFullYear();
@@ -12998,9 +13040,9 @@
                     }
                 }
             }
-            let zIndex = 10
+            let zIndex = 50
             // function required for popups or modals to appear
-            function showPopup(popupId, pinned) {
+            function openPopup(popupId, pinned) {
                 zIndex++
                 getRef(popupId).setAttribute('style', `z-index: ${zIndex}`)
                 getRef(popupId).show({ pinned })
@@ -13008,18 +13050,11 @@
             }
 
             // hides the popup or modal
-            function hidePopup() {
+            function closePopup() {
                 if (popupStack.peek() === undefined)
                     return;
                 popupStack.peek().popup.hide()
             }
-            document.addEventListener('popupopened', e => {
-                switch (e.target.id) {
-                    case 'sign_in_popup':
-
-                        break
-                }
-            })
             document.addEventListener('popupclosed', e => {
                 switch (e.target.id) {
                     case 'sign_in_popup':
@@ -13034,7 +13069,7 @@
             const getConfirmation = (title, options = {}) => {
                 return new Promise(resolve => {
                     const { message, cancelText = 'Cancel', confirmText = 'OK' } = options
-                    showPopup('confirmation_popup', true)
+                    openPopup('confirmation_popup', true)
                     getRef('confirm_title').textContent = title;
                     getRef('confirm_message').textContent = message;
                     let cancelButton = getRef('confirmation_popup').children[2].children[0],
@@ -13042,11 +13077,11 @@
                     submitButton.textContent = confirmText
                     cancelButton.textContent = cancelText
                     submitButton.onclick = () => {
-                        hidePopup()
+                        closePopup()
                         resolve(true);
                     }
                     cancelButton.onclick = () => {
-                        hidePopup()
+                        closePopup()
                         resolve(false);
                     }
                 })
@@ -13058,7 +13093,7 @@
                 document.querySelectorAll('sm-input[data-private-key]').forEach(input => input.customValidation = floCrypto.getPubKeyHex)
                 document.addEventListener('keyup', (e) => {
                     if (e.key === 'Escape') {
-                        hidePopup()
+                        closePopup()
                     }
                 })
                 document.addEventListener('copy', () => {
@@ -13142,79 +13177,9 @@
                         })
                         .catch(err => console.log(err))
                 } else {
-                    showPopup('sign_in_popup')
+                    openPopup('sign_in_popup')
                 }
             }, 300))
-            const slideInLeft = [
-                {
-                    opacity: 0,
-                    transform: 'translateX(1rem)'
-                },
-                {
-                    opacity: 1,
-                    transform: 'translateX(0)'
-                }
-            ]
-            const slideOutLeft = [
-                {
-                    opacity: 1,
-                    transform: 'translateX(0)'
-                },
-                {
-                    opacity: 0,
-                    transform: 'translateX(-1rem)'
-                },
-            ]
-            const slideInRight = [
-                {
-                    opacity: 0,
-                    transform: 'translateX(-1rem)'
-                },
-                {
-                    opacity: 1,
-                    transform: 'translateX(0)'
-                }
-            ]
-            const slideOutRight = [
-                {
-                    opacity: 1,
-                    transform: 'translateX(0)'
-                },
-                {
-                    opacity: 0,
-                    transform: 'translateX(1rem)'
-                },
-            ]
-            const slideInDown = [
-                {
-                    opacity: 0,
-                    transform: 'translateY(-1rem)'
-                },
-                {
-                    opacity: 1,
-                    transform: 'translateY(0)'
-                },
-            ]
-            const slideInUp = [
-                {
-                    opacity: 0,
-                    transform: 'translateY(1rem)'
-                },
-                {
-                    opacity: 1,
-                    transform: 'translateY(0)'
-                },
-            ]
-            const slideOutUp = [
-                {
-                    opacity: 1,
-                    transform: 'translateY(0)'
-                },
-                {
-                    opacity: 0,
-                    transform: 'translateY(-1rem)'
-                },
-            ]
             function generateCredentials() {
                 const animOptions = {
                     fill: 'forwards',
@@ -13285,12 +13250,12 @@
                     getRef('sign_in_button').onclick = () => {
                         resolve(getRef('private_key_field').value.trim())
                         getRef('private_key_field').value = ''
-                        hidePopup()
+                        closePopup()
                     }
                     getRef('sign_up_button').onclick = () => {
                         resolve(getRef('generated_private_key').value.trim())
                         getRef('generated_private_key').value = ''
-                        hidePopup()
+                        closePopup()
                     }
                 }))
 
@@ -13935,6 +13900,7 @@
                     }
                 })
 
+            //popup
             class Stack {
                 constructor() {
                     this.items = [];
@@ -13955,168 +13921,164 @@
 
             const smPopup = document.createElement('template');
             smPopup.innerHTML = `
-                <style>
-                *{
-                    padding: 0;
-                    margin: 0;
-                    -webkit-box-sizing: border-box;
-                            box-sizing: border-box;
-                }
-                :host{
-                    position: fixed;
-                    display: -ms-grid;
-                    display: grid;
-                    z-index: 10;
-                    --accent-color: #4d2588;
-                    --text-color: 17, 17, 17;
-                    --background-color: 255, 255, 255;
-                    --width: 100%;
-                    --height: auto;
-                    --min-width: auto;
-                    --min-height: auto;
-                    --backdrop-background: rgba(0, 0, 0, 0.6);
-                    --border-radius: 0.8rem 0.8rem 0 0;
-                }
-                .popup-container{
-                    display: -ms-grid;
-                    display: grid;
-                    position: fixed;
-                    top: 0;
-                    bottom: 0;
-                    left: 0;
-                    right: 0;
-                    place-items: center;
-                    z-index: 10;
-                    touch-action: none;
-                }
-                :host(.stacked) .popup{
-                    -webkit-transform: scale(0.9) translateY(-2rem) !important;
-                            transform: scale(0.9) translateY(-2rem) !important;
-                }
-                .background{
-                    position: absolute;
-                    top: 0;
-                    bottom: 0;
-                    left: 0;
-                    right: 0;
-                    pointer-events: none;
-                    background: var(--backdrop-background);
-                    -webkit-transition: opacity 0.3s;
-                    -o-transition: opacity 0.3s;
-                    transition: opacity 0.3s;
-                }
-                .popup{
-                    display: -webkit-box;
-                    display: -ms-flexbox;
-                    display: flex;
-                    -webkit-box-orient: vertical;
-                    -webkit-box-direction: normal;
-                            flex-direction: column;
-                    position: relative;
-                    -ms-flex-item-align: end;
-                        align-self: flex-end;
-                    -webkit-box-align: start;
-                        -ms-flex-align: start;
-                            align-items: flex-start;
-                    width: var(--width);
-                    min-width: var(--min-width);
-                    height: var(--height);
-                    min-height: var(--min-height);
-                    max-height: 90vh;
-                    border-radius: var(--border-radius);
-                    background: rgba(var(--background-color), 1);
-                    -webkit-box-shadow: 0 -1rem 2rem #00000020;
-                            box-shadow: 0 -1rem 2rem #00000020;
-                    transition: transform 0.3s;
-                }
-                .container-header{
-                    display: -webkit-box;
-                    display: flex;
-                    width: 100%;
-                    touch-action: none;
-                    -webkit-box-align: center;
-                        -ms-flex-align: center;
-                            align-items: center;
-                }
-                .popup-top{
-                    display: -webkit-box;
-                    display: flex;
-                    width: 100%;
-                }
-                .popup-body{
-                    display: -webkit-box;
-                    display: flex;
-                    -webkit-box-orient: vertical;
-                    -webkit-box-direction: normal;
-                        -ms-flex-direction: column;
-                            flex-direction: column;
-                    -webkit-box-flex: 1;
-                        -ms-flex: 1;
-                            flex: 1;
-                    width: 100%;
-                    padding: var(--body-padding, 1.5rem);
-                    overflow-y: auto;
-                }
-                .hide{
-                    display:none;
-                }
-                @media screen and (min-width: 640px){
-                    :host{
-                        --border-radius: 0.5rem;
-                    }
-                    .popup{
-                        -ms-flex-item-align: center;
-                            -ms-grid-row-align: center;
-                            align-self: center;
-                        border-radius: var(--border-radius);
-                        height: var(--height);
-                        -webkit-box-shadow: 0 3rem 2rem -0.5rem #00000040;
-                                box-shadow: 0 3rem 2rem -0.5rem #00000040;
-                    }
-                }
-                @media screen and (max-width: 640px){
-                    .popup-top{
-                        -webkit-box-orient: vertical;
-                        -webkit-box-direction: normal;
-                                flex-direction: column;
-                        -webkit-box-align: center;
-                                align-items: center;
-                    }
-                    .handle{
-                        height: 0.3rem;
-                        width: 2rem;
-                        background: rgba(var(--text-color), .4);
-                        border-radius: 1rem;
-                        margin: 0.5rem 0;
-                    }
-                }
-                @media (any-hover: hover){
-                    ::-webkit-scrollbar{
-                        width: 0.5rem;
-                    }
-
-                    ::-webkit-scrollbar-thumb{
-                        background: rgba(var(--text-color), 0.3);
-                        border-radius: 1rem;
-                        &:hover{
-                            background: rgba(var(--text-color), 0.5);
-                        }
-                    }
-                }
-                </style>
-                <div class="popup-container hide" role="dialog">
-                    <div part="background" class="background"></div>
-                    <div part="popup" class="popup">
-                        <div part="popup-header" class="popup-top">
-                            <div class="handle"></div>
-                            <slot name="header"></slot>
-                        </div>
-                        <div part="popup-body" class="popup-body">
-                            <slot></slot>
-                        </div>
-                    </div>
-                </div>
-                `;
+<style>
+*{
+    padding: 0;
+    margin: 0;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+} 
+:host{
+    position: fixed;
+    display: -ms-grid;
+    display: grid;
+    z-index: 10;
+    --width: 100%;
+    --height: auto;
+    --min-width: auto;
+    --min-height: auto;
+    --backdrop-background: rgba(0, 0, 0, 0.6);
+    --border-radius: 0.8rem 0.8rem 0 0;
+}
+.popup-container{
+    display: -ms-grid;
+    display: grid;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    place-items: center;
+    z-index: 10;
+    touch-action: none;
+}
+:host(.stacked) .popup{
+    -webkit-transform: scale(0.9) translateY(-2rem) !important;
+            transform: scale(0.9) translateY(-2rem) !important;
+}
+.background{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    background: var(--backdrop-background);
+    -webkit-transition: opacity 0.3s;
+    -o-transition: opacity 0.3s;
+    transition: opacity 0.3s;
+}
+.popup{
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+            flex-direction: column;
+    position: relative;
+    -ms-flex-item-align: end;
+        align-self: flex-end;
+    -webkit-box-align: start;
+        -ms-flex-align: start;
+            align-items: flex-start;
+    width: var(--width);
+    min-width: var(--min-width);
+    height: var(--height);
+    min-height: var(--min-height);
+    max-height: 90vh;
+    border-radius: var(--border-radius);
+    background: rgba(var(--background-color, (255,255,255)), 1);
+    -webkit-box-shadow: 0 -1rem 2rem #00000020;
+            box-shadow: 0 -1rem 2rem #00000020;
+}
+.container-header{
+    display: -webkit-box;
+    display: flex;
+    width: 100%;
+    touch-action: none;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+}
+.popup-top{
+    display: -webkit-box;
+    display: flex;
+    width: 100%;
+}
+.popup-body{
+    display: -webkit-box;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    -webkit-box-flex: 1;
+        -ms-flex: 1;
+            flex: 1;
+    width: 100%;
+    padding: var(--body-padding, 1.5rem);
+    overflow-y: auto;
+}
+.hide{
+    display:none;
+}
+@media screen and (min-width: 640px){
+    :host{
+        --border-radius: 0.5rem;
+    }
+    .popup{
+        -ms-flex-item-align: center;
+            -ms-grid-row-align: center;
+            align-self: center;
+        border-radius: var(--border-radius);
+        height: var(--height);
+        -webkit-box-shadow: 0 3rem 2rem -0.5rem #00000040;
+                box-shadow: 0 3rem 2rem -0.5rem #00000040;
+    }
+}
+@media screen and (max-width: 640px){
+    .popup-top{
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+                flex-direction: column;
+        -webkit-box-align: center;
+                align-items: center;
+    }
+    .handle{
+        height: 0.3rem;
+        width: 2rem;
+        background: rgba(var(--text-color, (17,17,17)), .4);
+        border-radius: 1rem;
+        margin: 0.5rem 0;
+    }
+}
+@media (any-hover: hover){
+    ::-webkit-scrollbar{
+        width: 0.5rem;
+    }
+    
+    ::-webkit-scrollbar-thumb{
+        background: rgba(var(--text-color, (17,17,17)), 0.3);
+        border-radius: 1rem;
+        &:hover{
+            background: rgba(var(--text-color, (17,17,17))), 0.5);
+        }
+    }
+}
+</style>
+<div class="popup-container hide" role="dialog">
+    <div part="background" class="background"></div>
+    <div part="popup" class="popup">
+        <div part="popup-header" class="popup-top">
+            <div class="handle"></div>
+            <slot name="header"></slot>
+        </div>
+        <div part="popup-body" class="popup-body">
+            <slot></slot>
+        </div>
+    </div>
+</div>
+`;
             customElements.define('sm-popup', class extends HTMLElement {
                 constructor() {
                     super();
@@ -14139,7 +14101,7 @@
 
                     this.popupContainer = this.shadowRoot.querySelector('.popup-container');
                     this.backdrop = this.shadowRoot.querySelector('.background');
-                    this.popup = this.shadowRoot.querySelector('.popup');
+                    this.dialogBox = this.shadowRoot.querySelector('.popup');
                     this.popupBodySlot = this.shadowRoot.querySelector('.popup-body slot');
                     this.popupHeader = this.shadowRoot.querySelector('.popup-top');
 
@@ -14173,7 +14135,7 @@
                 resumeScrolling() {
                     const scrollY = document.body.style.top;
                     window.scrollTo(0, parseInt(scrollY || '0') * -1);
-                    document.body.style.overflow = 'auto';
+                    document.body.style.overflow = '';
                     document.body.style.top = 'initial';
                 }
 
@@ -14184,7 +14146,7 @@
                             easing: 'ease'
                         }
                         const initialAnimation = (window.innerWidth > 640) ? 'scale(1.1)' : `translateY(${this.offset ? `${this.offset}px` : '100%'})`
-                        this.animateTo(this.popup, [
+                        this.animateTo(this.dialogBox, [
                             {
                                 opacity: this.offset ? 1 : 0,
                                 transform: initialAnimation
@@ -14205,17 +14167,15 @@
                             duration: 300,
                             easing: 'ease'
                         }
-                        if (popupStack) {
-                            popupStack.push({
-                                popup: this,
-                                permission: pinned
-                            });
-                            if (popupStack.items.length > 1) {
-                                this.animateTo(popupStack.items[popupStack.items.length - 2].popup.shadowRoot.querySelector('.popup'), [
-                                    { transform: 'none' },
-                                    { transform: 'translateY(-1.5rem) scale(0.9)' },
-                                ], animOptions)
-                            }
+                        popupStack.push({
+                            popup: this,
+                            permission: pinned
+                        });
+                        if (popupStack.items.length > 1) {
+                            this.animateTo(popupStack.items[popupStack.items.length - 2].popup.shadowRoot.querySelector('.popup'), [
+                                { transform: 'none' },
+                                { transform: (window.innerWidth > 640) ? 'scale(0.95)' : 'translateY(-1.5rem)' },
+                            ], animOptions)
                         }
                         this.popupContainer.classList.remove('hide');
                         if (!this.offset)
@@ -14251,7 +14211,7 @@
                         { opacity: 1 },
                         { opacity: 0 }
                     ], animOptions)
-                    this.animateTo(this.popup, [
+                    this.animateTo(this.dialogBox, [
                         {
                             opacity: 1,
                             transform: (window.innerWidth > 640) ? 'none' : `translateY(${this.offset ? `${this.offset}px` : '0'})`
@@ -14263,22 +14223,8 @@
                     ], animOptions).finished
                         .finally(() => {
                             this.popupContainer.classList.add('hide');
-                            this.popup.style = ''
+                            this.dialogBox.style = ''
                             this.removeAttribute('open');
-                            if (typeof popupStack !== 'undefined') {
-                                popupStack.pop();
-                                if (popupStack.items.length) {
-                                    this.animateTo(popupStack.items[popupStack.items.length - 1].popup.shadowRoot.querySelector('.popup'), [
-                                        { transform: 'translateY(-1.5rem) scale(0.9)' },
-                                        { transform: 'none' },
-                                    ], animOptions)
-
-                                } else {
-                                    this.resumeScrolling();
-                                }
-                            } else {
-                                this.resumeScrolling();
-                            }
 
                             if (this.forms.length) {
                                 this.forms.forEach(form => form.reset());
@@ -14293,6 +14239,16 @@
                             );
                             this.isOpen = false;
                         })
+                    popupStack.pop();
+                    if (popupStack.items.length) {
+                        this.animateTo(popupStack.items[popupStack.items.length - 1].popup.shadowRoot.querySelector('.popup'), [
+                            { transform: (window.innerWidth > 640) ? 'scale(0.95)' : 'translateY(-1.5rem)' },
+                            { transform: 'none' },
+                        ], animOptions)
+
+                    } else {
+                        this.resumeScrolling();
+                    }
                 }
 
                 handleTouchStart(e) {
@@ -14300,7 +14256,6 @@
                     this.popupHeader.addEventListener('touchmove', this.handleTouchMove, { passive: true });
                     this.popupHeader.addEventListener('touchend', this.handleTouchEnd, { passive: true });
                     this.touchStartY = e.changedTouches[0].clientY;
-                    this.popup.style.transition = 'transform 0.1s';
                     this.touchStartTime = e.timeStamp;
                 }
 
@@ -14308,7 +14263,7 @@
                     if (this.touchStartY < e.changedTouches[0].clientY) {
                         this.offset = e.changedTouches[0].clientY - this.touchStartY;
                         this.touchEndAnimation = window.requestAnimationFrame(() => {
-                            this.popup.style.transform = `translateY(${this.offset}px)`;
+                            this.dialogBox.style.transform = `translateY(${this.offset}px)`;
                         });
                     }
                 }
@@ -14317,7 +14272,7 @@
                     this.touchEndTime = e.timeStamp;
                     cancelAnimationFrame(this.touchEndAnimation);
                     this.touchEndY = e.changedTouches[0].clientY;
-                    this.threshold = this.popup.getBoundingClientRect().height * 0.3;
+                    this.threshold = this.dialogBox.getBoundingClientRect().height * 0.3;
                     if (this.touchEndTime - this.touchStartTime > 200) {
                         if (this.touchEndY - this.touchStartY > this.threshold) {
                             if (this.pinned) {
@@ -14357,7 +14312,7 @@
                 }
 
                 updateFocusableList() {
-                    this.focusable = this.querySelectorAll('sm-button:not([disabled]), button:not([disabled]), [href], sm-input, input, sm-select, select, sm-checkbox, sm-textarea, textarea, [tabindex]:not([tabindex="-1"])')
+                    this.focusable = this.querySelectorAll('sm-button:not([disabled]), button:not([disabled]), [href], sm-input, input:not([readonly]), sm-select, select, sm-checkbox, sm-textarea, textarea, [tabindex]:not([tabindex="-1"])')
                     this.autoFocus = this.querySelector('[autofocus]')
                 }
 
@@ -14410,6 +14365,7 @@
                     }
                 }
             });
+
             const smCopy = document.createElement('template');
             smCopy.innerHTML = `
                 <style>
