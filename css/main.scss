@@ -545,6 +545,12 @@ sm-copy {
   background-color: var(--foreground-color);
   z-index: 2;
 }
+#current_article_title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
 #options_panel {
   position: sticky;
@@ -1010,6 +1016,9 @@ sm-copy {
   }
   #article_name_wrapper {
     justify-content: flex-start;
+    .icon-only {
+      flex-shrink: 0;
+    }
   }
   .article-section {
     display: flex;
