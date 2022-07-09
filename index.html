@@ -46,7 +46,7 @@
     </script>
 </head>
 
-<body class="hide" onload="onLoadStartUp()">
+<body class="hidden" onload="onLoadStartUp()">
     <sm-notifications id="notification_drawer"></sm-notifications>
     <sm-popup id="confirmation_popup">
         <h4 id="confirm_title"></h4>
@@ -56,7 +56,7 @@
             <sm-button variant="no-outline" class="submit-btn">OK</sm-button>
         </div>
     </sm-popup>
-    <article id="landing" class="page page-layout hide-completely">
+    <article id="landing" class="page page-layout hidden">
         <header class="flex space-between">
             <div class="logo">
                 <svg class="main-logo" viewBox="0 0 27.25 32">
@@ -80,7 +80,7 @@
             </div>
         </section>
     </article>
-    <article id="sign_in" class="page page-layout hide-completely">
+    <article id="sign_in" class="page page-layout hidden">
         <header>
             <div class="logo">
                 <svg class="main-logo" viewBox="0 0 27.25 32">
@@ -106,7 +106,7 @@
             </p>
         </section>
     </article>
-    <article id="sign_up" class="page page-layout hide-completely">
+    <article id="sign_up" class="page page-layout hidden">
         <header>
             <div class="logo">
                 <svg class="main-logo" viewBox="0 0 27.25 32">
@@ -143,7 +143,7 @@
         <sm-spinner></sm-spinner>
         <h4>Loading RanchiMall CC</h4>
     </article>
-    <article id="main_page" class="grid page hide-completely">
+    <article id="main_page" class="grid page hidden">
         <header id="main_header">
             <div id="article_name_wrapper" class="flex gap-0-5 align-center">
                 <button class="icon-only" title="Show all articles list" onclick="openPopup('article_list_popup')">
@@ -155,8 +155,8 @@
                     </svg>
                 </button>
                 <h4 id="current_article_title"></h4>
-                <button id="article_outline_button" class="icon-only" title="View article outline"
-                    onclick="toggleOutlinePanel()">
+                <button id="article_outline_button" class="icon-only" title="View article plot"
+                    onclick="openPopup('plot_popup')">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px"
                         viewBox="0 0 24 24" width="24px" fill="#000000">
                         <g>
@@ -167,7 +167,7 @@
                         </g>
                     </svg>
                 </button>
-                <button id="filter_button" class="icon-only" title="Show filters" onclick="toggleFilterPanel()">
+                <button id="filter_button" class="icon-only" title="Show filters" onclick="toggleOptionsPanel()">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                         fill="#000000">
                         <path d="M0 0h24v24H0V0z" fill="none" />
@@ -209,7 +209,7 @@
                     </menu-option>
                 </sm-menu>
             </div>
-            <div id="selected_content_options" class="flex space-between hide-completely">
+            <div id="selected_content_options" class="flex space-between hidden">
                 <button onclick="clearSelection()" title="Clear selection">
                     <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
                         viewBox="0 0 24 24" width="24px" fill="#000000">
@@ -247,7 +247,7 @@
                 aria-label="User profile"></button>
             <theme-toggle></theme-toggle>
         </header>
-        <section id="options_panel" class="flex hide-completely">
+        <section id="options_panel" class="flex hidden">
             <div id="filter_panel" class="flex w-100 align-center gap-1 ">
                 <h5>Sort by</h5>
                 <strip-select id="sort_content_list" label="Sort by:">
@@ -255,12 +255,8 @@
                     <strip-option value="time">Most recent</strip-option>
                 </strip-select>
             </div>
-            <div id="article_outline_panel" class="flex align-center gap-1 hide-completely">
-                <h5>Sections</h5>
-                <ul id="article_outline" class="flex gap-1"></ul>
-            </div>
         </section>
-        <div id="text_toolbar" class="hide-completely">
+        <div id="text_toolbar" class="hidden">
             <div id="formatting_options">
                 <button id="strong_button" title="Bold (ctrl+b)" class="formatting-button" onclick="formatDoc('bold')">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
@@ -316,7 +312,7 @@
                     </svg>
                 </button>
             </div>
-            <div id="link_panel" class="hide-completely">
+            <div id="link_panel" class="hidden">
                 <sm-form style="--gap: 0.5rem">
                     <button class="icon-only justify-self-start" onclick="toggleLinkPanel()">
                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
@@ -331,7 +327,7 @@
             </div>
         </div>
         <div id="article_wrapper"></div>
-        <aside id="version_history_panel" class="flex direction-column hide-completely">
+        <aside id="version_history_panel" class="flex flex-direction-column hidden">
             <div class="flex align-center space-between">
                 <div class="flex align-center">
                     <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
@@ -351,10 +347,10 @@
                     </svg>
                 </button>
             </div>
-            <ul id="version_timeline" class="flex direction-column gap-1-5"></ul>
+            <ul id="version_timeline" class="flex flex-direction-column gap-1-5"></ul>
         </aside>
     </article>
-    <article id="preview_page" class="grid page hide-completely">
+    <article id="preview_page" class="grid page hidden">
         <header class="grid gap-1 full-bleed">
             <div class="flex align-center space-between">
                 <div class="flex gap-0-5">
@@ -500,6 +496,29 @@
             </div>
         </section>
     </sm-popup>
+    <sm-popup id="plot_popup">
+        <header slot="header" class="popup__header">
+            <div class="flex align-center">
+                <button class="popup__header__close" onclick="closePopup()">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                        fill="#000000">
+                        <path d="M0 0h24v24H0V0z" fill="none" />
+                        <path
+                            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
+                    </svg>
+                </button>
+                <h3>plot</h3>
+            </div>
+        </header>
+        <details id="plot_wrapper" class="hidden">
+            <summary>Plot</summary>
+            <div id="plot_diagram"></div>
+        </details>
+        <div class="grid gap-0-5">
+            <h4>Article sections</h4>
+            <ul id="article_outline" class="flex flex-direction-column gap-1"></ul>
+        </div>
+    </sm-popup>
     <sm-popup id="contributors_popup">
         <header slot="header" class="popup__header">
             <div class="flex align-center">
@@ -547,6 +566,14 @@
             </div>
         </header>
         <section class="grid gap-1-5">
+            <div class="grid gap-0-5">
+                <h4>
+                    BTC integrated with FLO
+                </h4>
+                <p>
+                    You can use your FLO private key to perform transaction on BTC network within our apps ecosystem.
+                </p>
+            </div>
             <div class="grid gap-0-5">
                 <h5>My FLO ID</h5>
                 <sm-copy id="user_flo_id"></sm-copy>
@@ -600,7 +627,7 @@
             <div class="content-card content-card--empty">
                 <div class="content__area" data-type="origin" placeholder="Write something new or edit existing content"
                     contenteditable="true"></div>
-                <button class="submit-entry hide-completely">Submit</button>
+                <button class="submit-entry hidden">Submit</button>
             </div>
             <!-- <div class="content-card-container"></div> -->
         </section>
@@ -631,7 +658,7 @@
                         </svg>
                     </button>
                 </div>
-                <button class="submit-entry hide-completely">Submit</button>
+                <button class="submit-entry hidden">Submit</button>
             </div>
         </div>
     </template>
@@ -768,7 +795,7 @@
             zIndex--
             switch (e.target.id) {
                 case 'edit_sections_popup':
-                    getRef('section_list_container').innerHTML = ''
+                    renderElem(getRef('section_list_container'), html``)
                     break;
                 case 'article_list_popup':
                     renderElem(getRef('article_list'), html``)
@@ -860,7 +887,7 @@
 
         window.addEventListener('hashchange', e => showPage(window.location.hash))
         window.addEventListener("load", () => {
-            document.body.classList.remove('hide-completely')
+            document.body.classList.remove('hidden')
             document.querySelectorAll('sm-input[data-private-key]').forEach(input => input.customValidation = floCrypto.getPubKeyHex)
             document.addEventListener('keyup', (e) => {
                 if (e.key === 'Escape') {
@@ -971,12 +998,12 @@
                     break;
                 case 'home':
                 case 'main_page':
-                    if (!floGlobals.currentArticle.id || params.articleID !== pagesData.params.articleID) {
+                    if (!floGlobals.currentArticle.id || params.articleID !== pagesData.params.articleID || params.focusMode !== pagesData.params.focusMode) {
                         closePopup()
-                        render.article(params.articleID)
+                        render.article(params.articleID, params.focusMode === 'true')
                     }
                     hideVersionHistory()
-                    window.history.replaceState('', '', `#/home?articleID=${params.articleID}`)
+                    window.history.replaceState('', '', `#/home?articleID=${params.articleID}&focusMode=${params.hasOwnProperty('focusMode') ? params.focusMode : 'true'}`)
                     renderElem(getRef('preview__body'), html``)
                     targetPage = 'main_page'
                     break;
@@ -989,8 +1016,8 @@
                     targetPage = 'preview_page'
                     break
             }
-            document.querySelectorAll('.page').forEach(page => page.classList.add('hide-completely'))
-            getRef(targetPage).classList.remove('hide-completely')
+            document.querySelectorAll('.page').forEach(page => page.classList.add('hidden'))
+            getRef(targetPage).classList.remove('hidden')
             if (pagesData.lastPage !== pageId) {
                 pagesData.lastPage = pageId
                 if (!pagesData.openedPages.includes(pageId)) {
@@ -1327,7 +1354,7 @@
 
         function downloadHTML(string, options = {}) {
             const { title } = options
-            const element = html.node`<a href="${`${`data:text/html;charset=utf-8, ${encodeURIComponent(string)}`}`}" download="${`${title ? title : 'article'}.html`}" class="hide"></a>`
+            const element = html.node`<a href="${`${`data:text/html;charset=utf-8, ${encodeURIComponent(string)}`}`}" download="${`${title ? title : 'article'}.html`}" class="hidden"></a>`
             document.body.appendChild(element);
             element.click();
             document.body.removeChild(element);
@@ -1510,7 +1537,7 @@
                 target.removeEventListener('paste', checkEntry)
                 const selection = window.getSelection()
                 if (!e.relatedTarget?.closest('#text_toolbar')) {
-                    getRef('text_toolbar').classList.add('hide-completely')
+                    getRef('text_toolbar').classList.add('hidden')
                     childObserver.disconnect()
                     activeEntry = undefined
                 }
@@ -1613,25 +1640,52 @@
             return scoreElement
         }
         const render = {
-            article(id) {
+            article(id, focusMode) {
                 floGlobals.currentArticle.id = id
                 parseArticleData()
                 const { title } = floGlobals.appObjects.cc.articleList[id]
                 const { writer, sections } = floGlobals.currentArticle
-                const frag = document.createDocumentFragment()
-                let index = 0
-                for (const sectionID in sections) {
-                    frag.append(render.section(sectionID, sections[sectionID], index))
-                    index += 1
+                let assignedSection = localStorage.getItem(`${id}_assigned_section_${myFloID}`)
+                const sectionKeys = Object.keys(floGlobals.currentArticle.sections)
+                if (assignedSection === null && !floGlobals.isSubAdmin) {
+                    const randomIndex = floCrypto.randInt(0, sectionKeys.length - 1)
+                    assignedSection = sectionKeys[randomIndex]
+                    localStorage.setItem(`${id}_assigned_section_${myFloID}`, assignedSection)
                 }
                 getRef('current_article_title').textContent = title
                 getRef('article_wrapper').innerHTML = ''
-                getRef('article_wrapper').append(frag)
+                if (!floGlobals.isSubAdmin && focusMode) {
+                    getRef('article_wrapper').append(render.section(assignedSection, sections[assignedSection]))
+                    getRef('article_wrapper').append(html.node`
+                        <div id="focus_mode_panel" class="flex align-center space-between">
+                            <div class="grid gap-0-3">
+                                <h4>Focus mode is on</h4>
+                                <p>
+                                    You are only seeing one section assigned to you. Turn off focus mode to see all sections.
+                                </p>
+                            </div>
+                            <a id="focus_mode_button" href="${`#/home?articleID=${id}&focusMode=false`}" class="button">Turn off</a>
+                        </div>
+                    `)
+                    floGlobals.focusMode = {
+                        assignedSection,
+                        active: true
+                    }
+                } else {
+                    const frag = document.createDocumentFragment()
+                    for (const sectionID in sections) {
+                        frag.append(render.section(sectionID, sections[sectionID]))
+                    }
+                    getRef('article_wrapper').append(frag)
+                    floGlobals.focusMode = {
+                        active: false
+                    }
+                }
                 render.sectionOutline()
             },
             articleLink(details, isDefaultArticle, ref) {
                 const { uid, timestamp, title } = details
-                return html.for(ref, uid)`<a class="${`article-link flex interact ${isDefaultArticle ? 'default-article' : ''}`}" title=${isDefaultArticle ? 'Actively written article' : ''}  href="${`#/home?articleID=${uid}`}">${title}</a>`
+                return html.for(ref, uid)`<a class="${`article-link flex interact ${isDefaultArticle ? 'default-article' : ''}`}" title=${isDefaultArticle ? 'Actively written article' : ''}  href="${`#/home?articleID=${uid}&focusMode=true`}">${title}</a>`
             },
             contentCard(id, version = 0) {
                 const { html, contributors, score = 0, vectorClock } = getIterationDetails(id)
@@ -1716,23 +1770,31 @@
             },
             sectionCard(details) {
                 const { title, id } = details
-                return html.node`
+                return html`
                     <div class="section-card flex align-center" data-section-id="${id}">
                         <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><g><rect fill="none" height="24" width="24"/></g><g><path d="M9,18h12v-2H9V18z M3,6v2h18V6H3z M9,13h12v-2H9V13z"/></g></svg>
                         <input placeholder="Section title" value="${title}"/>
                     </div>`
             },
             sectionOutline() {
-                const frag = document.createDocumentFragment()
-                getRef('article_outline').innerHTML = ''
-                floGlobals.appObjects[floGlobals.currentArticle.id].sections.forEach(section => {
-                    frag.append(createElement('button', {
-                        attributes: { 'data-section-id': section.id },
-                        className: 'outline-button',
-                        textContent: section.title,
-                    }))
+                const sections = floGlobals.appObjects[floGlobals.currentArticle.id].sections.filter(v => v).map(({ id, title }) => {
+                    let shouldBeDisabled = floGlobals.focusMode.active && floGlobals.focusMode.assignedSection !== id
+                    return html.for(getRef('article_outline'), id)`
+                        <div class="flex gap-0-5 align-center">
+                        <button class="outline-button" data-section-id="${id}" ?disabled=${shouldBeDisabled}>
+                            ${title}
+                        </button>
+                        ${shouldBeDisabled ? html`<button class="button enable-focus-button" data-section-id="${id}">Focus</button>` : ''}
+                        </div> `
                 })
-                getRef('article_outline').append(frag)
+                renderElem(getRef('article_outline'), html`${sections}`)
+
+                if (floGlobals.currentArticle.hasOwnProperty('plot')) {
+                    getRef('plot_diagram').textContent = floGlobals.currentArticle.plot
+                    getRef('plot_wrapper').classList.remove('hidden')
+                } else {
+                    getRef('plot_wrapper').classList.add('hidden')
+                }
             }
         }
 
@@ -1797,7 +1859,7 @@
             const uid = contentCard.dataset.uid
             const isUniqueEntry = contentArea.dataset.type === 'origin'
             if (contentArea.innerText.trim() === '') {
-                contentCard.querySelector('.submit-entry').classList.add('hide-completely')
+                contentCard.querySelector('.submit-entry').classList.add('hidden')
             } else {
                 const cleanHTML = DOMPurify.sanitize(contentArea.innerHTML.split('\n').map(v => v.trim()).filter(v => v).join('\n'), { FORBID_ATTR: ['style'], ADD_ATTR: ['target'] })
                 const hash = Crypto.SHA256(cleanHTML)
@@ -1808,9 +1870,9 @@
                     previousHash = ''
                 }
                 if (previousHash !== hash)
-                    contentCard.querySelector('.submit-entry').classList.remove('hide-completely')
+                    contentCard.querySelector('.submit-entry').classList.remove('hidden')
                 else
-                    contentCard.querySelector('.submit-entry').classList.add('hide-completely')
+                    contentCard.querySelector('.submit-entry').classList.add('hidden')
             }
 
         }, 300)
@@ -1855,7 +1917,7 @@
                         .then((res) => {
                             // Add result to general data
                             floGlobals.generalData[`${floGlobals.currentArticle.id}_gd|${floGlobals.adminID}|${floGlobals.application}`][res.vectorClock] = { ...res, message: entry }
-                            submitButton.classList.add('hide-completely')
+                            submitButton.classList.add('hidden')
                             notify('Content submitted', 'success')
                             if (isUniqueEntry) {
                                 contentArea.innerHTML = ''
@@ -2002,23 +2064,23 @@
                 const selectedContentSize = selectedContent.size
                 getRef('selected_entries_no').textContent = selectedContentSize
                 if (selectedContentSize === 1 && !isContentSelected) {
-                    getRef('article_name_wrapper').classList.remove('hide-completely')
-                    getRef('selected_content_options').classList.add('hide-completely')
+                    getRef('article_name_wrapper').classList.remove('hidden')
+                    getRef('selected_content_options').classList.add('hidden')
                     animateTo(getRef('article_name_wrapper'), slideOutLeft, animOptions)
                         .onfinish = () => {
                             isContentSelected = true
-                            getRef('article_name_wrapper').classList.add('hide-completely')
-                            getRef('selected_content_options').classList.remove('hide-completely')
+                            getRef('article_name_wrapper').classList.add('hidden')
+                            getRef('selected_content_options').classList.remove('hidden')
                             animateTo(getRef('selected_content_options'), slideInLeft, animOptions)
                         }
                 } else if (selectedContent.size === 0) {
-                    getRef('article_name_wrapper').classList.add('hide-completely')
-                    getRef('selected_content_options').classList.remove('hide-completely')
+                    getRef('article_name_wrapper').classList.add('hidden')
+                    getRef('selected_content_options').classList.remove('hidden')
                     animateTo(getRef('selected_content_options'), slideOutRight, animOptions)
                         .onfinish = () => {
                             isContentSelected = false
-                            getRef('article_name_wrapper').classList.remove('hide-completely')
-                            getRef('selected_content_options').classList.add('hide-completely')
+                            getRef('article_name_wrapper').classList.remove('hidden')
+                            getRef('selected_content_options').classList.add('hidden')
                             animateTo(getRef('article_name_wrapper'), slideInRight, animOptions)
                         }
                 }
@@ -2050,7 +2112,6 @@
         }
 
 
-        let currentOptionsPanel = ''
         function toggleOptionsPanel(type) {
             const animInOptions = {
                 duration: 200,
@@ -2063,8 +2124,8 @@
                 easing: 'ease'
             }
 
-            if (getRef('options_panel').classList.contains('hide-completely')) {
-                getRef('options_panel').classList.remove('hide-completely')
+            if (getRef('options_panel').classList.contains('hidden')) {
+                getRef('options_panel').classList.remove('hidden')
                 getRef('options_panel').animate(slideInDown, animInOptions)
                 getRef('article_wrapper').animate([
                     {
@@ -2073,10 +2134,10 @@
                         transform: 'translateY(0)'
                     }
                 ], animInOptions)
-            } else if (currentOptionsPanel === type) {
+            } else {
                 getRef('options_panel').animate(slideOutUp, animOutOptions)
                     .onfinish = () => {
-                        getRef('options_panel').classList.add('hide-completely')
+                        getRef('options_panel').classList.add('hidden')
                     }
                 getRef('article_wrapper').animate([
                     {
@@ -2086,27 +2147,23 @@
                     }
                 ], animOutOptions).onfinish = e => e.target.cancel()
             }
-            currentOptionsPanel = type
-        }
-
-        function toggleFilterPanel() {
-            getRef('filter_panel').classList.remove('hide-completely')
-            getRef('article_outline_panel').classList.add('hide-completely')
-            toggleOptionsPanel('filter')
-        }
-        function toggleOutlinePanel() {
-            getRef('filter_panel').classList.add('hide-completely')
-            getRef('article_outline_panel').classList.remove('hide-completely')
-            toggleOptionsPanel('outline')
         }
         getRef('article_outline').addEventListener('click', e => {
             if (e.target.closest('.outline-button')) {
                 const sectionID = e.target.closest('.outline-button').dataset.sectionId
                 const target = document.querySelector(`.heading[data-section-id="${sectionID}"]`)
+                if (!target) return;
                 getRef('article_wrapper').scrollTo({
                     behavior: 'smooth',
                     top: target.getBoundingClientRect().top - getRef('article_wrapper').getBoundingClientRect().top + getRef('article_wrapper').scrollTop
                 })
+                closePopup()
+            } else if (e.target.closest('.enable-focus-button')) {
+                const sectionID = e.target.closest('.enable-focus-button').dataset.sectionId
+                localStorage.setItem(`${floGlobals.currentArticle.id}_assigned_section_${myFloID}`, sectionID)
+                location.hash = `#/home?articleID=${floGlobals.currentArticle.id}&focusMode=true`
+                render.article(floGlobals.currentArticle.id, true)
+                closePopup()
             }
         })
         function transformScroll(event) {
@@ -2121,13 +2178,9 @@
 
         getRef('options_panel').addEventListener('wheel', transformScroll);
         const activeHeading = debounce((target) => {
-            [...getRef('article_outline').children].forEach(elem => elem.classList.remove('outline-button--active'))
+            getRef('article_outline').querySelectorAll('.outline-button').forEach(elem => elem.classList.remove('outline-button--active'))
             target.classList.add('outline-button--active')
-            target.scrollIntoView({ behavior: "smooth", block: "end", inline: "center" });
-            getRef('options_panel').scrollTo({
-                behavior: 'smooth',
-                left: target.getBoundingClientRect().left - getRef('options_panel').getBoundingClientRect().left + getRef('options_panel').scrollLeft - ((getRef('options_panel').getBoundingClientRect().width / 2) - target.getBoundingClientRect().width / 2)
-            })
+            target.scrollIntoView({ behavior: "smooth", block: "center" });
         }, 150)
 
         const headingIntersectionObserver = new IntersectionObserver(entries => {
@@ -2181,12 +2234,11 @@
         function renderSectionList() {
             if (!floGlobals.isSubAdmin) return
             getRef('edit_article_title').value = floGlobals.appObjects.cc.articleList[floGlobals.currentArticle.id].title
-            const frag = document.createDocumentFragment()
-            floGlobals.appObjects[floGlobals.currentArticle.id].sections.forEach(section => {
-                frag.append(render.sectionCard(section))
+            const sections = floGlobals.appObjects[floGlobals.currentArticle.id].sections.filter(v => v).map(section => {
+                return render.sectionCard(section)
             })
-            getRef('section_list_container').innerHTML = ''
-            getRef('section_list_container').append(frag)
+            console.log(sections)
+            renderElem(getRef('section_list_container'), html`${sections}`)
         }
         function insertEmptySection() {
             const emptySection = html.node`
@@ -2244,7 +2296,7 @@
                     didTitlesChange = floGlobals.appObjects[floGlobals.currentArticle.id].sections.some(({ title }, index) => title !== changedSections[index].title)
                 }
                 if (didAddSection || didTitlesChange) {
-                    floGlobals.appObjects[floGlobals.currentArticle.id].sections = changedSections
+                    floGlobals.appObjects[floGlobals.currentArticle.id].sections = changedSections.filter(v => v)
                     floCloudAPI.updateObjectData(floGlobals.currentArticle.id)
                         .then((res) => {
                             render.sectionOutline()
@@ -2352,7 +2404,7 @@
             getRef('version_timeline').innerHTML = ''
             getRef('version_timeline').append(frag)
             if (!floGlobals.versionHistory.isOpen) {
-                getRef('version_history_panel').classList.remove('hide-completely')
+                getRef('version_history_panel').classList.remove('hidden')
                 getRef('main_page').classList.add('active-sidebar')
                 floGlobals.versionHistory.isOpen = true
             }
@@ -2360,7 +2412,7 @@
 
         function hideVersionHistory() {
             if (floGlobals.versionHistory.isOpen) {
-                getRef('version_history_panel').classList.add('hide-completely')
+                getRef('version_history_panel').classList.add('hidden')
                 getRef('version_timeline').innerHTML = ''
                 getRef('main_page').classList.remove('active-sidebar')
                 floGlobals.versionHistory.isOpen = false
@@ -2384,23 +2436,23 @@
         function manageFormattingOptions() {
             const selection = window.getSelection();
             if (selection.isCollapsed) {
-                getRef('text_toolbar').classList.add('hide-completely')
+                getRef('text_toolbar').classList.add('hidden')
                 document.querySelectorAll('.formatting-button').forEach(elem => elem.classList.remove('active'))
             } else {
                 getRef('create_link_href').value = ''
                 if (isMobileView) {
-                    getRef('text_toolbar').classList.remove('hide-completely')
+                    getRef('text_toolbar').classList.remove('hidden')
                     getRef('text_toolbar').style.transform = `none`
                 } else {
                     const pos = selection.getRangeAt(0).getBoundingClientRect()
                     const leftOffset = pos.left + 200 < window.innerWidth ? pos.left : pos.left - 220 + window.innerWidth - pos.left
                     const topOffeset = (pos.bottom + window.pageYOffset + 64) > window.innerHeight ? pos.top + window.pageYOffset - 56 : pos.bottom + window.pageYOffset
                     getRef('text_toolbar').style.transform = `translate(${leftOffset}px, calc(${topOffeset}px + 1rem))`
-                    getRef('text_toolbar').classList.remove('hide-completely')
+                    getRef('text_toolbar').classList.remove('hidden')
                     getRef('text_toolbar').style.transform = `translate(${leftOffset}px, calc(${topOffeset}px + 0.3rem))`
                 }
-                getRef('formatting_options').classList.remove('hide-completely')
-                getRef('link_panel').classList.add('hide-completely')
+                getRef('formatting_options').classList.remove('hidden')
+                getRef('link_panel').classList.add('hidden')
             }
         }
 
@@ -2464,13 +2516,13 @@
             } else {
                 getRef('create_link_href').value = ''
             }
-            if (getRef('link_panel').classList.contains('hide-completely')) {
+            if (getRef('link_panel').classList.contains('hidden')) {
                 currentSelection = saveSelection()
             } else {
 
             }
-            getRef('formatting_options').classList.toggle('hide-completely')
-            getRef('link_panel').classList.toggle('hide-completely')
+            getRef('formatting_options').classList.toggle('hidden')
+            getRef('link_panel').classList.toggle('hidden')
         }
 
         function isLink() {
@@ -2559,6 +2611,7 @@
             floDapps.setCustomPrivKeyInput(getSignedIn)
 
             floDapps.launchStartUp().then(async result => {
+                floGlobals.isSubAdmin = floGlobals.subAdmins.includes(myFloID)
                 getRef('user_flo_id').value = myFloID
                 getRef('user_btc_id').value = btc_api.convert.legacy2bech(myFloID)
                 renderElem(getRef('user_popup_button'), html`
@@ -2580,12 +2633,11 @@
                         isShowingFloID = false
                     }
                 }, 1000 * 60);
-                floGlobals.isSubAdmin = floGlobals.subAdmins.includes(myFloID)
                 maxCardsPerSection = floGlobals.isSubAdmin ? 3 : 2
                 if (floGlobals.isSubAdmin) {
-                    document.querySelectorAll('.admin-option').forEach(elem => elem.classList.remove('hide-completely'))
+                    document.querySelectorAll('.admin-option').forEach(elem => elem.classList.remove('hidden'))
                 } else {
-                    document.querySelectorAll('.admin-option').forEach(elem => elem.classList.add('hide-completely'))
+                    document.querySelectorAll('.admin-option').forEach(elem => elem.classList.add('hidden'))
                 }
                 await Promise.all([
                     floCloudAPI.requestObjectData('cc'),
@@ -2708,7 +2760,7 @@
                 display: flex
             }
 
-            .direction-column {
+            .flex-direction-column {
                 -webkit-box-orient: vertical;
                 -webkit-box-direction: normal;
                 -ms-flex-direction: column;
@@ -3142,7 +3194,7 @@
                 }
             }
 
-            .hide-completely {
+            .hidden {
                 display: none
             }
         </style>
@@ -3163,7 +3215,7 @@
                 <h4>RanchiMall Times</h4>
             </a>
             <theme-toggle></theme-toggle>
-            <button id="user_button" class="hide-completely" onclick="openPopup('user_popup')">
+            <button id="user_button" class="hidden" onclick="openPopup('user_popup')">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" height="24px" viewBox="0 0 24 24" width="24px"
                     fill="#000000">
                     <path d="M0 0h24v24H0V0z" fill="none" />
@@ -3422,7 +3474,7 @@
                     </button>
                 </div>
             </section>
-            <section id="sign_up" class="grid gap-1-5 hide-completely">
+            <section id="sign_up" class="grid gap-1-5 hidden">
                 <button class="justify-self-start" onclick="goToSignIn()">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                         fill="#000000">
@@ -3623,9 +3675,9 @@
             document.addEventListener('popupclosed', e => {
                 switch (e.target.id) {
                     case 'sign_in_popup':
-                        getRef('sign_in').classList.remove('hide-completely')
+                        getRef('sign_in').classList.remove('hidden')
                         getRef('sign_in').style = ''
-                        getRef('sign_up').classList.add('hide-completely')
+                        getRef('sign_up').classList.add('hidden')
                         break
                 }
             })
@@ -3654,7 +3706,7 @@
             let currentArticleID
             window.addEventListener("load", () => {
                 currentArticleID = document.body.dataset.articleId
-                document.body.classList.remove('hide-completely')
+                document.body.classList.remove('hidden')
                 document.querySelectorAll('sm-input[data-private-key]').forEach(input => input.customValidation = floCrypto.getPubKeyHex)
                 document.addEventListener('keyup', (e) => {
                     if (e.key === 'Escape') {
@@ -3755,8 +3807,8 @@
                 getRef('generated_flo_id').value = floID
                 getRef('generated_private_key').value = privKey
                 animateTo(getRef('sign_in'), slideOutLeft, animOptions).onfinish = () => {
-                    getRef('sign_in').classList.add('hide-completely')
-                    getRef('sign_up').classList.remove('hide-completely')
+                    getRef('sign_in').classList.add('hidden')
+                    getRef('sign_up').classList.remove('hidden')
                     animateTo(getRef('sign_up'), slideInLeft, animOptions)
                 }
             }
@@ -3767,9 +3819,9 @@
                     ease: 'easing',
                 }
                 animateTo(getRef('sign_up'), slideOutRight, animOptions).onfinish = () => {
-                    getRef('sign_in').classList.remove('hide-completely')
+                    getRef('sign_in').classList.remove('hidden')
                     animateTo(getRef('sign_in'), slideInRight, animOptions)
-                    getRef('sign_up').classList.add('hide-completely')
+                    getRef('sign_up').classList.add('hidden')
                 }
             }
             function signOut() {
@@ -3777,7 +3829,7 @@
                     .then(async (res) => {
                         if (res) {
                             await floDapps.clearCredentials()
-                            getRef('user_button').classList.add('hide-completely')
+                            getRef('user_button').classList.add('hidden')
                             location.reload()
                         }
                     })
@@ -3830,7 +3882,7 @@
                     floGlobals.isSubAdmin = floGlobals.subAdmins.includes(myFloID)
 
                     getRef('user_flo_id').value = myFloID
-                    getRef('user_button').classList.remove('hide-completely')
+                    getRef('user_button').classList.remove('hidden')
                     console.log(result)
                 }).catch(error => console.error(error))
             }
@@ -4042,7 +4094,7 @@
                    opacity: 0 !important;
                    pointer-events: none !important;
                 }
-                .hide-completely{
+                .hidden{
                     display: none;
                 }
                 .icon {
