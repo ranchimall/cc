@@ -174,6 +174,14 @@
                         <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
                     </svg>
                 </button>
+                <button class="icon-only" title="Refresh article" onclick="refreshArticle()">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                        fill="#000000">
+                        <path d="M0 0h24v24H0V0z" fill="none" />
+                        <path
+                            d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+                    </svg>
+                </button>
                 <sm-menu align-options="right" title="Admin options" class="admin-option">
                     <menu-option onclick="openPopup('create_article_popup')">
                         <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
@@ -510,13 +518,26 @@
                 <h3>plot</h3>
             </div>
         </header>
-        <details id="plot_wrapper" class="hidden">
-            <summary>Plot</summary>
-            <div id="plot_diagram"></div>
-        </details>
-        <div class="grid gap-0-5">
-            <h4>Article sections</h4>
-            <ul id="article_outline" class="flex flex-direction-column gap-1"></ul>
+        <div class="grid gap-2">
+            <details id="plot_wrapper" class="hidden">
+                <summary class="interact">
+                    <b style="font-size: 0.9rem;">See plot diagram</b>
+                    <svg class="icon down-arrow" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                        width="24px" fill="#000000">
+                        <path d="M0 0h24v24H0V0z" fill="none" />
+                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
+                    </svg>
+                </summary>
+                <div id="plot_diagram" style="line-height: 1.5;"></div>
+            </details>
+            <div class="grid gap-1">
+                <div class="flex align-center space-between">
+                    <h4>Article sections</h4>
+                    <button id="toggle_focus_mode" class="button hide" onclick="toggleFocusMode()">Turn on focus
+                        mode</button>
+                </div>
+                <ul id="article_outline" class="flex flex-direction-column gap-1"></ul>
+            </div>
         </div>
     </sm-popup>
     <sm-popup id="contributors_popup">
@@ -789,6 +810,9 @@
                 case 'article_list_popup':
                     renderArticleList()
                     break;
+                case 'plot_popup':
+                    getRef('toggle_focus_mode').textContent = floGlobals.focusMode.active ? 'Turn off focus mode' : 'Turn on focus mode'
+                    break;
             }
         })
         document.addEventListener('popupclosed', e => {
@@ -972,14 +996,6 @@
                 const urlSearchParams = new URLSearchParams('?' + searchParams);
                 params = Object.fromEntries(urlSearchParams.entries());
             }
-            if (firstLoad || params.articleID !== pagesData.params.articleID) {
-                if (!params.articleID)
-                    params['articleID'] = floGlobals.appObjects.cc.defaultArticle
-                await Promise.all([
-                    floCloudAPI.requestObjectData(params.articleID),
-                    floCloudAPI.requestGeneralData(`${params.articleID}_gd`)
-                ])
-            }
             switch (pageId) {
                 case 'landing':
                     targetPage = 'landing'
@@ -998,6 +1014,14 @@
                     break;
                 case 'home':
                 case 'main_page':
+                    if (firstLoad || params.articleID !== pagesData.params.articleID) {
+                        if (!params.articleID)
+                            params['articleID'] = floGlobals.appObjects.cc.defaultArticle
+                        await Promise.all([
+                            floCloudAPI.requestObjectData(params.articleID),
+                            floCloudAPI.requestGeneralData(`${params.articleID}_gd`)
+                        ])
+                    }
                     if (!floGlobals.currentArticle.id || params.articleID !== pagesData.params.articleID || params.focusMode !== pagesData.params.focusMode) {
                         closePopup()
                         render.article(params.articleID, params.focusMode === 'true')
@@ -1152,6 +1176,7 @@
             })
             return anime
         }
+
     </script>
     <script>
         // JS Diff
@@ -1664,7 +1689,10 @@
                                     You are only seeing one section assigned to you. Turn off focus mode to see all sections.
                                 </p>
                             </div>
-                            <a id="focus_mode_button" href="${`#/home?articleID=${id}&focusMode=false`}" class="button">Turn off</a>
+                            <div class="flex gap-0-3">
+                                <button class="button" onclick="openPopup('plot_popup')">View plot</button>
+                                <a id="focus_mode_button" href="${`#/home?articleID=${id}&focusMode=false`}" class="button">Turn off</a>
+                            </div>
                         </div>
                     `)
                     floGlobals.focusMode = {
@@ -1778,19 +1806,29 @@
             },
             sectionOutline() {
                 const sections = floGlobals.appObjects[floGlobals.currentArticle.id].sections.filter(v => v).map(({ id, title }) => {
-                    let shouldBeDisabled = floGlobals.focusMode.active && floGlobals.focusMode.assignedSection !== id
+                    let shouldBeDisabled
+                    let assignedState
+                    if (floGlobals.focusMode.active) {
+                        if (floGlobals.focusMode.assignedSection === id) {
+                            assignedState = 'assigned'
+                            assignedState = html`<span style="font-size: 0.8rem">Assigned</span>`
+                        } else {
+                            shouldBeDisabled = true
+                            assignedState = html`<button class="button enable-focus-button" data-section-id="${id}">Assign</button>`
+                        }
+                    }
                     return html.for(getRef('article_outline'), id)`
                         <div class="flex gap-0-5 align-center">
                         <button class="outline-button" data-section-id="${id}" ?disabled=${shouldBeDisabled}>
                             ${title}
                         </button>
-                        ${shouldBeDisabled ? html`<button class="button enable-focus-button" data-section-id="${id}">Focus</button>` : ''}
+                        ${assignedState}
                         </div> `
                 })
                 renderElem(getRef('article_outline'), html`${sections}`)
 
-                if (floGlobals.currentArticle.hasOwnProperty('plot')) {
-                    getRef('plot_diagram').textContent = floGlobals.currentArticle.plot
+                if (floGlobals.appObjects[floGlobals.currentArticle.id].hasOwnProperty('plot')) {
+                    getRef('plot_diagram').textContent = floGlobals.appObjects[floGlobals.currentArticle.id].plot
                     getRef('plot_wrapper').classList.remove('hidden')
                 } else {
                     getRef('plot_wrapper').classList.add('hidden')
@@ -2166,6 +2204,19 @@
                 closePopup()
             }
         })
+        function toggleFocusMode() {
+            closePopup()
+            floGlobals.focusMode.active = !floGlobals.focusMode.active
+            location.hash = `#/home?articleID=${floGlobals.currentArticle.id}&focusMode=${floGlobals.focusMode.active}`
+        }
+        async function refreshArticle() {
+            await Promise.all([
+                floCloudAPI.requestObjectData(floGlobals.currentArticle.id),
+                floCloudAPI.requestGeneralData(`${floGlobals.currentArticle.id}_gd`)
+            ])
+            render.article(floGlobals.currentArticle.id, floGlobals.focusMode.active)
+            notify('Article refreshed', 'success')
+        }
         function transformScroll(event) {
             if (!event.deltaY) {
                 return;

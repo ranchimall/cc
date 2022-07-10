@@ -443,16 +443,19 @@ ul {
 
 details summary {
   display: flex;
-  justify-content: space-between;
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
   cursor: pointer;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--accent-color);
 }
-details[open] > summary {
+
+details[open] summary {
   margin-bottom: 1rem;
 }
-details[open] > summary .icon {
+details[open] > summary .down-arrow {
   transform: rotate(180deg);
 }
 
@@ -574,9 +577,7 @@ sm-copy {
 }
 
 #main_header {
-  position: -webkit-sticky;
-  position: sticky;
-  top: 0;
+  position: relative;
   display: grid;
   gap: 1rem;
   padding: 1rem;
@@ -615,8 +616,10 @@ sm-copy {
   padding: 0.5rem 0;
   text-align: left;
   line-height: 1.7;
+  width: 100%;
 }
 .outline-button::before {
+  position: absolute;
   content: "";
   width: 0.3rem;
   border-radius: 0.5rem;
@@ -627,9 +630,16 @@ sm-copy {
   background-color: rgba(var(--text-color), 0.5);
   opacity: 0;
 }
+.outline-button--active {
+  padding-left: 1rem;
+}
 .outline-button--active::before {
   opacity: 1;
   background-color: var(--accent-color);
+}
+
+.enable-focus-button {
+  flex-shrink: 0;
 }
 
 .label {
@@ -667,12 +677,13 @@ sm-copy {
 }
 
 #article_list {
+  gap: 0 1.5rem;
   grid-template-columns: repeat(auto-fill, minmax(30ch, 1fr));
 }
 
 .article-link {
   position: relative;
-  padding: 1rem;
+  padding: 1rem 0;
   color: rgba(var(--text-color), 0.8);
   font-weight: 500;
   border-radius: 0.3rem;
@@ -750,6 +761,9 @@ sm-copy {
 }
 .heading button {
   margin-left: auto;
+}
+.heading .section-title {
+  line-height: 1.4;
 }
 
 .article-section {
