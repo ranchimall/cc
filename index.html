@@ -519,7 +519,7 @@
             </div>
         </header>
         <div class="grid gap-2">
-            <details id="plot_wrapper" class="hidden">
+            <details id="plot_wrapper" class="hidden" open>
                 <summary class="interact">
                     <b style="font-size: 0.9rem;">See plot diagram</b>
                     <svg class="icon down-arrow" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
@@ -593,10 +593,11 @@
                 </h4>
                 <p>
                     You can use your FLO private key to perform transaction on BTC network within our apps ecosystem.
+                    The private key is same for both.
                 </p>
             </div>
             <div class="grid gap-0-5">
-                <h5>My FLO ID</h5>
+                <h5>My FLO address</h5>
                 <sm-copy id="user_flo_id"></sm-copy>
             </div>
             <div class="grid gap-0-5">
@@ -1679,7 +1680,7 @@
                 }
                 getRef('current_article_title').textContent = title
                 getRef('article_wrapper').innerHTML = ''
-                if (!floGlobals.isSubAdmin && focusMode) {
+                if (!floGlobals.isSubAdmin && focusMode && floGlobals.appObjects.cc.defaultArticle === id) {
                     getRef('article_wrapper').append(render.section(assignedSection, sections[assignedSection]))
                     getRef('article_wrapper').append(html.node`
                         <div id="focus_mode_panel" class="flex align-center space-between">
@@ -1828,7 +1829,7 @@
                 renderElem(getRef('article_outline'), html`${sections}`)
 
                 if (floGlobals.appObjects[floGlobals.currentArticle.id].hasOwnProperty('plot')) {
-                    getRef('plot_diagram').textContent = floGlobals.appObjects[floGlobals.currentArticle.id].plot
+                    getRef('plot_diagram').innerText = floGlobals.appObjects[floGlobals.currentArticle.id].plot.replace(/->/g, '\n').replace(/\(|\)/g, '')
                     getRef('plot_wrapper').classList.remove('hidden')
                 } else {
                     getRef('plot_wrapper').classList.add('hidden')
