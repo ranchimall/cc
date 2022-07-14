@@ -201,7 +201,17 @@
                         </svg>
                         Edit title & sections
                     </menu-option>
-                    <menu-option onclick="setDefaultArticle()">
+                    <menu-option id="mark_as_wip" class="hidden" onclick="markAsWIP()">
+                        <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg"
+                            enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px"
+                            fill="#000000">
+                            <rect fill="none" height="24" width="24" />
+                            <path
+                                d="M22,12c0,5.52-4.48,10-10,10S2,17.52,2,12c0-2.76,1.12-5.26,2.93-7.07L12,12V2C17.52,2,22,6.48,22,12z" />
+                        </svg>
+                        Mark as WIP
+                    </menu-option>
+                    <menu-option id="mark_as_done" class="hidden" onclick="markAsDone()">
                         <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg"
                             enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px"
                             fill="#000000">
@@ -213,7 +223,7 @@
                                     d="M14,2H6C4.9,2,4.01,2.9,4.01,4L4,20c0,1.1,0.89,2,1.99,2H18c1.1,0,2-0.9,2-2V8L14,2z M18,20H6V4h7v5h5V20z M8.82,13.05 L7.4,14.46L10.94,18l5.66-5.66l-1.41-1.41l-4.24,4.24L8.82,13.05z" />
                             </g>
                         </svg>
-                        Make default article
+                        Mark as Done
                     </menu-option>
                 </sm-menu>
             </div>
@@ -422,14 +432,14 @@
         </header>
         <sm-form>
             <sm-input id="get_article_title" placeholder="Article title" required autofocus></sm-input>
-            <sm-checkbox id="set_default_checkbox" checked>
+            <!--             <sm-checkbox id="set_default_checkbox" checked>
                 <div class="grid margin-left-0-5 gap-0-5">
                     Set as default
                     <p style="font-size: 0.8rem;">
                         This article will be opened by default for everyone when CC is first loaded.
                     </p>
                 </div>
-            </sm-checkbox>
+            </sm-checkbox> -->
             <div class="grid gap-1">
                 <div class="grid gap-0-5">
                     <h4>Define plot (optional)</h4>
@@ -592,8 +602,8 @@
                     BTC integrated with FLO
                 </h4>
                 <p>
-                    You can use your FLO private key to perform transaction on BTC network within our apps ecosystem.
-                    The private key is same for both.
+                    You can use your FLO private key to perform transactions on the BTC network within our app
+                    ecosystem. The private key is the same for both.
                 </p>
             </div>
             <div class="grid gap-0-5">
@@ -997,6 +1007,14 @@
                 const urlSearchParams = new URLSearchParams('?' + searchParams);
                 params = Object.fromEntries(urlSearchParams.entries());
             }
+            if (firstLoad || params.articleID !== pagesData.params.articleID) {
+                if (!params.articleID)
+                    params['articleID'] = floGlobals.appObjects.cc.wipArticles[0]
+                await Promise.all([
+                    floCloudAPI.requestObjectData(params.articleID),
+                    floCloudAPI.requestGeneralData(`${params.articleID}_gd`)
+                ])
+            }
             switch (pageId) {
                 case 'landing':
                     targetPage = 'landing'
@@ -1015,17 +1033,16 @@
                     break;
                 case 'home':
                 case 'main_page':
-                    if (firstLoad || params.articleID !== pagesData.params.articleID) {
-                        if (!params.articleID)
-                            params['articleID'] = floGlobals.appObjects.cc.defaultArticle
-                        await Promise.all([
-                            floCloudAPI.requestObjectData(params.articleID),
-                            floCloudAPI.requestGeneralData(`${params.articleID}_gd`)
-                        ])
-                    }
                     if (!floGlobals.currentArticle.id || params.articleID !== pagesData.params.articleID || params.focusMode !== pagesData.params.focusMode) {
                         closePopup()
                         render.article(params.articleID, params.focusMode === 'true')
+                    }
+                    if (floGlobals.appObjects.cc.wipArticles.includes(params.articleID)) {
+                        getRef('mark_as_done').classList.remove('hidden')
+                        getRef('mark_as_wip').classList.add('hidden')
+                    } else {
+                        getRef('mark_as_done').classList.add('hidden')
+                        getRef('mark_as_wip').classList.remove('hidden')
                     }
                     hideVersionHistory()
                     window.history.replaceState('', '', `#/home?articleID=${params.articleID}&focusMode=${params.hasOwnProperty('focusMode') ? params.focusMode : 'true'}`)
@@ -1248,7 +1265,7 @@
             createNewArticle() {
                 if (floGlobals.isSubAdmin) {
                     const title = getRef('get_article_title').value.trim()
-                    const setDefault = getRef('set_default_checkbox').checked
+                    // const setDefault = getRef('set_default_checkbox').checked
                     const plot = getRef('get_plot').value.trim()
                     const sectionTitles = parsePlot(plot)
                     let sections = []
@@ -1261,8 +1278,8 @@
                         })
                     }
                     const uid = floCrypto.randString(16, true)
-                    if (setDefault)
-                        floGlobals.appObjects.cc['defaultArticle'] = uid
+                    if (!floGlobals.appObjects.cc['wipArticles'].includes(uid))
+                        floGlobals.appObjects.cc['wipArticles'].push(uid)
                     floGlobals.appObjects.cc['articleList'][uid] = {
                         title,
                         timestamp: Date.now(),
@@ -1320,16 +1337,54 @@
             return tstring;
         }
 
-        function setDefaultArticle() {
+        function markAsWIP() {
             if (floGlobals.isSubAdmin) {
-                getConfirmation('Set as default article?').then(res => {
+                getConfirmation('Mark as WIP article?').then(res => {
                     if (res) {
-                        floGlobals.appObjects.cc['defaultArticle'] = floGlobals.currentArticle.id
-                        floCloudAPI.updateObjectData('cc')
-                            .then((res) => {
-                                notify('Set current article as default', 'success')
-                            })
-                            .catch(err => console.error(err))
+                        if (!floGlobals.appObjects.cc['wipArticles'].includes(floGlobals.currentArticle.id)) {
+                            floGlobals.appObjects.cc['wipArticles'].push(floGlobals.currentArticle.id)
+                            floCloudAPI.updateObjectData('cc')
+                                .then((res) => {
+                                    notify('Marked current article as WIP', 'success')
+                                    if (floGlobals.appObjects.cc.wipArticles.includes(floGlobals.currentArticle.id)) {
+                                        getRef('mark_as_done').classList.remove('hidden')
+                                        getRef('mark_as_wip').classList.add('hidden')
+                                    } else {
+                                        getRef('mark_as_done').classList.add('hidden')
+                                        getRef('mark_as_wip').classList.remove('hidden')
+                                    }
+                                })
+                                .catch(err => console.error(err))
+                        } else {
+                            notify('Current article is already default', 'error')
+                        }
+                    }
+                })
+            } else {
+                notify('This action requires sub-admin privileges', 'error')
+            }
+        }
+        function markAsDone() {
+            if (floGlobals.isSubAdmin) {
+                getConfirmation('Mark as done article?').then(res => {
+                    if (res) {
+                        if (floGlobals.appObjects.cc['wipArticles'].includes(floGlobals.currentArticle.id)) {
+                            floGlobals.appObjects.cc['wipArticles'] = floGlobals.appObjects.cc['wipArticles'].filter(id => id != floGlobals.currentArticle.id)
+                            floCloudAPI.updateObjectData('cc')
+                                .then((res) => {
+                                    notify('Marked current article as done', 'success')
+                                    if (floGlobals.appObjects.cc.wipArticles.includes(floGlobals.currentArticle.id)) {
+                                        getRef('mark_as_done').classList.remove('hidden')
+                                        getRef('mark_as_wip').classList.add('hidden')
+                                    } else {
+                                        getRef('mark_as_done').classList.add('hidden')
+                                        getRef('mark_as_wip').classList.remove('hidden')
+                                    }
+                                })
+                                .catch(err => console.error(err))
+                        } else {
+                            notify('Current article is already done', 'error')
+                        }
                     }
                 })
             } else {
@@ -1680,7 +1735,7 @@
                 }
                 getRef('current_article_title').textContent = title
                 getRef('article_wrapper').innerHTML = ''
-                if (!floGlobals.isSubAdmin && focusMode && floGlobals.appObjects.cc.defaultArticle === id) {
+                if (!floGlobals.isSubAdmin && focusMode && floGlobals.appObjects.cc.wipArticles.includes(id)) {
                     getRef('article_wrapper').append(render.section(assignedSection, sections[assignedSection]))
                     getRef('article_wrapper').append(html.node`
                         <div id="focus_mode_panel" class="flex align-center space-between">
@@ -2416,9 +2471,8 @@
         getRef('sort_article_list').addEventListener('change', e => { renderArticleList() })
 
         function renderArticleList(articleList) {
-            const defaultArticle = floGlobals.appObjects.cc.defaultArticle;
             const articlesList = (articleList || getArticleList()).map((article) => {
-                const isDefaultArticle = defaultArticle === article.uid
+                const isDefaultArticle = floGlobals.appObjects.cc.wipArticles.includes(article.uid)
                 return render.articleLink(article, isDefaultArticle, getRef('article_list'))
             })
             renderElem(getRef('article_list'), html`${articlesList}`)
