@@ -1008,8 +1008,11 @@
                 params = Object.fromEntries(urlSearchParams.entries());
             }
             if (firstLoad || params.articleID !== pagesData.params.articleID) {
-                if (!params.articleID)
-                    params['articleID'] = floGlobals.appObjects.cc.wipArticles[0]
+                if (!params.articleID) {
+                    // if no articleID is provided, get a random article from work-in-progress
+                    const randomArticle = floCrypto.randInt(0, floGlobals.appObjects.cc.wipArticles.length - 1)
+                    params['articleID'] = floGlobals.appObjects.cc.wipArticles[randomArticle]
+                }
                 await Promise.all([
                     floCloudAPI.requestObjectData(params.articleID),
                     floCloudAPI.requestGeneralData(`${params.articleID}_gd`)
@@ -1278,8 +1281,8 @@
                         })
                     }
                     const uid = floCrypto.randString(16, true)
-                    if (!floGlobals.appObjects.cc['wipArticles'].includes(uid))
-                        floGlobals.appObjects.cc['wipArticles'].push(uid)
+                    if (!floGlobals.appObjects.cc.wipArticles.includes(uid))
+                        floGlobals.appObjects.cc.wipArticles.push(uid)
                     floGlobals.appObjects.cc['articleList'][uid] = {
                         title,
                         timestamp: Date.now(),
@@ -1341,8 +1344,8 @@
             if (floGlobals.isSubAdmin) {
                 getConfirmation('Mark as WIP article?').then(res => {
                     if (res) {
-                        if (!floGlobals.appObjects.cc['wipArticles'].includes(floGlobals.currentArticle.id)) {
-                            floGlobals.appObjects.cc['wipArticles'].push(floGlobals.currentArticle.id)
+                        if (!floGlobals.appObjects.cc.wipArticles.includes(floGlobals.currentArticle.id)) {
+                            floGlobals.appObjects.cc.wipArticles.push(floGlobals.currentArticle.id)
                             floCloudAPI.updateObjectData('cc')
                                 .then((res) => {
                                     notify('Marked current article as WIP', 'success')
@@ -1368,8 +1371,8 @@
             if (floGlobals.isSubAdmin) {
                 getConfirmation('Mark as done article?').then(res => {
                     if (res) {
-                        if (floGlobals.appObjects.cc['wipArticles'].includes(floGlobals.currentArticle.id)) {
-                            floGlobals.appObjects.cc['wipArticles'] = floGlobals.appObjects.cc['wipArticles'].filter(id => id != floGlobals.currentArticle.id)
+                        if (floGlobals.appObjects.cc.wipArticles.includes(floGlobals.currentArticle.id)) {
+                            floGlobals.appObjects.cc.wipArticles = floGlobals.appObjects.cc.wipArticles.filter(id => id && id !== floGlobals.currentArticle.id)
                             floCloudAPI.updateObjectData('cc')
                                 .then((res) => {
                                     notify('Marked current article as done', 'success')
