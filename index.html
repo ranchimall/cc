@@ -1016,7 +1016,7 @@
                     // remove empty slots from array
                     floGlobals.appObjects.cc.wipArticles = floGlobals.appObjects.cc.wipArticles.filter(v => v)
                     // if no articleID is provided, get a random article from work-in-progress
-                    const randomArticle = floCrypto.randInt(0, floGlobals.appObjects.cc.wipArticles.filter(v => v).length - 1)
+                    const randomArticle = floCrypto.randInt(0, floGlobals.appObjects.cc.wipArticles.length - 1)
                     params['articleID'] = floGlobals.appObjects.cc.wipArticles[randomArticle]
                 }
                 await Promise.all([
