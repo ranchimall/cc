@@ -500,8 +500,7 @@ sm-copy {
   }
 }
 
-#sign_in,
-#sign_up {
+#sign_in {
   grid-template-rows: auto 1fr;
   align-items: center;
   section {
@@ -517,18 +516,18 @@ sm-copy {
   }
 }
 #sign_up {
+  grid-template-rows: auto 1fr;
+  align-items: center;
+  header {
+    padding: 1.5rem 0;
+  }
+  keys-generator {
+    justify-self: center;
+    width: min(26rem, 100%);
+    margin-top: -4rem;
+  }
   .h2 {
     margin-bottom: 0.5rem;
-  }
-  .card {
-    margin: 1.5rem 0;
-  }
-  h5 {
-    font-weight: 500;
-    color: rgba(var(--text-color), 0.8);
-  }
-  .warning {
-    margin-top: 2rem;
   }
 }
 #loading {
@@ -1160,6 +1159,7 @@ sm-copy {
   }
   .interact:not([disabled]),
   .button:not([disabled]),
+  .button:not(.button--primary),
   button:not(.button--primary):not([disabled]) {
     transition: background-color 0.3s;
     &:hover {
@@ -1168,6 +1168,7 @@ sm-copy {
   }
   .button--primary {
     transition: filter 0.3s;
+    background-color: var(--accent-color) !important;
     &:hover {
       filter: brightness(120%);
     }
