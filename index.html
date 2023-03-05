@@ -882,7 +882,7 @@
             }
         }
 
-        window.addEventListener('hashchange', e => showPage(window.location.hash))
+        window.addEventListener('hashchange', e => routeTo(window.location.hash))
         window.addEventListener("load", () => {
             document.body.classList.remove('hidden')
             document.querySelectorAll('sm-input[data-private-key]').forEach(input => input.customValidation = floCrypto.getPubKeyHex)
@@ -937,8 +937,8 @@
             params: {}
         }
 
-        async function showPage(targetPage, options = {}) {
-            const { firstLoad, hashChange, isPreview } = options
+        async function routeTo(targetPage, options = {}) {
+            const { firstLoad, hashChange, isPreview, redirected } = options
             let pageId
             let params = {}
             let searchParams
@@ -968,6 +968,9 @@
             if (isPreview) {
                 floGlobals.preview = location.hash;
             }
+            if (redirected) {
+                floGlobals.redirectToArticle = location.hash
+            }
             if (typeof floGlobals.myFloID === "undefined" && !(['sign_up', 'sign_in', 'loading', 'landing'].includes(pageId))) return
             if (searchParams) {
                 const urlSearchParams = new URLSearchParams('?' + searchParams);
@@ -986,6 +989,7 @@
                     floCloudAPI.requestGeneralData(`${params.articleID}_gd`)
                 ])
             }
+            console.log(params)
             switch (pageId) {
                 case 'landing':
                     targetPage = 'landing'
@@ -2721,19 +2725,19 @@
         function getSignedIn() {
             return new Promise((resolve, reject) => {
                 if (window.location.hash.includes('sign_in') || window.location.hash.includes('sign_up')) {
-                    showPage(window.location.hash)
+                    routeTo(window.location.hash)
                 } else {
-                    showPage('landing', { isPreview: location.hash.includes('preview') })
+                    routeTo('landing', { isPreview: location.hash.includes('preview'), redirected: location.hash.includes('articleID') })
                 }
                 getRef('sign_in_button').onclick = () => {
                     resolve(getRef('private_key_field').value.trim())
                     getRef('private_key_field').value = ''
-                    showPage('loading')
+                    routeTo('loading')
                 }
                 getRef('sign_up_button').onclick = () => {
                     resolve(getRef('keys_generator').keys.privKey);
                     getRef('keys_generator').clearKeys();
-                    showPage('loading')
+                    routeTo('loading')
                 }
             })
         }
@@ -2824,10 +2828,10 @@
                     </sm-button>
                 `
                 if (window.location.hash.includes('sign_in') || window.location.hash.includes('sign_up')) {
-                    const hash = floGlobals.preview ? floGlobals.preview : ' '
+                    const hash = floGlobals.preview || floGlobals.redirectToArticle || ' '
                     history.replaceState(null, null, hash)
                 }
-                showPage(window.location.hash, { firstLoad: true })
+                routeTo(window.location.hash, { firstLoad: true })
                 console.log(result)
             }).catch(error => console.error(error))
         }
