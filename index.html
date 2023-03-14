@@ -230,10 +230,10 @@
         <section id="options_panel" class="flex hidden">
             <div id="filter_panel" class="flex w-100 align-center gap-1 ">
                 <h5>Sort by</h5>
-                <strip-select id="sort_content_list" label="Sort by:">
-                    <strip-option value="score" selected>Score</strip-option>
-                    <strip-option value="time">Most recent</strip-option>
-                </strip-select>
+                <sm-chips id="sort_content_list" label="Sort by:">
+                    <sm-chip value="score" selected>Score</sm-chip>
+                    <sm-chip value="time">Most recent</sm-chip>
+                </sm-chips>
             </div>
         </section>
         <div id="text_toolbar" class="hidden">
@@ -394,14 +394,6 @@
         </header>
         <sm-form>
             <sm-input id="get_article_title" placeholder="Article title" required autofocus></sm-input>
-            <!--             <sm-checkbox id="set_default_checkbox" checked>
-                <div class="grid margin-left-0-5 gap-0-5">
-                    Set as default
-                    <p style="font-size: 0.8rem;">
-                        This article will be opened by default for everyone when CC is first loaded.
-                    </p>
-                </div>
-            </sm-checkbox> -->
             <div class="grid gap-1">
                 <div class="grid gap-0-5">
                     <h4>Define plot (optional)</h4>

@@ -479,18 +479,22 @@ details[open] > summary .down-arrow {
 
 sm-select,
 sm-option,
-strip-option {
+sm-chip {
   font-size: 0.9rem;
 }
 
-strip-select {
-  --gap: 0;
+sm-chips {
+  --gap: 0.3rem;
 }
 
-strip-option {
+sm-chip {
   font-weight: 500;
-  --border-radius: 0.3rem;
-  --active-option-color: var(--accent-color);
+  --border-radius: 0.5rem;
+  --background: rgba(var(--text-color), 0.06);
+}
+sm-chip[selected] {
+  color: rgba(var(--background-color), 1);
+  --background: var(--accent-color);
 }
 
 sm-checkbox {
