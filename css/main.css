@@ -125,7 +125,7 @@ a:any-link:focus-visible {
 sm-input,
 sm-textarea,
 tags-input {
-  font-size: 0.9rem;
+  font-size: 1rem;
   --border-radius: 0.3rem;
 }
 
@@ -379,6 +379,24 @@ ul {
 }
 .icon-button .icon {
   fill: var(--accent-color);
+}
+
+.multi-state-button {
+  display: grid;
+  text-align: center;
+  align-items: center;
+  justify-items: center;
+}
+.multi-state-button > * {
+  grid-area: 1/1/2/2;
+}
+.multi-state-button button {
+  z-index: 1;
+  width: 100%;
+}
+.multi-state-button sm-spinner {
+  --height: 1em;
+  --width: 1em;
 }
 
 #confirmation_popup,
@@ -716,6 +734,10 @@ sm-copy {
   font-weight: 500;
   font-size: 0.9rem;
 }
+.section-card .handle {
+  cursor: -webkit-grab;
+  cursor: grab;
+}
 .section-card input {
   background-color: rgba(var(--text-color), 0.06);
   padding: 0.8rem;
@@ -741,7 +763,7 @@ sm-copy {
   display: flex;
   flex-direction: column;
   padding: 1rem;
-  gap: 1rem 0;
+  gap: 1.5rem 0;
   height: 100%;
   overflow-y: auto;
   scroll-padding-top: 1.5rem;
@@ -810,7 +832,7 @@ sm-copy {
   border-radius: inherit;
   padding: 1rem;
   white-space: pre-line;
-  font-size: 0.9rem;
+  font-size: 1rem;
   line-height: 1.7;
   color: rgba(var(--text-color), 0.8);
   background-color: rgba(var(--text-color), 0.02);
@@ -827,6 +849,10 @@ sm-copy {
 .content__area:focus-within {
   outline: none;
   box-shadow: 0 0 0 0.1rem var(--accent-color) inset;
+}
+.content__area > * {
+  font-family: inherit;
+  font-size: 1rem;
 }
 
 .content__options {
@@ -1253,4 +1279,23 @@ button:not(.button--primary):not([disabled]):hover {
   .preview-group .preview-group__buttons:focus-within {
     opacity: 1;
   }
+}
+.gu-mirror {
+  position: fixed;
+  z-index: 9999 !important;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.16);
+}
+
+.gu-hide {
+  display: none !important;
+}
+
+.gu-unselectable {
+  -webkit-user-select: none !important;
+     -moz-user-select: none !important;
+          user-select: none !important;
+}
+
+.gu-transit {
+  opacity: 0.2;
 }

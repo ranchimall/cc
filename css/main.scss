@@ -116,7 +116,7 @@ a:any-link:focus-visible {
 sm-input,
 sm-textarea,
 tags-input {
-  font-size: 0.9rem;
+  font-size: 1rem;
   --border-radius: 0.3rem;
 }
 sm-button {
@@ -364,6 +364,23 @@ ul {
   height: max-content;
   .icon {
     fill: var(--accent-color);
+  }
+}
+.multi-state-button {
+  display: grid;
+  text-align: center;
+  align-items: center;
+  justify-items: center;
+  & > * {
+    grid-area: 1/1/2/2;
+  }
+  button {
+    z-index: 1;
+    width: 100%;
+  }
+  sm-spinner {
+    --height: 1em;
+    --width: 1em;
   }
 }
 #confirmation_popup,
@@ -670,6 +687,9 @@ sm-copy {
 .section-card {
   font-weight: 500;
   font-size: 0.9rem;
+  .handle {
+    cursor: grab;
+  }
   input {
     background-color: rgba(var(--text-color), 0.06);
     padding: 0.8rem;
@@ -695,7 +715,7 @@ sm-copy {
   display: flex;
   flex-direction: column;
   padding: 1rem;
-  gap: 1rem 0;
+  gap: 1.5rem 0;
   height: 100%;
   overflow-y: auto;
   scroll-padding-top: 1.5rem;
@@ -761,7 +781,7 @@ sm-copy {
   border-radius: inherit;
   padding: 1rem;
   white-space: pre-line;
-  font-size: 0.9rem;
+  font-size: 1rem;
   line-height: 1.7;
   color: rgba(var(--text-color), 0.8);
   background-color: rgba(var(--text-color), 0.02);
@@ -777,6 +797,10 @@ sm-copy {
   &:focus-within {
     outline: none;
     box-shadow: 0 0 0 0.1rem var(--accent-color) inset;
+  }
+  & > * {
+    font-family: inherit;
+    font-size: 1rem;
   }
 }
 .content__options {
@@ -1199,4 +1223,20 @@ sm-copy {
       opacity: 1;
     }
   }
+}
+
+// dragula styles
+.gu-mirror {
+  position: fixed;
+  z-index: 9999 !important;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.16);
+}
+.gu-hide {
+  display: none !important;
+}
+.gu-unselectable {
+  user-select: none !important;
+}
+.gu-transit {
+  opacity: 0.2;
 }
