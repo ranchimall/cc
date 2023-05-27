@@ -594,6 +594,7 @@ sm-copy {
 }
 #loading sm-spinner {
   margin-bottom: 1.5rem;
+  justify-self: center;
 }
 
 #main_header {
