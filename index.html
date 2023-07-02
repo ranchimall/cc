@@ -584,7 +584,7 @@
             </button>
             <h3>Update score</h3>
         </header>
-        <sm-form>
+        <sm-form id="update_score_form">
             <sm-input id="update_score_field" class="outlined" placeholder="Score" type="number" step="0.1" min="0"
                 max="100" error-text="Value must be between 1-100" autofocus animate required hiderequired></sm-input>
             <div id="inc_section" class="flex">
@@ -1785,7 +1785,7 @@
         function getScoreElement(score) {
             let scoreElement
             if (floGlobals.isSubAdmin) {
-                scoreElement = html.node`<button class="score-button" title="Score this content"></button>`
+                scoreElement = html.node`<button class="score-button" title="Score this content" onclick="initScoreChange(event)"></button>`
             } else {
                 scoreElement = html.node`<div class="flex align-center" title="Score"></div>`
             }
@@ -2190,19 +2190,14 @@
                     })
                     floGlobals.currentArticle.sections[sectionID].expanded = true
                 }
-            } else if (e.target.closest('.score-button') && floGlobals.isSubAdmin) {
-                floGlobals.versionHistory.currentEntry = e.target.closest('.content-card').dataset.vectorClock
-                getRef('update_score_field').value = e.target.closest('.score-button').children[1].textContent
-                openPopup('scoring_popup')
             }
         })
-        getRef('version_timeline').addEventListener('click', e => {
-            if (e.target.closest('.score-button') && floGlobals.isSubAdmin) {
-                floGlobals.versionHistory.currentEntry = e.target.closest('.history-entry').dataset.vectorClock
-                getRef('update_score_field').value = e.target.closest('.score-button').children[1].textContent
-                openPopup('scoring_popup')
-            }
-        })
+        function initScoreChange(e) {
+            floGlobals.versionHistory.currentEntry = e.target.closest('.history-entry, .content-card').dataset.vectorClock
+            getRef('update_score_field').value = e.target.closest('.score-button').children[1].textContent
+            openPopup('scoring_popup')
+            getRef('update_score_form')._checkValidity()
+        }
         getRef('article_wrapper').addEventListener("paste", e => {
             const paste = (event.clipboardData || window.clipboardData).getData('text');
 
