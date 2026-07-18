@@ -1978,7 +1978,6 @@
                 }
                 render.sectionOutline()
             },
-
             articleLink(details, isDefaultArticle, ref) {
                 const { uid, timestamp, title } = details
                 return html.for(ref, uid)`<a class="${`article-link flex interact ${isDefaultArticle ? 'default-article' : ''}`}" title=${isDefaultArticle ? 'Actively written article' : ''}  href="${`#/home?articleID=${uid}&focusMode=true`}">${title}</a>`
